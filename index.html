@@ -214,13 +214,13 @@
     </div>
 
     <div class="media-box">
-      <label id="lblGrab">Subir audio <span class="opt">— de WhatsApp, opcional</span></label>
+      <label id="lblGrab">Subir grabación <span class="opt">— audio o vídeo, opcional</span></label>
       <div id="audioActual" style="display:none;margin-bottom:6px">
         <div id="audioActualPlayer"></div>
         <label class="chk"><input type="checkbox" id="f-quitar-audio" /> Quitar la grabación actual</label>
       </div>
-      <input id="f-grab-file" type="file" accept="audio/*" />
-      <p class="hint" id="hintGrab">Tu nota de voz de WhatsApp o un audio de clase · hasta 50 MB.</p>
+      <input id="f-grab-file" type="file" accept="audio/*,video/*" />
+      <p class="hint" id="hintGrab">Audio de WhatsApp o un vídeo corto de clase · hasta 50 MB por archivo.</p>
     </div>
 
     <div class="media-box">
@@ -474,7 +474,7 @@ function pintarEstado(){
   const el=$("#estado"), txt=$("#estadoTxt");
   if(MODO==="nube"){ el.classList.remove("local"); txt.innerHTML="Conectado · el cuaderno se comparte con <b>toda la clase</b>"; }
   else{ el.classList.add("local"); txt.innerHTML="Modo local · solo se guarda en <b>este dispositivo</b>. Revisa que <b>config.js</b> tenga tus claves de Supabase.";
-    const hg=$("#hintGrab"); if(hg) hg.innerHTML="Para subir audios necesitas Supabase. En modo local, usa el YouTube de referencia."; }
+    const hg=$("#hintGrab"); if(hg) hg.innerHTML="Para subir archivos necesitas Supabase. En modo local, usa el YouTube de referencia."; }
 }
 
 /* ---------- Modal añadir/editar ---------- */
@@ -487,7 +487,7 @@ function abrir(id){
   ["f-estilo","f-titulo","f-cantaor","f-letra","f-youtube","f-autor"].forEach(i=>$("#"+i).value="");
   $("#f-grab-file").value=""; $("#f-palo-nuevo").value=""; $("#f-palo-nuevo").style.display="none";
   $("#f-quitar-audio").checked=false; $("#audioActual").style.display="none"; $("#audioActualPlayer").innerHTML="";
-  $("#hintGrab").textContent="Tu nota de voz de WhatsApp o un audio de clase · hasta 50 MB.";
+  $("#hintGrab").textContent="Audio de WhatsApp o un vídeo corto de clase · hasta 50 MB por archivo.";
   const sel=$("#f-palo");
   if(EDITING){
     const it=byId(EDITING);
@@ -501,7 +501,7 @@ function abrir(id){
         $("#audioActualPlayer").innerHTML = esAudio(it.audio_url)
           ? `<audio controls preload="none" src="${escapar(it.audio_url)}"></audio>`
           : `<a href="${escapar(it.audio_url)}" target="_blank" rel="noopener" style="color:var(--vino)">Abrir grabación actual →</a>`;
-        $("#hintGrab").textContent="Sube otro audio para reemplazar el actual · hasta 50 MB.";
+        $("#hintGrab").textContent="Sube otro archivo para reemplazar el actual · hasta 50 MB.";
       }
     }
   } else { sel.selectedIndex=0; }
@@ -529,8 +529,8 @@ $("#guardar").onclick = async ()=>{
 
   const grabFile=$("#f-grab-file").files[0];
   if(grabFile){
-    if(MODO!=="nube"){ alert("Para subir audios necesitas conectar Supabase (ver README). De momento, usa el YouTube de referencia."); return; }
-    if(grabFile.size>MAX_MB*1024*1024){ alert(`El audio supera los ${MAX_MB} MB.`); return; }
+    if(MODO!=="nube"){ alert("Para subir archivos necesitas conectar Supabase (ver README). De momento, usa el YouTube de referencia."); return; }
+    if(grabFile.size>MAX_MB*1024*1024){ alert(`El archivo supera los ${MAX_MB} MB. Para vídeos largos, usa un enlace de YouTube de referencia.`); return; }
   }
 
   const editIt = EDITING ? byId(EDITING) : null;
