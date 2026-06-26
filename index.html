@@ -55,10 +55,20 @@
   .btn.danger{background:var(--papel);color:var(--vino);border:1px solid #e7c9cd}
   .btn.danger:hover{background:#fbeef0;border-color:var(--vino)}
 
-  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 4px}
-  .chip{border:1px solid var(--linea);background:var(--papel);color:var(--tinta-2);padding:7px 14px;border-radius:999px;font-size:.86rem;cursor:pointer;font-family:"Spectral",serif;transition:all .18s;white-space:nowrap}
-  .chip:hover{color:var(--tinta);border-color:var(--oro)}
-  .chip[aria-pressed="true"]{background:var(--tinta);color:var(--cal);border-color:var(--tinta);font-weight:500}
+  .btn-icon{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border:1px solid var(--linea);background:var(--papel);color:var(--tinta);border-radius:50%;cursor:pointer;box-shadow:var(--sombra-sm);transition:all .15s}
+  .btn-icon:hover{border-color:var(--oro);color:var(--vino)}
+  /* Drawer menú de palos */
+  .drawer-overlay{position:fixed;inset:0;z-index:60;display:none;background:rgba(42,33,26,.45);backdrop-filter:blur(2px)}
+  .drawer-overlay.open{display:block}
+  .drawer{position:absolute;left:0;top:0;bottom:0;width:min(82vw,300px);background:var(--cal);border-right:1px solid var(--linea);box-shadow:0 0 50px -10px rgba(40,26,12,.5);padding:18px 16px;overflow-y:auto;transform:translateX(-6px);display:flex;flex-direction:column;gap:4px}
+  .drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .drawer-head span{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.4rem;color:var(--tinta)}
+  .menu-item{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;border:0;background:none;font-family:"Spectral",serif;font-size:1.02rem;color:var(--tinta);padding:11px 12px;border-radius:10px;cursor:pointer;border-left:3px solid transparent;transition:background .15s}
+  .menu-item:hover{background:var(--papel-2)}
+  .menu-item.on{background:var(--papel);border-left-color:var(--palo,var(--vino));font-weight:600}
+  .menu-item .cnt{font-size:.78rem;color:var(--tinta-2);background:var(--papel-2);border:1px solid var(--linea);border-radius:999px;padding:1px 9px}
+  .menu-sep{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-2);margin:14px 12px 4px}
+  .ptag{display:inline-block;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--palo,var(--oro));margin-bottom:2px}
 
   .estado{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;color:var(--tinta-2);margin:6px 0 8px;padding:7px 13px;border-radius:999px;background:var(--papel);border:1px solid var(--linea)}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--oro)}
@@ -174,13 +184,13 @@
     <div class="estado" id="estado"><span class="dot"></span><span id="estadoTxt">Comprobando…</span></div>
 
     <div class="toolbar">
+      <button class="btn-icon" id="abrirMenu" aria-label="Menú de palos"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
       <label class="search">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         <input id="buscar" type="search" placeholder="Buscar por palo, título, cantaor, letra…" aria-label="Buscar" />
       </label>
       <button class="btn btn-vino" id="abrirAdd">＋ Añadir cante</button>
     </div>
-    <div class="chips" id="chips"></div>
 
     <div id="board"></div>
 
@@ -193,6 +203,14 @@
   </div>
 
   <div id="detail"></div>
+</div>
+
+<!-- Menú lateral de palos -->
+<div class="drawer-overlay" id="menuDrawer">
+  <nav class="drawer">
+    <div class="drawer-head"><span>Navegar</span><button class="close-x" id="cerrarMenu" aria-label="Cerrar">×</button></div>
+    <div id="menuLista"></div>
+  </nav>
 </div>
 
 <!-- Modal: añadir / editar cante -->
@@ -321,7 +339,14 @@ async function anadir(item){
 }
 async function actualizar(id, patch){
   if(MODO==="nube"){
-    try{ const { data } = await conReintento(p=>sb.from("materiales").update(p).eq("id", id).select(), patch); return data?.[0] || true; }
+    try{
+      const { data } = await conReintento(p=>sb.from("materiales").update(p).eq("id", id).select(), patch);
+      if(!data || data.length===0){
+        alert("La edición no se guardó: falta el permiso de edición en Supabase.\n\nEjecuta en el SQL Editor:\n\ncreate policy \"edicion_publica\" on materiales for update to anon, authenticated using (true) with check (true);\ngrant update on table materiales to anon, authenticated;\nnotify pgrst, 'reload schema';");
+        return null;
+      }
+      return data[0];
+    }
     catch(e){ alert("No se pudo actualizar: "+e.message); return null; }
   }
   const a=leerMatLocal(); const i=a.findIndex(x=>String(x.id)===String(id));
@@ -362,7 +387,7 @@ async function guardarPaloDB(nombre){
 }
 
 /* ---------- Estado ---------- */
-let DATOS = [], CUSTOM_PALOS = [], filtro = "todo", q = "", EDITING = null, audiosEstado = [], audiosBorrar = [];
+let DATOS = [], CUSTOM_PALOS = [], filtro = "recientes", q = "", EDITING = null, audiosEstado = [], audiosBorrar = [];
 
 function palosConocidos(){ const usados=DATOS.map(d=>d.palo).filter(Boolean); return [...new Set([...BASE_PALOS, ...CUSTOM_PALOS, ...usados])]; }
 function ordenPalo(n){ const i=BASE_PALOS.indexOf(n); return i>=0?i:1000+(n||"").toLowerCase().charCodeAt(0); }
@@ -386,9 +411,16 @@ function byId(id){ return DATOS.find(x=>String(x.id)===String(id)); }
 
 /* ---------- Tablón (compacto) ---------- */
 const board = $("#board");
-function tarjeta(it){
+function ultimaActividad(it){
+  let t = it.creado ? new Date(it.creado).getTime() : 0;
+  if(Array.isArray(it.historial)) for(const h of it.historial){ const x=h.cuando?new Date(h.cuando).getTime():0; if(x>t)t=x; }
+  if(it.editado){ const x=new Date(it.editado).getTime(); if(x>t)t=x; }
+  return t||0;
+}
+function tarjeta(it, mostrarPalo){
   const col=colorPalo(it.palo);
   const titulo=it.titulo||it.estilo||it.palo||"Sin título";
+  const ptag = mostrarPalo ? `<div class="ptag" style="--palo:${col}">${escapar(it.palo||"")}</div>` : "";
   const estilo=(it.estilo && it.estilo!==titulo)?`<div class="metaline">${escapar(it.estilo)}</div>`:"";
   const hist=Array.isArray(it.historial)?it.historial:(it.editor?[{por:it.editor,cuando:it.editado}]:[]);
   const ult=hist[hist.length-1];
@@ -398,6 +430,7 @@ function tarjeta(it){
   if(nAud) marcas.push(`<span class="mk" title="Audios">♪${nAud>1?nAud:""}</span>`);
   if(youtubeId(it.video_url)) marcas.push('<span class="mk" title="Tiene YouTube">YT</span>');
   return `<article class="card" style="--palo:${col}" tabindex="0" role="button" onclick="verCante('${it.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();verCante('${it.id}')}">
+    ${ptag}
     <h3>${escapar(titulo)}</h3>
     ${estilo}
     ${editado}
@@ -408,30 +441,47 @@ function tarjeta(it){
     </div>
   </article>`;
 }
+function seccion(titulo, col, arr, mostrarPalo){
+  return `<section class="palo-sec">
+    <div class="palo-head" style="--palo:${col}"><h2>${escapar(titulo)}</h2><span class="n">${arr.length} ${arr.length===1?"cante":"cantes"}</span><span class="rule"></span></div>
+    <div class="grid">${arr.map(it=>tarjeta(it, mostrarPalo)).join("")}</div>
+  </section>`;
+}
+function vacio(){
+  board.innerHTML=`<div class="empty">
+    <h3>${DATOS.length?"Nada por aquí":"El tablón aún está sin estrenar"}</h3>
+    <p>${DATOS.length?"Prueba con otro palo (menú ☰) o con otra búsqueda.":"Sube el primer cante: por soleá, por seguiriya, por lo que toque en clase."}</p>
+    <button class="btn btn-vino" onclick="document.getElementById('abrirAdd').click()">＋ Añadir el primero</button>
+  </div>`;
+}
 function render(){
   const ql=q.trim().toLowerCase();
-  const items=DATOS.filter(it=>{
-    if(filtro!=="todo" && (it.palo||"")!==filtro) return false;
-    if(!ql) return true;
-    return [it.palo,it.titulo,it.estilo,it.cantaor,it.letra,it.autor].join(" ").toLowerCase().includes(ql);
-  });
-  if(!items.length){
-    board.innerHTML=`<div class="empty">
-      <h3>${DATOS.length?"Nada por aquí":"El tablón aún está sin estrenar"}</h3>
-      <p>${DATOS.length?"Prueba con otro palo o con otra búsqueda.":"Sube el primer cante: por soleá, por seguiriya, por lo que toque en clase."}</p>
-      <button class="btn btn-vino" onclick="document.getElementById('abrirAdd').click()">＋ Añadir el primero</button>
-    </div>`;
+  // Búsqueda: muestra todo lo que coincide, agrupado por palo
+  if(ql){
+    const items=DATOS.filter(it=>[it.palo,it.titulo,it.estilo,it.cantaor,it.letra,it.autor].join(" ").toLowerCase().includes(ql));
+    if(!items.length) return vacio();
+    const grupos={}; items.forEach(it=>{ const k=it.palo||"Sin clasificar"; (grupos[k]=grupos[k]||[]).push(it); });
+    board.innerHTML=Object.keys(grupos).sort((a,b)=>ordenPalo(a)-ordenPalo(b)).map(p=>seccion(p, colorPalo(p), grupos[p], false)).join("");
     return;
   }
-  const grupos={}; items.forEach(it=>{ const k=it.palo||"Sin clasificar"; (grupos[k]=grupos[k]||[]).push(it); });
-  const claves=Object.keys(grupos).sort((a,b)=>ordenPalo(a)-ordenPalo(b));
-  board.innerHTML=claves.map(palo=>{
-    const col=colorPalo(palo), arr=grupos[palo];
-    return `<section class="palo-sec">
-      <div class="palo-head" style="--palo:${col}"><h2>${escapar(palo)}</h2><span class="n">${arr.length} ${arr.length===1?"cante":"cantes"}</span><span class="rule"></span></div>
-      <div class="grid">${arr.map(tarjeta).join("")}</div>
-    </section>`;
-  }).join("");
+  // Recientes (pantalla principal): 10 últimas actualizaciones
+  if(filtro==="recientes"){
+    const recientes=[...DATOS].sort((a,b)=>ultimaActividad(b)-ultimaActividad(a)).slice(0,10);
+    if(!recientes.length) return vacio();
+    board.innerHTML=seccion("Últimas actualizaciones", "var(--vino)", recientes, true);
+    return;
+  }
+  // Todos los palos: agrupado
+  if(filtro==="todo"){
+    if(!DATOS.length) return vacio();
+    const grupos={}; DATOS.forEach(it=>{ const k=it.palo||"Sin clasificar"; (grupos[k]=grupos[k]||[]).push(it); });
+    board.innerHTML=Object.keys(grupos).sort((a,b)=>ordenPalo(a)-ordenPalo(b)).map(p=>seccion(p, colorPalo(p), grupos[p], false)).join("");
+    return;
+  }
+  // Un palo concreto
+  const arr=DATOS.filter(it=>(it.palo||"")===filtro);
+  if(!arr.length) return vacio();
+  board.innerHTML=seccion(filtro, colorPalo(filtro), arr, false);
 }
 
 /* ---------- Página de detalle ---------- */
@@ -509,18 +559,27 @@ async function borrarCante(id){
   const it=byId(id); if(!it) return;
   if(!confirm("¿Quitar este cante del tablón?")) return;
   for(const p of audiosDe(it).map(a=>a.path).filter(Boolean)) await borrarArchivo(p);
-  if(await borrar(id)){ DATOS=DATOS.filter(x=>String(x.id)!==String(id)); location.hash=""; pintarChips(); render(); }
+  if(await borrar(id)){ DATOS=DATOS.filter(x=>String(x.id)!==String(id)); location.hash=""; render(); }
 }
 function editarCante(id){ abrir(id); }
 window.borrarCante=borrarCante; window.editarCante=editarCante;
 
 /* ---------- Chips ---------- */
-function pintarChips(){
-  const usados=[...new Set(DATOS.map(d=>d.palo).filter(Boolean))].sort((a,b)=>ordenPalo(a)-ordenPalo(b));
-  const all=[{k:"todo",l:"Todos"}].concat(usados.map(p=>({k:p,l:p})));
-  $("#chips").innerHTML=all.map(c=>`<button class="chip" data-f="${escapar(c.k)}" aria-pressed="${c.k===filtro}">${escapar(c.l)}</button>`).join("");
-  $("#chips").querySelectorAll(".chip").forEach(b=>{ b.onclick=()=>{ filtro=b.dataset.f; pintarChips(); render(); }; });
+function pintarMenu(){
+  const usados={}; DATOS.forEach(d=>{ if(d.palo) usados[d.palo]=(usados[d.palo]||0)+1; });
+  const palos=Object.keys(usados).sort((a,b)=>ordenPalo(a)-ordenPalo(b));
+  let html =`<button class="menu-item ${filtro==='recientes'?'on':''}" data-f="recientes">Últimas actualizaciones</button>`;
+  html+=`<button class="menu-item ${filtro==='todo'?'on':''}" data-f="todo">Todos los palos <span class="cnt">${DATOS.length}</span></button>`;
+  if(palos.length) html+=`<div class="menu-sep">Por palo</div>`;
+  html+=palos.map(p=>`<button class="menu-item ${filtro===p?'on':''}" data-f="${escapar(p)}" style="--palo:${colorPalo(p)}">${escapar(p)} <span class="cnt">${usados[p]}</span></button>`).join("");
+  $("#menuLista").innerHTML=html;
+  $("#menuLista").querySelectorAll(".menu-item").forEach(b=>{ b.onclick=()=>{ filtro=b.dataset.f; q=""; $("#buscar").value=""; cerrarMenu(); render(); window.scrollTo(0,0); }; });
 }
+function abrirMenu(){ pintarMenu(); $("#menuDrawer").classList.add("open"); }
+function cerrarMenu(){ $("#menuDrawer").classList.remove("open"); }
+$("#abrirMenu").onclick=abrirMenu;
+$("#cerrarMenu").onclick=cerrarMenu;
+$("#menuDrawer").addEventListener("click",e=>{ if(e.target===$("#menuDrawer")) cerrarMenu(); });
 
 /* ---------- Select de palo ---------- */
 function pintarSelectPalo(){
@@ -601,7 +660,7 @@ function cerrar(){ overlay.classList.remove("open"); }
 $("#abrirAdd").onclick=()=>abrir();
 $("#cerrar").onclick=cerrar; $("#cancelar").onclick=cerrar;
 overlay.addEventListener("click",e=>{ if(e.target===overlay) cerrar(); });
-document.addEventListener("keydown",e=>{ if(e.key==="Escape") cerrar(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ cerrar(); cerrarMenu(); } });
 $("#buscar").addEventListener("input",e=>{ q=e.target.value; render(); });
 
 $("#guardar").onclick = async ()=>{
@@ -653,7 +712,7 @@ $("#guardar").onclick = async ()=>{
       const eraEdicion = !!EDITING;
       CUSTOM_PALOS = await listarPalos();
       DATOS = await listar();
-      pintarChips(); cerrar(); EDITING=null;
+      cerrar(); EDITING=null;
       if(eraEdicion && location.hash.startsWith("#cante=")) renderRoute(); else render();
     }
   }catch(e){ alert("No se pudo guardar: "+(e.message||e)); }
@@ -669,7 +728,7 @@ $("#guardar").onclick = async ()=>{
   pintarCompas(); pintarEstado();
   CUSTOM_PALOS = await listarPalos();
   DATOS = await listar();
-  pintarChips(); render(); renderRoute();
+  render(); renderRoute();
 })();
 </script>
 </body>
