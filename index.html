@@ -7,19 +7,14 @@
 <meta name="description" content="El cuaderno vivo de la clase de cante de El Cuchillero, organizado por palos." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;0,6..96,900;1,6..96,500;1,6..96,700&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;0,6..96,900;1,6..96,500;1,6..96,700&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --cal:#F6F1E6;        /* fondo de cal cálido */
-    --papel:#FFFFFF;      /* fichas */
-    --papel-2:#FBF6EC;    /* superficies suaves */
-    --linea:#E6DCC8;      /* hairlines */
-    --linea-2:#D8CCB4;
-    --tinta:#2A211A;      /* texto principal */
-    --tinta-2:#7A6C59;    /* texto secundario */
+    --cal:#F6F1E6; --papel:#FFFFFF; --papel-2:#FBF6EC;
+    --linea:#E6DCC8; --linea-2:#D8CCB4;
+    --tinta:#2A211A; --tinta-2:#7A6C59;
     --vino:#8E1E2C; --vino-claro:#AE2E3E;
-    --oro:#B5852F; --oro-claro:#D3A546;
-    --azulejo:#2F6F8F;
+    --oro:#B5852F; --oro-claro:#D3A546; --azulejo:#2F6F8F;
     --maxw:1180px; --r:14px;
     --sombra:0 14px 34px -20px rgba(70,45,20,.45);
     --sombra-sm:0 6px 18px -12px rgba(70,45,20,.4);
@@ -27,36 +22,25 @@
   }
   *{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
-  body{
-    margin:0;
-    background:
-      radial-gradient(1100px 600px at 82% -6%, rgba(142,30,44,.07), transparent 60%),
-      radial-gradient(900px 540px at 2% 2%, rgba(181,133,47,.08), transparent 55%),
-      var(--cal);
-    color:var(--tinta); font-family:"Spectral",Georgia,serif; line-height:1.55; min-height:100vh;
-  }
+  body{margin:0;background:radial-gradient(1100px 600px at 82% -6%, rgba(142,30,44,.07), transparent 60%),radial-gradient(900px 540px at 2% 2%, rgba(181,133,47,.08), transparent 55%),var(--cal);color:var(--tinta);font-family:"Spectral",Georgia,serif;line-height:1.55;min-height:100vh}
   body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:var(--paper);mix-blend-mode:multiply;opacity:.5}
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(16px,4vw,22px);position:relative;z-index:1}
   a{color:inherit}
   button{font-family:inherit}
 
-  /* Hero */
   header.hero{padding:clamp(30px,6vw,48px) 0 18px}
   .eyebrow{font-size:.76rem;letter-spacing:.3em;text-transform:uppercase;color:var(--vino);font-weight:600;margin:0 0 14px;display:flex;align-items:center;gap:12px}
   .eyebrow::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--linea-2),transparent)}
   h1.title{font-family:"Bodoni Moda",serif;font-weight:900;font-size:clamp(2.5rem,9vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em;color:var(--tinta)}
   h1.title em{font-style:italic;font-weight:700;color:var(--vino)}
-  .lede{margin:16px 0 0;max-width:54ch;font-size:clamp(1rem,2.6vw,1.12rem);color:var(--tinta-2);font-weight:400}
+  .lede{margin:16px 0 0;max-width:54ch;font-size:clamp(1rem,2.6vw,1.12rem);color:var(--tinta-2)}
 
-  /* Compás (sin título, golpes en 7 y 8) */
+  /* Compás: golpes 3,7,8,10,12 resaltados solo al pasar */
   .compas{margin:26px 0 4px;display:flex;align-items:center;gap:10px}
-  .beat{width:11px;height:11px;border-radius:50%;background:#E7DCC6;border:1px solid var(--linea-2);transition:transform .25s,background .25s,box-shadow .25s,border-color .25s;cursor:default}
-  .beat.acc{width:15px;height:15px;background:var(--vino);border-color:var(--vino)}
-  .beat.on{background:var(--oro);border-color:var(--oro);box-shadow:0 0 12px rgba(181,133,47,.55);transform:scale(1.22)}
-  .beat.acc.on{background:var(--vino-claro);box-shadow:0 0 14px rgba(174,46,62,.5)}
-  .beat:hover{transform:scale(1.18)}
+  .beat{width:11px;height:11px;border-radius:50%;background:#E7DCC6;border:1px solid var(--linea-2);transition:transform .2s,background .2s,box-shadow .2s,border-color .2s}
+  .beat.on{background:var(--oro);border-color:var(--oro);transform:scale(1.15);box-shadow:0 0 10px rgba(181,133,47,.4)}
+  .beat.on-acc{background:var(--vino);border-color:var(--vino);transform:scale(1.55);box-shadow:0 0 18px rgba(142,30,44,.55)}
 
-  /* Toolbar */
   .toolbar{position:sticky;top:0;z-index:5;margin:14px 0 8px;padding:12px 0;background:linear-gradient(180deg,var(--cal) 72%,rgba(246,241,230,0));display:flex;gap:12px;align-items:center;flex-wrap:wrap}
   .search{flex:1 1 240px;display:flex;align-items:center;gap:10px;background:var(--papel);border:1px solid var(--linea);border-radius:999px;padding:11px 16px;min-width:0;box-shadow:var(--sombra-sm)}
   .search input{flex:1;background:none;border:0;outline:0;color:var(--tinta);font-family:"Spectral",serif;font-size:1rem;min-width:0}
@@ -68,6 +52,8 @@
   .btn-vino:hover{background:var(--vino-claro)}
   .btn-ghost{background:var(--papel);color:var(--tinta-2);border:1px solid var(--linea)}
   .btn-ghost:hover{color:var(--tinta);border-color:var(--linea-2)}
+  .btn.danger{background:var(--papel);color:var(--vino);border:1px solid #e7c9cd}
+  .btn.danger:hover{background:#fbeef0;border-color:var(--vino)}
 
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 4px}
   .chip{border:1px solid var(--linea);background:var(--papel);color:var(--tinta-2);padding:7px 14px;border-radius:999px;font-size:.86rem;cursor:pointer;font-family:"Spectral",serif;transition:all .18s;white-space:nowrap}
@@ -79,7 +65,6 @@
   .estado.local .dot{background:var(--vino)}
   .estado b{color:var(--tinta);font-weight:500}
 
-  /* Secciones por palo */
   .palo-sec{margin:28px 0 6px}
   .palo-head{display:flex;align-items:baseline;gap:14px;margin:0 0 16px}
   .palo-head h2{font-family:"Bodoni Moda",serif;font-weight:700;font-size:clamp(1.45rem,4.5vw,2.1rem);margin:0;color:var(--tinta)}
@@ -87,27 +72,39 @@
   .palo-head .rule{flex:1;height:0;border-top:1px solid var(--linea);position:relative;top:-4px;min-width:24px}
   .palo-head .rule::after{content:"";position:absolute;left:0;top:0;width:46px;border-top:2px solid var(--palo,var(--oro))}
 
-  .grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr))}
-  .card{background:var(--papel);border:1px solid var(--linea);border-radius:var(--r);padding:20px 20px 16px;position:relative;overflow:hidden;box-shadow:var(--sombra);display:flex;flex-direction:column;gap:11px}
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr))}
+  .card{background:var(--papel);border:1px solid var(--linea);border-radius:var(--r);padding:18px 18px 14px;position:relative;overflow:hidden;box-shadow:var(--sombra-sm);display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:box-shadow .15s,transform .15s}
+  .card:hover,.card:focus-visible{box-shadow:var(--sombra);transform:translateY(-2px);outline:none}
   .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--palo,var(--oro))}
-  .card h3{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.4rem;margin:0;line-height:1.14;color:var(--tinta);word-break:break-word}
-  .card .metaline{font-size:.85rem;color:var(--tinta-2);letter-spacing:.02em}
-  .card .metaline b{color:var(--vino);font-weight:600}
-  .card .letra{margin:0;color:#4a4035;font-size:.99rem;white-space:pre-wrap;font-style:italic;border-left:2px solid var(--linea-2);padding-left:12px;display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden}
-  .card audio{width:100%;height:38px}
-  .card .video-embed{position:relative;width:100%;padding-top:56.25%;border-radius:8px;overflow:hidden;background:#000}
-  .card .video-embed iframe,.card .video-embed video{position:absolute;inset:0;width:100%;height:100%;border:0}
-  .card .foot{margin-top:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--linea)}
-  .who{font-size:.82rem;color:var(--tinta-2);flex:1;min-width:0}
+  .card h3{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.3rem;margin:0;line-height:1.15;color:var(--tinta);word-break:break-word}
+  .card .metaline{font-size:.86rem;color:var(--tinta-2)}
+  .card .foot{margin-top:auto;display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--linea)}
+  .who{font-size:.8rem;color:var(--tinta-2);flex:1;min-width:0}
   .who b{color:var(--tinta);font-weight:600}
-  .open{text-decoration:none;font-size:.84rem;color:var(--tinta);background:var(--papel-2);border:1px solid var(--linea);padding:7px 12px;border-radius:8px;display:inline-flex;gap:7px;align-items:center;transition:background .15s}
-  .open:hover{background:#f1e9da}
-  .del{background:none;border:0;color:#b0a08c;cursor:pointer;font-size:.95rem;padding:6px;line-height:1;border-radius:6px}
-  .del:hover{color:var(--vino)}
+  .ver{font-size:.8rem;color:var(--palo,var(--oro));font-weight:600;white-space:nowrap}
 
   .empty{text-align:center;padding:clamp(48px,10vw,72px) 20px;border:1px dashed var(--linea-2);border-radius:var(--r);color:var(--tinta-2);background:var(--papel-2)}
   .empty h3{font-family:"Bodoni Moda",serif;color:var(--tinta);font-size:1.6rem;margin:0 0 8px}
   .empty p{margin:0 auto 22px;max-width:42ch}
+
+  /* Página de detalle */
+  #detail{display:none}
+  .detalle{max-width:760px;margin:0 auto;padding:clamp(18px,4vw,36px) 0}
+  .back{background:none;border:0;color:var(--tinta-2);font-family:"Spectral",serif;font-size:.96rem;cursor:pointer;padding:8px 0;margin-bottom:14px}
+  .back:hover{color:var(--vino)}
+  .detalle .eyebrow{color:var(--palo,var(--vino))}
+  .dtitulo{font-family:"Bodoni Moda",serif;font-weight:900;font-size:clamp(2rem,6.5vw,3.4rem);line-height:1.03;margin:4px 0 8px;color:var(--tinta)}
+  .dmeta{color:var(--tinta-2);font-size:1.05rem;margin-bottom:26px}
+  .dmeta b{color:var(--vino);font-weight:600}
+  .dletra{font-family:"Spectral",serif;font-style:italic;font-size:clamp(1.1rem,3vw,1.28rem);line-height:1.75;white-space:pre-wrap;color:#3c332a;border-left:3px solid var(--palo,var(--oro));padding:6px 0 6px 18px;margin:0 0 28px}
+  .dmedia{margin:0 0 22px}
+  .dmedia audio{width:100%}
+  .dmedia .video-embed{position:relative;width:100%;padding-top:56.25%;border-radius:10px;overflow:hidden;background:#000}
+  .dmedia .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .cap{display:block;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-2);font-weight:600;margin-bottom:8px}
+  .dfoot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-top:1px solid var(--linea);padding-top:18px;color:var(--tinta-2);font-size:.92rem}
+  .dfoot b{color:var(--tinta)}
+  .dactions{display:flex;gap:10px}
 
   /* Modal */
   .overlay{position:fixed;inset:0;z-index:50;display:none;align-items:flex-start;justify-content:center;background:rgba(42,33,26,.45);backdrop-filter:blur(3px);padding:clamp(14px,4vw,28px) 14px;overflow-y:auto}
@@ -129,6 +126,9 @@
   .media-box{border:1px solid var(--linea);border-radius:12px;padding:13px 14px;margin-bottom:15px;background:var(--papel-2)}
   .media-box > label{display:block;font-size:.77rem;letter-spacing:.1em;text-transform:uppercase;color:var(--oro);margin:0 0 8px;font-weight:600}
   .media-box > label .opt{color:#a99a83;font-weight:400;text-transform:none;letter-spacing:0}
+  .chk{display:flex !important;align-items:center;gap:8px;font-size:.9rem;color:var(--tinta);text-transform:none !important;letter-spacing:0 !important;margin-top:8px}
+  .chk input{width:auto !important}
+  #audioActual audio{width:100%}
   .modal-actions{display:flex;gap:12px;margin-top:8px;justify-content:flex-end;flex-wrap:wrap}
   .close-x{position:absolute;top:14px;right:14px;background:none;border:0;color:var(--tinta-2);font-size:1.7rem;cursor:pointer;line-height:1}
   .close-x:hover{color:var(--tinta)}
@@ -140,46 +140,46 @@
   footer .mini-compas span.a{background:var(--vino)}
 
   :focus-visible{outline:2px solid var(--oro);outline-offset:2px}
-  @media (max-width:600px){
-    .row2{grid-template-columns:1fr}
-    .toolbar .btn{flex:1 1 auto;text-align:center}
-    footer{flex-direction:column;align-items:flex-start;gap:12px}
-  }
+  @media (max-width:600px){.row2{grid-template-columns:1fr}.toolbar .btn{flex:1 1 auto;text-align:center}footer{flex-direction:column;align-items:flex-start;gap:12px}}
   @media (prefers-reduced-motion:reduce){.beat{transition:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <header class="hero">
-    <p class="eyebrow" id="eyebrow">Tablón de la clase · El Cuchillero</p>
-    <h1 class="title" id="titulo">El cante <em>a cuchillo</em></h1>
-    <p class="lede" id="lede">El cuaderno vivo de la clase, ordenado por palos. Cada cante con su título, su letra y sus grabaciones. Lo llenamos entre todos.</p>
-    <div class="compas" id="compas" aria-hidden="true"></div>
-  </header>
+  <div id="main">
+    <header class="hero">
+      <p class="eyebrow" id="eyebrow">Tablón de la clase · El Cuchillero</p>
+      <h1 class="title" id="titulo">El cante <em>a cuchillo</em></h1>
+      <p class="lede" id="lede">El cuaderno vivo de la clase, ordenado por palos. Pulsa un cante para ver la letra y escucharlo. Lo llenamos entre todos.</p>
+      <div class="compas" id="compas" aria-hidden="true"></div>
+    </header>
 
-  <div class="estado" id="estado"><span class="dot"></span><span id="estadoTxt">Comprobando…</span></div>
+    <div class="estado" id="estado"><span class="dot"></span><span id="estadoTxt">Comprobando…</span></div>
 
-  <div class="toolbar">
-    <label class="search">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-      <input id="buscar" type="search" placeholder="Buscar por palo, título, cantaor, letra…" aria-label="Buscar" />
-    </label>
-    <button class="btn btn-vino" id="abrirAdd">＋ Añadir cante</button>
-  </div>
-  <div class="chips" id="chips"></div>
-
-  <div id="board"></div>
-
-  <footer>
-    <span>El cante a cuchillo · sube tu cante cuando lo tengas.</span>
-    <div class="mini-compas" aria-hidden="true">
-      <span></span><span></span><span></span><span></span><span></span><span></span><span class="a"></span><span class="a"></span><span></span><span></span><span></span><span></span>
+    <div class="toolbar">
+      <label class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="buscar" type="search" placeholder="Buscar por palo, título, cantaor, letra…" aria-label="Buscar" />
+      </label>
+      <button class="btn btn-vino" id="abrirAdd">＋ Añadir cante</button>
     </div>
-  </footer>
+    <div class="chips" id="chips"></div>
+
+    <div id="board"></div>
+
+    <footer>
+      <span>El cante a cuchillo · sube tu cante cuando lo tengas.</span>
+      <div class="mini-compas" aria-hidden="true">
+        <span></span><span></span><span class="a"></span><span></span><span></span><span></span><span class="a"></span><span class="a"></span><span></span><span class="a"></span><span></span><span class="a"></span>
+      </div>
+    </footer>
+  </div>
+
+  <div id="detail"></div>
 </div>
 
-<!-- Modal: añadir cante -->
+<!-- Modal: añadir / editar cante -->
 <div class="overlay" id="overlay">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTit">
     <button class="close-x" id="cerrar" aria-label="Cerrar">×</button>
@@ -214,22 +214,19 @@
     </div>
 
     <div class="media-box">
-      <label>Audio <span class="opt">— opcional</span></label>
-      <input id="f-audio-url" type="url" placeholder="Enlace (SoundCloud, Drive…)" />
-      <input id="f-audio-file" type="file" accept="audio/*" />
-      <p class="hint" id="hintAudio">O sube un archivo de audio · hasta 50 MB.</p>
+      <label id="lblGrab">Subir audio <span class="opt">— de WhatsApp, opcional</span></label>
+      <div id="audioActual" style="display:none;margin-bottom:6px">
+        <div id="audioActualPlayer"></div>
+        <label class="chk"><input type="checkbox" id="f-quitar-audio" /> Quitar la grabación actual</label>
+      </div>
+      <input id="f-grab-file" type="file" accept="audio/*" />
+      <p class="hint" id="hintGrab">Tu nota de voz de WhatsApp o un audio de clase · hasta 50 MB.</p>
     </div>
 
     <div class="media-box">
-      <label>Vídeo <span class="opt">— opcional</span></label>
-      <input id="f-video-url" type="url" placeholder="Enlace de YouTube (se ve dentro de la web)" />
-      <input id="f-video-file" type="file" accept="video/*" />
-      <p class="hint" id="hintVideo">Para vídeos largos, mejor un enlace de YouTube.</p>
-    </div>
-
-    <div class="field">
-      <label for="f-autor">Quién lo sube <span class="req">•</span></label>
-      <input id="f-autor" placeholder="Tu nombre" maxlength="40" />
+      <label>YouTube de referencia <span class="opt">— opcional</span></label>
+      <input id="f-youtube" type="url" placeholder="https://youtube.com/…  (se ve dentro de la web)" />
+      <p class="hint">El cante de referencia en YouTube. No ocupa espacio tuyo.</p>
     </div>
 
     <div class="modal-actions">
@@ -256,7 +253,7 @@ const BASE_PALOS = ["Soleá","Seguiriya","Bulerías","Tangos","Tientos","Fandang
 const PALETA = ["#A12B38","#B5852F","#AA4F2A","#6E7A35","#2F6F8F","#8C5A2C","#7A2230","#9E7A2C","#5A4E86"];
 const MAX_MB = 50, BUCKET = "material";
 const LS_MAT = "cuchillo_materiales_v1", LS_PALOS = "cuchillo_palos_v1";
-const COMPAS_ACC = [7,8]; // golpes marcados
+const COMPAS_ACC = [3,7,8,10,12];
 
 /* ---------- Conexión ---------- */
 let sb = null, MODO = "local";
@@ -284,13 +281,23 @@ async function anadir(item){
   }
   const a = leerMatLocal(); item.id = "loc-"+Date.now(); a.unshift(item); guardarMatLocal(a); return item;
 }
+async function actualizar(id, patch){
+  if(MODO==="nube"){
+    const { data, error } = await sb.from("materiales").update(patch).eq("id", id).select();
+    if(error){ alert("No se pudo actualizar: "+error.message); return null; }
+    return data?.[0] || true;
+  }
+  const a=leerMatLocal(); const i=a.findIndex(x=>String(x.id)===String(id));
+  if(i<0) return null;
+  a[i]={...a[i], ...patch}; guardarMatLocal(a); return a[i];
+}
 async function borrar(id){
   if(MODO==="nube"){
     const { error } = await sb.from("materiales").delete().eq("id", id);
     if(error){ alert("No se pudo borrar: "+error.message); return false; }
     return true;
   }
-  guardarMatLocal(leerMatLocal().filter(x=>x.id!==id)); return true;
+  guardarMatLocal(leerMatLocal().filter(x=>String(x.id)!==String(id))); return true;
 }
 async function subir(file){
   const limpio = file.name.replace(/[^a-zA-Z0-9.\-_]/g,"_");
@@ -300,6 +307,7 @@ async function subir(file){
   const { data } = sb.storage.from(BUCKET).getPublicUrl(path);
   return { url:data.publicUrl, path };
 }
+async function borrarArchivo(path){ if(path && MODO==="nube"){ try{ await sb.storage.from(BUCKET).remove([path]); }catch(e){ console.warn(e); } } }
 
 /* ---------- Datos: palos ---------- */
 function leerPalosLocal(){ try{ return JSON.parse(localStorage.getItem(LS_PALOS)||"[]"); }catch{ return []; } }
@@ -312,223 +320,249 @@ async function listarPalos(){
   return leerPalosLocal();
 }
 async function guardarPaloDB(nombre){
-  if(MODO==="nube"){
-    try{ const { error } = await sb.from("palos").insert({ nombre }); if(error) throw error; return; }
-    catch(e){ console.warn(e.message); }
-  }
+  if(MODO==="nube"){ try{ const { error } = await sb.from("palos").insert({ nombre }); if(error) throw error; return; }catch(e){ console.warn(e.message); } }
   const a = leerPalosLocal(); if(!a.includes(nombre)){ a.push(nombre); guardarPalosLocal(a); }
 }
 
 /* ---------- Estado ---------- */
-let DATOS = [], CUSTOM_PALOS = [], filtro = "todo", q = "";
+let DATOS = [], CUSTOM_PALOS = [], filtro = "todo", q = "", EDITING = null;
 
-function palosConocidos(){
-  const usados = DATOS.map(d=>d.palo).filter(Boolean);
-  return [...new Set([...BASE_PALOS, ...CUSTOM_PALOS, ...usados])];
-}
+function palosConocidos(){ const usados=DATOS.map(d=>d.palo).filter(Boolean); return [...new Set([...BASE_PALOS, ...CUSTOM_PALOS, ...usados])]; }
 function ordenPalo(n){ const i=BASE_PALOS.indexOf(n); return i>=0?i:1000+(n||"").toLowerCase().charCodeAt(0); }
 function colorPalo(n){ let h=0; for(const c of (n||"")) h=(h+c.charCodeAt(0))%PALETA.length; return PALETA[h]; }
 
 /* ---------- Helpers ---------- */
 const $ = s => document.querySelector(s);
 function escapar(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-function fecha(iso){ if(!iso) return ""; const d=new Date(iso); return isNaN(d)?"":d.toLocaleDateString("es-ES",{day:"numeric",month:"short"}); }
+function fecha(iso){ if(!iso) return ""; const d=new Date(iso); return isNaN(d)?"":d.toLocaleDateString("es-ES",{day:"numeric",month:"short",year:"numeric"}); }
 function esAudio(u){ return u && /\.(mp3|m4a|wav|ogg|oga|aac|opus|flac)$/.test(u.split("?")[0].toLowerCase()); }
 function esVideoFile(u){ return u && /\.(mp4|webm|mov|m4v)$/.test(u.split("?")[0].toLowerCase()); }
 function youtubeId(u){ if(!u) return null; const m=u.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/); return m?m[1]:null; }
+function byId(id){ return DATOS.find(x=>String(x.id)===String(id)); }
 
-/* ---------- Render ---------- */
+/* ---------- Tablón (compacto) ---------- */
 const board = $("#board");
-
 function tarjeta(it){
-  const col = colorPalo(it.palo);
-  const titulo = it.titulo || it.estilo || it.palo || "Sin título";
-  const metaParts = [];
-  if(it.estilo && it.estilo!==titulo) metaParts.push(escapar(it.estilo));
-  if(it.cantaor) metaParts.push(`<b>${escapar(it.cantaor)}</b>`);
-  const meta = metaParts.length ? `<div class="metaline">${metaParts.join(" · ")}</div>` : "";
-
-  let audio = "";
-  if(esAudio(it.audio_url)) audio = `<audio controls preload="none" src="${escapar(it.audio_url)}"></audio>`;
-  else if(it.audio_url) audio = `<a class="open" href="${escapar(it.audio_url)}" target="_blank" rel="noopener">Escuchar
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></a>`;
-
-  let video = "", videoLink = "";
-  const yt = youtubeId(it.video_url);
-  if(yt) video = `<div class="video-embed"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${yt}" title="Vídeo" allow="encrypted-media;picture-in-picture" allowfullscreen></iframe></div>`;
-  else if(esVideoFile(it.video_url)) video = `<div class="video-embed"><video controls preload="none" src="${escapar(it.video_url)}"></video></div>`;
-  else if(it.video_url) videoLink = `<a class="open" href="${escapar(it.video_url)}" target="_blank" rel="noopener">Ver vídeo
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></a>`;
-
-  return `<article class="card" style="--palo:${col}">
+  const col=colorPalo(it.palo);
+  const titulo=it.titulo||it.estilo||it.palo||"Sin título";
+  const estilo=(it.estilo && it.estilo!==titulo)?`<div class="metaline">${escapar(it.estilo)}</div>`:"";
+  return `<article class="card" style="--palo:${col}" tabindex="0" role="button" onclick="verCante('${it.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();verCante('${it.id}')}">
     <h3>${escapar(titulo)}</h3>
-    ${meta}
-    ${it.letra?`<p class="letra">${escapar(it.letra)}</p>`:""}
-    ${audio}
-    ${video}
+    ${estilo}
     <div class="foot">
       <span class="who">${it.autor?`<b>${escapar(it.autor)}</b> · `:""}${fecha(it.creado)}</span>
-      ${videoLink}
-      <button class="del" title="Borrar" onclick="quitar('${it.id}')">✕</button>
+      <span class="ver">Ver →</span>
     </div>
   </article>`;
 }
-
 function render(){
-  const ql = q.trim().toLowerCase();
-  const items = DATOS.filter(it=>{
+  const ql=q.trim().toLowerCase();
+  const items=DATOS.filter(it=>{
     if(filtro!=="todo" && (it.palo||"")!==filtro) return false;
     if(!ql) return true;
     return [it.palo,it.titulo,it.estilo,it.cantaor,it.letra,it.autor].join(" ").toLowerCase().includes(ql);
   });
-
   if(!items.length){
-    board.innerHTML = `<div class="empty">
+    board.innerHTML=`<div class="empty">
       <h3>${DATOS.length?"Nada por aquí":"El tablón aún está sin estrenar"}</h3>
       <p>${DATOS.length?"Prueba con otro palo o con otra búsqueda.":"Sube el primer cante: por soleá, por seguiriya, por lo que toque en clase."}</p>
       <button class="btn btn-vino" onclick="document.getElementById('abrirAdd').click()">＋ Añadir el primero</button>
     </div>`;
     return;
   }
-
-  const grupos = {};
-  items.forEach(it=>{ const k = it.palo || "Sin clasificar"; (grupos[k]=grupos[k]||[]).push(it); });
-  const claves = Object.keys(grupos).sort((a,b)=>ordenPalo(a)-ordenPalo(b));
-
-  board.innerHTML = claves.map(palo=>{
-    const col = colorPalo(palo), arr = grupos[palo];
+  const grupos={}; items.forEach(it=>{ const k=it.palo||"Sin clasificar"; (grupos[k]=grupos[k]||[]).push(it); });
+  const claves=Object.keys(grupos).sort((a,b)=>ordenPalo(a)-ordenPalo(b));
+  board.innerHTML=claves.map(palo=>{
+    const col=colorPalo(palo), arr=grupos[palo];
     return `<section class="palo-sec">
-      <div class="palo-head" style="--palo:${col}">
-        <h2>${escapar(palo)}</h2>
-        <span class="n">${arr.length} ${arr.length===1?"cante":"cantes"}</span>
-        <span class="rule"></span>
-      </div>
+      <div class="palo-head" style="--palo:${col}"><h2>${escapar(palo)}</h2><span class="n">${arr.length} ${arr.length===1?"cante":"cantes"}</span><span class="rule"></span></div>
       <div class="grid">${arr.map(tarjeta).join("")}</div>
     </section>`;
   }).join("");
 }
 
-async function quitar(id){
-  if(!confirm("¿Quitar este cante del tablón?")) return;
-  const it = DATOS.find(x=>x.id===id);
-  if(it && MODO==="nube"){
-    const paths = [it.audio_path, it.video_path].filter(Boolean);
-    if(paths.length){ try{ await sb.storage.from(BUCKET).remove(paths); }catch(e){ console.warn(e); } }
-  }
-  if(await borrar(id)){ DATOS = DATOS.filter(x=>x.id!==id); render(); }
+/* ---------- Página de detalle ---------- */
+function mediaHTML(it){
+  let grab="";
+  if(esAudio(it.audio_url)) grab=`<div class="dmedia"><span class="cap">Grabación</span><audio controls preload="none" src="${escapar(it.audio_url)}"></audio></div>`;
+  else if(esVideoFile(it.audio_url)) grab=`<div class="dmedia"><span class="cap">Grabación</span><div class="video-embed"><video controls preload="none" src="${escapar(it.audio_url)}" style="position:absolute;inset:0;width:100%;height:100%"></video></div></div>`;
+  else if(it.audio_url) grab=`<div class="dmedia"><a class="back" href="${escapar(it.audio_url)}" target="_blank" rel="noopener">Abrir grabación →</a></div>`;
+  let ref=""; const yt=youtubeId(it.video_url);
+  if(yt) ref=`<div class="dmedia"><span class="cap">Referencia</span><div class="video-embed"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${yt}" title="Referencia" allow="encrypted-media;picture-in-picture" allowfullscreen></iframe></div></div>`;
+  else if(it.video_url) ref=`<div class="dmedia"><a class="back" href="${escapar(it.video_url)}" target="_blank" rel="noopener">Ver referencia →</a></div>`;
+  return grab+ref;
 }
-window.quitar = quitar;
+function renderDetalle(id){
+  const cont=$("#detail"); const it=byId(id);
+  if(!it){ cont.innerHTML=`<div class="detalle"><button class="back" onclick="volver()">← Volver al tablón</button><p>Ese cante ya no está disponible.</p></div>`; return; }
+  const col=colorPalo(it.palo);
+  const metaParts=[];
+  if(it.estilo) metaParts.push(escapar(it.estilo));
+  if(it.cantaor) metaParts.push(`<b>${escapar(it.cantaor)}</b>`);
+  const dmeta = metaParts.length?`<div class="dmeta">${metaParts.join(" · ")}</div>`:"";
+  cont.innerHTML=`<div class="detalle" style="--palo:${col}">
+    <button class="back" onclick="volver()">← Volver al tablón</button>
+    <p class="eyebrow">${escapar(it.palo||"")}</p>
+    <h1 class="dtitulo">${escapar(it.titulo||it.estilo||"Sin título")}</h1>
+    ${dmeta}
+    ${it.letra?`<div class="dletra">${escapar(it.letra)}</div>`:""}
+    ${mediaHTML(it)}
+    <div class="dfoot">
+      <span>Subido por <b>${escapar(it.autor||"—")}</b> · ${fecha(it.creado)}</span>
+      <div class="dactions">
+        <button class="btn btn-ghost" onclick="editarCante('${it.id}')">Editar</button>
+        <button class="btn danger" onclick="borrarCante('${it.id}')">Borrar</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- Rutas ---------- */
+function renderRoute(){
+  const m=location.hash.match(/^#cante=(.+)$/);
+  if(m){ renderDetalle(decodeURIComponent(m[1])); $("#main").style.display="none"; $("#detail").style.display="block"; window.scrollTo(0,0); }
+  else { $("#detail").style.display="none"; $("#main").style.display="block"; }
+}
+window.addEventListener("hashchange", renderRoute);
+function verCante(id){ location.hash="cante="+encodeURIComponent(id); }
+function volver(){ location.hash=""; }
+window.verCante=verCante; window.volver=volver;
+
+async function borrarCante(id){
+  const it=byId(id); if(!it) return;
+  if(!confirm("¿Quitar este cante del tablón?")) return;
+  await borrarArchivo(it.audio_path);
+  if(await borrar(id)){ DATOS=DATOS.filter(x=>String(x.id)!==String(id)); location.hash=""; pintarChips(); render(); }
+}
+function editarCante(id){ abrir(id); }
+window.borrarCante=borrarCante; window.editarCante=editarCante;
 
 /* ---------- Chips ---------- */
 function pintarChips(){
-  const usados = [...new Set(DATOS.map(d=>d.palo).filter(Boolean))].sort((a,b)=>ordenPalo(a)-ordenPalo(b));
-  const all = [{k:"todo",l:"Todos"}].concat(usados.map(p=>({k:p,l:p})));
-  $("#chips").innerHTML = all.map(c=>`<button class="chip" data-f="${escapar(c.k)}" aria-pressed="${c.k===filtro}">${escapar(c.l)}</button>`).join("");
+  const usados=[...new Set(DATOS.map(d=>d.palo).filter(Boolean))].sort((a,b)=>ordenPalo(a)-ordenPalo(b));
+  const all=[{k:"todo",l:"Todos"}].concat(usados.map(p=>({k:p,l:p})));
+  $("#chips").innerHTML=all.map(c=>`<button class="chip" data-f="${escapar(c.k)}" aria-pressed="${c.k===filtro}">${escapar(c.l)}</button>`).join("");
   $("#chips").querySelectorAll(".chip").forEach(b=>{ b.onclick=()=>{ filtro=b.dataset.f; pintarChips(); render(); }; });
 }
 
 /* ---------- Select de palo ---------- */
 function pintarSelectPalo(){
-  const sel = $("#f-palo"), prev = sel.value;
-  const opts = palosConocidos().sort((a,b)=>ordenPalo(a)-ordenPalo(b)).map(p=>`<option>${escapar(p)}</option>`).join("");
-  sel.innerHTML = opts + `<option value="__nuevo__">➕ Nuevo palo…</option>`;
-  if(prev && prev!=="__nuevo__") sel.value = prev;
-  sel.onchange = ()=>{
-    const nuevo = sel.value==="__nuevo__";
-    $("#f-palo-nuevo").style.display = nuevo ? "block" : "none";
-    if(nuevo) $("#f-palo-nuevo").focus();
-  };
+  const sel=$("#f-palo"), prev=sel.value;
+  const opts=palosConocidos().sort((a,b)=>ordenPalo(a)-ordenPalo(b)).map(p=>`<option>${escapar(p)}</option>`).join("");
+  sel.innerHTML=opts+`<option value="__nuevo__">➕ Nuevo palo…</option>`;
+  if(prev && prev!=="__nuevo__") sel.value=prev;
+  sel.onchange=()=>{ const nuevo=sel.value==="__nuevo__"; $("#f-palo-nuevo").style.display=nuevo?"block":"none"; if(nuevo)$("#f-palo-nuevo").focus(); };
 }
 
 /* ---------- Compás / estado ---------- */
 function pintarCompas(){
-  const cont = $("#compas");
-  cont.innerHTML = Array.from({length:12},(_,i)=>`<span class="beat ${COMPAS_ACC.includes(i+1)?'acc':''}"></span>`).join("");
+  const cont=$("#compas");
+  cont.innerHTML=Array.from({length:12},()=>`<span class="beat"></span>`).join("");
   if(window.matchMedia("(prefers-reduced-motion:reduce)").matches) return;
   const all=[...cont.children]; let i=0;
-  setInterval(()=>{ all.forEach(b=>b.classList.remove("on")); all[i].classList.add("on"); i=(i+1)%12; },360);
+  setInterval(()=>{ all.forEach(b=>b.classList.remove("on","on-acc")); all[i].classList.add(COMPAS_ACC.includes(i+1)?"on-acc":"on"); i=(i+1)%12; },360);
 }
 function pintarEstado(){
   const el=$("#estado"), txt=$("#estadoTxt");
   if(MODO==="nube"){ el.classList.remove("local"); txt.innerHTML="Conectado · el cuaderno se comparte con <b>toda la clase</b>"; }
-  else{
-    el.classList.add("local"); txt.innerHTML="Modo local · solo se guarda en <b>este dispositivo</b>. Configura Supabase para compartir.";
-    $("#hintAudio").innerHTML = "Para subir archivos necesitas Supabase. En modo local, usa un enlace.";
-    $("#hintVideo").innerHTML = "Para subir archivos necesitas Supabase. En modo local, usa un enlace de YouTube.";
-  }
+  else{ el.classList.add("local"); txt.innerHTML="Modo local · solo se guarda en <b>este dispositivo</b>. Configura Supabase para compartir.";
+    const hg=$("#hintGrab"); if(hg) hg.innerHTML="Para subir audios necesitas Supabase. En modo local, usa el YouTube de referencia."; }
 }
 
-/* ---------- Modal cante ---------- */
+/* ---------- Modal añadir/editar ---------- */
 const overlay=$("#overlay");
-function abrir(){ pintarSelectPalo(); overlay.classList.add("open"); $("#f-estilo").focus(); }
+function abrir(id){
+  EDITING = id || null;
+  pintarSelectPalo();
+  $("#modalTit").textContent = EDITING ? "Editar cante" : "Añadir un cante";
+  $("#guardar").textContent = EDITING ? "Guardar cambios" : "Guardar cante";
+  ["f-estilo","f-titulo","f-cantaor","f-letra","f-youtube","f-autor"].forEach(i=>$("#"+i).value="");
+  $("#f-grab-file").value=""; $("#f-palo-nuevo").value=""; $("#f-palo-nuevo").style.display="none";
+  $("#f-quitar-audio").checked=false; $("#audioActual").style.display="none"; $("#audioActualPlayer").innerHTML="";
+  $("#hintGrab").textContent="Tu nota de voz de WhatsApp o un audio de clase · hasta 50 MB.";
+  const sel=$("#f-palo");
+  if(EDITING){
+    const it=byId(EDITING);
+    if(it){
+      if([...sel.options].some(o=>o.value===it.palo)) sel.value=it.palo;
+      $("#f-estilo").value=it.estilo||""; $("#f-titulo").value=it.titulo||"";
+      $("#f-cantaor").value=it.cantaor||""; $("#f-letra").value=it.letra||"";
+      $("#f-youtube").value=it.video_url||""; $("#f-autor").value=it.autor||"";
+      if(it.audio_url){
+        $("#audioActual").style.display="block";
+        $("#audioActualPlayer").innerHTML = esAudio(it.audio_url)
+          ? `<audio controls preload="none" src="${escapar(it.audio_url)}"></audio>`
+          : `<a href="${escapar(it.audio_url)}" target="_blank" rel="noopener" style="color:var(--vino)">Abrir grabación actual →</a>`;
+        $("#hintGrab").textContent="Sube otro audio para reemplazar el actual · hasta 50 MB.";
+      }
+    }
+  } else { sel.selectedIndex=0; }
+  overlay.classList.add("open");
+  $("#f-titulo").focus();
+}
 function cerrar(){ overlay.classList.remove("open"); }
-$("#abrirAdd").onclick=abrir; $("#cerrar").onclick=cerrar; $("#cancelar").onclick=cerrar;
+$("#abrirAdd").onclick=()=>abrir();
+$("#cerrar").onclick=cerrar; $("#cancelar").onclick=cerrar;
 overlay.addEventListener("click",e=>{ if(e.target===overlay) cerrar(); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") cerrar(); });
 $("#buscar").addEventListener("input",e=>{ q=e.target.value; render(); });
 
 $("#guardar").onclick = async ()=>{
-  let palo = $("#f-palo").value;
-  const paloNuevo = $("#f-palo-nuevo").value.trim();
-  if(palo==="__nuevo__") palo = paloNuevo;
-
-  const estilo=$("#f-estilo").value.trim();
-  const titulo=$("#f-titulo").value.trim();
-  const letra=$("#f-letra").value.trim();
-  const autor=$("#f-autor").value.trim();
-  const cantaor=$("#f-cantaor").value.trim();
+  let palo=$("#f-palo").value; const paloNuevo=$("#f-palo-nuevo").value.trim();
+  if(palo==="__nuevo__") palo=paloNuevo;
+  const estilo=$("#f-estilo").value.trim(), titulo=$("#f-titulo").value.trim();
+  const letra=$("#f-letra").value.trim(), autor=$("#f-autor").value.trim();
+  const cantaor=$("#f-cantaor").value.trim(), youtube=$("#f-youtube").value.trim();
 
   const faltan=[];
-  if(!palo) faltan.push("palo");
-  if(!estilo) faltan.push("estilo");
-  if(!titulo) faltan.push("título");
-  if(!letra) faltan.push("letra");
-  if(!autor) faltan.push("quién lo sube");
+  if(!palo)faltan.push("palo"); if(!estilo)faltan.push("estilo"); if(!titulo)faltan.push("título");
+  if(!letra)faltan.push("letra"); if(!autor)faltan.push("quién lo sube");
   if(faltan.length){ alert("Faltan campos obligatorios: "+faltan.join(", ")+"."); return; }
 
-  const audioFile=$("#f-audio-file").files[0], videoFile=$("#f-video-file").files[0];
-  for(const f of [audioFile, videoFile]){
-    if(f){
-      if(MODO!=="nube"){ alert("Para subir archivos necesitas conectar Supabase (ver README). Mientras tanto, usa un enlace."); return; }
-      if(f.size > MAX_MB*1024*1024){ alert(`Un archivo supera los ${MAX_MB} MB. Para vídeos largos usa un enlace de YouTube.`); return; }
-    }
+  const grabFile=$("#f-grab-file").files[0];
+  if(grabFile){
+    if(MODO!=="nube"){ alert("Para subir audios necesitas conectar Supabase (ver README). De momento, usa el YouTube de referencia."); return; }
+    if(grabFile.size>MAX_MB*1024*1024){ alert(`El audio supera los ${MAX_MB} MB.`); return; }
   }
 
-  const item = {
-    palo, estilo, titulo, cantaor, letra,
-    audio_url:$("#f-audio-url").value.trim(), audio_path:null,
-    video_url:$("#f-video-url").value.trim(), video_path:null,
-    autor, creado:new Date().toISOString()
-  };
+  const editIt = EDITING ? byId(EDITING) : null;
+  let audio_url = editIt ? (editIt.audio_url||"") : "";
+  let audio_path = editIt ? (editIt.audio_path||null) : null;
+  let oldPath = null;
 
   const btn=$("#guardar"); btn.disabled=true;
   try{
-    if(audioFile){ btn.textContent="Subiendo audio…"; const up=await subir(audioFile); item.audio_url=up.url; item.audio_path=up.path; }
-    if(videoFile){ btn.textContent="Subiendo vídeo…"; const up=await subir(videoFile); item.video_url=up.url; item.video_path=up.path; }
+    if(grabFile){ btn.textContent="Subiendo audio…"; const up=await subir(grabFile); oldPath=audio_path; audio_url=up.url; audio_path=up.path; }
+    else if(EDITING && $("#f-quitar-audio").checked){ oldPath=audio_path; audio_url=""; audio_path=null; }
+
+    const datos={ palo, estilo, titulo, cantaor, letra, audio_url, audio_path, video_url:youtube, video_path:null, autor };
+
     btn.textContent="Guardando…";
     if(paloNuevo && palo===paloNuevo) await guardarPaloDB(paloNuevo);
-    const saved = await anadir(item);
-    if(saved){
+
+    const ok = EDITING ? await actualizar(EDITING, datos) : await anadir({...datos, creado:new Date().toISOString()});
+    if(ok){
+      await borrarArchivo(oldPath);
+      const eraEdicion = !!EDITING;
       CUSTOM_PALOS = await listarPalos();
       DATOS = await listar();
-      ["f-estilo","f-titulo","f-cantaor","f-letra","f-audio-url","f-video-url","f-autor"].forEach(id=>$("#"+id).value="");
-      $("#f-audio-file").value=""; $("#f-video-file").value=""; $("#f-palo-nuevo").value=""; $("#f-palo-nuevo").style.display="none";
-      pintarChips(); render(); cerrar();
+      pintarChips(); cerrar(); EDITING=null;
+      if(eraEdicion && location.hash.startsWith("#cante=")) renderRoute(); else render();
     }
-  }catch(e){ alert("No se pudo subir: "+(e.message||e)); }
-  finally{ btn.disabled=false; btn.textContent="Guardar cante"; }
+  }catch(e){ alert("No se pudo guardar: "+(e.message||e)); }
+  finally{ btn.disabled=false; btn.textContent= EDITING? "Guardar cambios":"Guardar cante"; }
 };
 
 /* ---------- Arranque ---------- */
 (async function(){
-  if(CONFIG.NOMBRE_CLASE && CONFIG.NOMBRE_CLASE!=="El cante a cuchillo") $("#titulo").textContent = CONFIG.NOMBRE_CLASE;
-  $("#eyebrow").textContent = `Tablón de la clase · ${CONFIG.PROFESOR}`;
-  document.title = `${CONFIG.NOMBRE_CLASE} · La clase de ${CONFIG.PROFESOR}`;
+  if(CONFIG.NOMBRE_CLASE && CONFIG.NOMBRE_CLASE!=="El cante a cuchillo") $("#titulo").textContent=CONFIG.NOMBRE_CLASE;
+  $("#eyebrow").textContent=`Tablón de la clase · ${CONFIG.PROFESOR}`;
+  document.title=`${CONFIG.NOMBRE_CLASE} · La clase de ${CONFIG.PROFESOR}`;
   initStore();
   pintarCompas(); pintarEstado();
   CUSTOM_PALOS = await listarPalos();
   DATOS = await listar();
-  pintarChips(); pintarSelectPalo(); render();
+  pintarChips(); render(); renderRoute();
 })();
 </script>
 </body>
