@@ -100,6 +100,13 @@
   .dletra{font-family:"Spectral",serif;font-style:italic;font-size:clamp(1.1rem,3vw,1.28rem);line-height:1.75;white-space:pre-wrap;color:#3c332a;border-left:3px solid var(--palo,var(--oro));padding:6px 0 6px 18px;margin:0 0 28px}
   .dmedia{margin:0 0 22px}
   .dmedia audio{width:100%}
+  .speed{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .speed span{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-2);margin-right:4px}
+  .speed button{font-family:"Spectral",serif;font-size:.82rem;border:1px solid var(--linea-2);background:var(--papel);color:var(--tinta-2);border-radius:999px;padding:4px 12px;cursor:pointer;transition:all .15s}
+  .speed button:hover{border-color:var(--oro);color:var(--tinta)}
+  .speed button.on{background:var(--vino);color:#fff;border-color:var(--vino)}
+  .dwho{display:flex;flex-direction:column;gap:3px}
+  .edit-line{font-size:.85rem;color:var(--tinta-2)}
   .dmedia .video-embed{position:relative;width:100%;padding-top:56.25%;border-radius:10px;overflow:hidden;background:#000}
   .dmedia .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
   .cap{display:block;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-2);font-weight:600;margin-bottom:8px}
@@ -403,12 +410,27 @@ function render(){
 function mediaHTML(it){
   let grab="";
   if(it.audio_url){
-    grab=`<div class="dmedia"><span class="cap">Grabación</span><audio controls preload="metadata" src="${escapar(it.audio_url)}"></audio><div style="margin-top:8px"><a class="open" href="${escapar(it.audio_url)}" target="_blank" rel="noopener" style="font-size:.8rem">Descargar / abrir en otra pestaña</a></div></div>`;
+    grab=`<div class="dmedia"><span class="cap">Grabación</span>
+      <audio controls preload="metadata" src="${escapar(it.audio_url)}"></audio>
+      <div class="speed"><span>Velocidad</span>
+        <button data-r="0.5">0.5×</button>
+        <button data-r="0.75">0.75×</button>
+        <button data-r="1" class="on">1×</button>
+        <button data-r="1.25">1.25×</button>
+        <button data-r="1.5">1.5×</button>
+      </div>
+      <div style="margin-top:8px"><a class="open" href="${escapar(it.audio_url)}" target="_blank" rel="noopener" style="font-size:.8rem">Descargar / abrir en otra pestaña</a></div></div>`;
   }
   let ref=""; const yt=youtubeId(it.video_url);
   if(yt) ref=`<div class="dmedia"><span class="cap">Referencia</span><div class="video-embed"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${yt}" title="Referencia" allow="encrypted-media;picture-in-picture" allowfullscreen></iframe></div></div>`;
   else if(it.video_url) ref=`<div class="dmedia"><a class="back" href="${escapar(it.video_url)}" target="_blank" rel="noopener">Ver referencia →</a></div>`;
   return grab+ref;
+}
+function wireSpeed(scope){
+  const audio = scope.querySelector("audio, video"); if(!audio) return;
+  scope.querySelectorAll(".speed button").forEach(b=>{
+    b.onclick=()=>{ audio.playbackRate=parseFloat(b.dataset.r); scope.querySelectorAll(".speed button").forEach(x=>x.classList.toggle("on", x===b)); };
+  });
 }
 function renderDetalle(id){
   const cont=$("#detail"); const it=byId(id);
@@ -418,6 +440,8 @@ function renderDetalle(id){
   if(it.estilo) metaParts.push(escapar(it.estilo));
   if(it.cantaor) metaParts.push(`<b>${escapar(it.cantaor)}</b>`);
   const dmeta = metaParts.length?`<div class="dmeta">${metaParts.join(" · ")}</div>`:"";
+  const hist = Array.isArray(it.historial) ? it.historial : (it.editor ? [{por:it.editor, cuando:it.editado}] : []);
+  const edits = hist.map(h=>`<span class="edit-line">Editado por <b>${escapar(h.por||"—")}</b> · ${fecha(h.cuando)}</span>`).join("");
   cont.innerHTML=`<div class="detalle" style="--palo:${col}">
     <button class="back" onclick="volver()">← Volver al tablón</button>
     <p class="eyebrow">${escapar(it.palo||"")}</p>
@@ -426,20 +450,26 @@ function renderDetalle(id){
     ${it.letra?`<div class="dletra">${escapar(it.letra)}</div>`:""}
     ${mediaHTML(it)}
     <div class="dfoot">
-      <span>Subido por <b>${escapar(it.autor||"—")}</b> · ${fecha(it.creado)}${it.editor?` &nbsp;·&nbsp; Editado por <b>${escapar(it.editor)}</b> · ${fecha(it.editado)}`:""}</span>
+      <div class="dwho">
+        <span>Subido por <b>${escapar(it.autor||"—")}</b> · ${fecha(it.creado)}</span>
+        ${edits}
+      </div>
       <div class="dactions">
         <button class="btn btn-ghost" onclick="editarCante('${it.id}')">Editar</button>
         <button class="btn danger" onclick="borrarCante('${it.id}')">Borrar</button>
       </div>
     </div>
   </div>`;
+  wireSpeed(cont);
 }
 
 /* ---------- Rutas ---------- */
+function pararMedios(){ document.querySelectorAll("#detail audio, #detail video").forEach(m=>{ try{ m.pause(); }catch(e){} }); }
 function renderRoute(){
+  pararMedios();
   const m=location.hash.match(/^#cante=(.+)$/);
   if(m){ renderDetalle(decodeURIComponent(m[1])); $("#main").style.display="none"; $("#detail").style.display="block"; window.scrollTo(0,0); }
-  else { $("#detail").style.display="none"; $("#main").style.display="block"; }
+  else { $("#detail").style.display="none"; $("#detail").innerHTML=""; $("#main").style.display="block"; }
 }
 window.addEventListener("hashchange", renderRoute);
 function verCante(id){ location.hash="cante="+encodeURIComponent(id); }
@@ -558,8 +588,17 @@ $("#guardar").onclick = async ()=>{
     else if(EDITING && $("#f-quitar-audio").checked){ oldPath=audio_path; audio_url=""; audio_path=null; }
 
     const datos={ palo, estilo, titulo, cantaor, letra, audio_url, audio_path, video_url:youtube, video_path:null };
-    if(EDITING){ datos.autor = editIt.autor; datos.editor = editor; datos.editado = new Date().toISOString(); }
-    else { datos.autor = autor; datos.creado = new Date().toISOString(); }
+    if(EDITING){
+      const ahora=new Date().toISOString();
+      const hist = Array.isArray(editIt.historial) ? editIt.historial.slice()
+                 : (editIt.editor ? [{por:editIt.editor, cuando:editIt.editado}] : []);
+      hist.push({ por:editor, cuando:ahora });
+      datos.autor = editIt.autor;
+      datos.historial = hist;
+      datos.editor = editor; datos.editado = ahora;   // última edición (compatibilidad)
+    } else {
+      datos.autor = autor; datos.creado = new Date().toISOString();
+    }
 
     btn.textContent="Guardando…";
     if(paloNuevo && palo===paloNuevo) await guardarPaloDB(paloNuevo);
