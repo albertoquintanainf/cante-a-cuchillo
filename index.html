@@ -101,6 +101,13 @@
   .dletra{font-family:"Spectral",serif;font-style:italic;font-size:clamp(1.1rem,3vw,1.28rem);line-height:1.75;white-space:pre-wrap;color:#3c332a;border-left:3px solid var(--palo,var(--oro));padding:6px 0 6px 18px;margin:0 0 28px}
   .dmedia{margin:0 0 22px}
   .dmedia audio{width:100%}
+  .audio-item{margin-bottom:18px}
+  .audio-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;background:var(--papel);border:1px solid var(--linea);border-radius:10px;padding:6px 8px}
+  .audio-row .audio-nombre-in{flex:1;margin:0;border:0;background:transparent;padding:6px 4px}
+  .audio-row .audio-nombre-in:focus{box-shadow:none}
+  .audio-tag{font-size:.74rem;color:var(--tinta-2);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .audio-del{background:none;border:0;color:#b0a08c;cursor:pointer;font-size:.95rem;padding:4px 6px;border-radius:6px}
+  .audio-del:hover{color:var(--vino)}
   .speed{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap}
   .speed span{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-2);margin-right:4px}
   .speed button{font-family:"Spectral",serif;font-size:.82rem;border:1px solid var(--linea-2);background:var(--papel);color:var(--tinta-2);border-radius:999px;padding:4px 12px;cursor:pointer;transition:all .15s}
@@ -223,13 +230,10 @@
     </div>
 
     <div class="media-box">
-      <label id="lblGrab">Subir audio <span class="opt">— solo audios, opcional</span></label>
-      <div id="audioActual" style="display:none;margin-bottom:6px">
-        <div id="audioActualPlayer"></div>
-        <label class="chk"><input type="checkbox" id="f-quitar-audio" /> Quitar la grabación actual</label>
-      </div>
-      <input id="f-grab-file" type="file" accept="audio/*,.mp4,.m4a,.opus,.ogg,.aac" />
-      <p class="hint" id="hintGrab">Sube <b>solo audios</b> (vale el .mp4 de WhatsApp) · máximo 5 MB.</p>
+      <label id="lblGrab">Audios <span class="opt">— solo audios, opcional</span></label>
+      <div id="audiosLista"></div>
+      <input id="f-grab-file" type="file" accept="audio/*,.mp4,.m4a,.opus,.ogg,.aac" multiple />
+      <p class="hint" id="hintGrab">Puedes añadir <b>varios</b> (si el cante va por partes) · máximo 5 MB cada uno.</p>
     </div>
 
     <div class="media-box">
@@ -295,19 +299,30 @@ async function listar(){
   }
   return leerMatLocal();
 }
+// Si Supabase se queja de una columna que no existe (falta migración),
+// la quita del envío y reintenta, en vez de romperse.
+async function conReintento(fn, payload){
+  let p = {...payload}, quitadas = [];
+  for(let i=0;i<8;i++){
+    const { data, error } = await fn(p);
+    if(!error) return { data, quitadas };
+    const m = error.message && error.message.match(/Could not find the '([^']+)' column/);
+    if(m && (m[1] in p)){ delete p[m[1]]; quitadas.push(m[1]); continue; }
+    throw new Error(error.message);
+  }
+  throw new Error("No se pudo guardar tras varios intentos.");
+}
 async function anadir(item){
   if(MODO==="nube"){
-    const { data, error } = await sb.from("materiales").insert(item).select();
-    if(error){ alert("No se pudo guardar: "+error.message); return null; }
-    return data?.[0];
+    try{ const { data } = await conReintento(p=>sb.from("materiales").insert(p).select(), item); return data?.[0]; }
+    catch(e){ alert("No se pudo guardar: "+e.message); return null; }
   }
   const a = leerMatLocal(); item.id = "loc-"+Date.now(); a.unshift(item); guardarMatLocal(a); return item;
 }
 async function actualizar(id, patch){
   if(MODO==="nube"){
-    const { data, error } = await sb.from("materiales").update(patch).eq("id", id).select();
-    if(error){ alert("No se pudo actualizar: "+error.message); return null; }
-    return data?.[0] || true;
+    try{ const { data } = await conReintento(p=>sb.from("materiales").update(p).eq("id", id).select(), patch); return data?.[0] || true; }
+    catch(e){ alert("No se pudo actualizar: "+e.message); return null; }
   }
   const a=leerMatLocal(); const i=a.findIndex(x=>String(x.id)===String(id));
   if(i<0) return null;
@@ -347,7 +362,7 @@ async function guardarPaloDB(nombre){
 }
 
 /* ---------- Estado ---------- */
-let DATOS = [], CUSTOM_PALOS = [], filtro = "todo", q = "", EDITING = null;
+let DATOS = [], CUSTOM_PALOS = [], filtro = "todo", q = "", EDITING = null, audiosEstado = [], audiosBorrar = [];
 
 function palosConocidos(){ const usados=DATOS.map(d=>d.palo).filter(Boolean); return [...new Set([...BASE_PALOS, ...CUSTOM_PALOS, ...usados])]; }
 function ordenPalo(n){ const i=BASE_PALOS.indexOf(n); return i>=0?i:1000+(n||"").toLowerCase().charCodeAt(0); }
@@ -379,7 +394,8 @@ function tarjeta(it){
   const ult=hist[hist.length-1];
   const editado=ult?`<div class="metaline editado">Editado por ${escapar(ult.por||"—")} · ${fecha(ult.cuando)}</div>`:"";
   const marcas=[];
-  if(it.audio_url) marcas.push('<span class="mk" title="Tiene audio">♪</span>');
+  const nAud = Array.isArray(it.audios)? it.audios.length : (it.audio_url?1:0);
+  if(nAud) marcas.push(`<span class="mk" title="Audios">♪${nAud>1?nAud:""}</span>`);
   if(youtubeId(it.video_url)) marcas.push('<span class="mk" title="Tiene YouTube">YT</span>');
   return `<article class="card" style="--palo:${col}" tabindex="0" role="button" onclick="verCante('${it.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();verCante('${it.id}')}">
     <h3>${escapar(titulo)}</h3>
@@ -419,28 +435,30 @@ function render(){
 }
 
 /* ---------- Página de detalle ---------- */
+function audiosDe(it){
+  if(Array.isArray(it.audios) && it.audios.length) return it.audios;
+  if(it.audio_url) return [{url:it.audio_url, path:it.audio_path||null, nombre:""}];
+  return [];
+}
+const SPEED_BTNS = `<div class="speed"><span>Velocidad</span><button data-r="0.5">0.5×</button><button data-r="0.75">0.75×</button><button data-r="1" class="on">1×</button><button data-r="1.25">1.25×</button><button data-r="1.5">1.5×</button></div>`;
 function mediaHTML(it){
-  let grab="";
-  if(it.audio_url){
-    grab=`<div class="dmedia"><span class="cap">Grabación</span>
-      <audio controls preload="metadata" src="${escapar(it.audio_url)}"></audio>
-      <div class="speed"><span>Velocidad</span>
-        <button data-r="0.5">0.5×</button>
-        <button data-r="0.75">0.75×</button>
-        <button data-r="1" class="on">1×</button>
-        <button data-r="1.25">1.25×</button>
-        <button data-r="1.5">1.5×</button>
-      </div></div>`;
-  }
+  const auds = audiosDe(it);
+  const grab = auds.map((a,i)=>`<div class="dmedia audio-item">
+      <span class="cap">${a.nombre? escapar(a.nombre) : (auds.length>1? "Grabación "+(i+1) : "Grabación")}</span>
+      <audio controls preload="metadata" src="${escapar(a.url)}"></audio>
+      ${SPEED_BTNS}
+    </div>`).join("");
   let ref=""; const yt=youtubeId(it.video_url);
   if(yt) ref=`<div class="dmedia"><span class="cap">Referencia</span><div class="video-embed"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${yt}" title="Referencia" allow="encrypted-media;picture-in-picture" allowfullscreen></iframe></div></div>`;
   else if(it.video_url) ref=`<div class="dmedia"><a class="back" href="${escapar(it.video_url)}" target="_blank" rel="noopener">Ver referencia →</a></div>`;
   return grab+ref;
 }
 function wireSpeed(scope){
-  const audio = scope.querySelector("audio, video"); if(!audio) return;
-  scope.querySelectorAll(".speed button").forEach(b=>{
-    b.onclick=()=>{ audio.playbackRate=parseFloat(b.dataset.r); scope.querySelectorAll(".speed button").forEach(x=>x.classList.toggle("on", x===b)); };
+  scope.querySelectorAll(".audio-item").forEach(item=>{
+    const audio=item.querySelector("audio, video"); if(!audio) return;
+    item.querySelectorAll(".speed button").forEach(b=>{
+      b.onclick=()=>{ audio.playbackRate=parseFloat(b.dataset.r); item.querySelectorAll(".speed button").forEach(x=>x.classList.toggle("on", x===b)); };
+    });
   });
 }
 function renderDetalle(id){
@@ -490,7 +508,7 @@ window.verCante=verCante; window.volver=volver;
 async function borrarCante(id){
   const it=byId(id); if(!it) return;
   if(!confirm("¿Quitar este cante del tablón?")) return;
-  await borrarArchivo(it.audio_path);
+  for(const p of audiosDe(it).map(a=>a.path).filter(Boolean)) await borrarArchivo(p);
   if(await borrar(id)){ DATOS=DATOS.filter(x=>String(x.id)!==String(id)); location.hash=""; pintarChips(); render(); }
 }
 function editarCante(id){ abrir(id); }
@@ -530,6 +548,28 @@ function pintarEstado(){
 
 /* ---------- Modal añadir/editar ---------- */
 const overlay=$("#overlay");
+function pintarAudios(){
+  const cont=$("#audiosLista");
+  cont.innerHTML = audiosEstado.map((a,i)=>`<div class="audio-row">
+      <input class="audio-nombre-in" data-i="${i}" placeholder="Nombre (ej. Parte 1, opcional)" value="${escapar(a.nombre||"")}" maxlength="40" />
+      <span class="audio-tag">${a.file? escapar(a.file.name) : "guardado"}</span>
+      <button type="button" class="audio-del" data-i="${i}" title="Quitar">✕</button>
+    </div>`).join("");
+  cont.querySelectorAll(".audio-nombre-in").forEach(inp=>{ inp.oninput=()=>{ audiosEstado[+inp.dataset.i].nombre=inp.value; }; });
+  cont.querySelectorAll(".audio-del").forEach(b=>{ b.onclick=()=>{
+    const i=+b.dataset.i, a=audiosEstado[i];
+    if(a && a.path) audiosBorrar.push(a.path);
+    audiosEstado.splice(i,1); pintarAudios();
+  }; });
+}
+$("#f-grab-file").onchange=()=>{
+  if(MODO!=="nube"){ alert("Para subir audios necesitas conectar Supabase (ver README). De momento, usa el YouTube de referencia."); $("#f-grab-file").value=""; return; }
+  for(const f of [...$("#f-grab-file").files]){
+    if(f.size>MAX_MB*1024*1024){ alert(`"${f.name}" supera los ${MAX_MB} MB y no se añade. Prueba con uno más corto.`); continue; }
+    audiosEstado.push({ file:f, nombre:"" });
+  }
+  $("#f-grab-file").value=""; pintarAudios();
+};
 function abrir(id){
   EDITING = id || null;
   pintarSelectPalo();
@@ -537,9 +577,9 @@ function abrir(id){
   $("#guardar").textContent = EDITING ? "Guardar cambios" : "Guardar cante";
   ["f-estilo","f-titulo","f-cantaor","f-letra","f-youtube","f-autor","f-editor"].forEach(i=>$("#"+i).value="");
   $("#f-grab-file").value=""; $("#f-palo-nuevo").value=""; $("#f-palo-nuevo").style.display="none";
-  $("#f-quitar-audio").checked=false; $("#audioActual").style.display="none"; $("#audioActualPlayer").innerHTML="";
-  $("#hintGrab").innerHTML="Sube <b>solo audios</b> (vale el .mp4 de WhatsApp) · máximo 5 MB.";
+  $("#hintGrab").innerHTML="Puedes añadir <b>varios</b> (si el cante va por partes) · máximo 5 MB cada uno.";
   $("#f-autor").readOnly = false; $("#campoEditor").style.display="none"; $("#lblAutor").innerHTML='Quién lo sube <span class="req">•</span>';
+  audiosEstado = []; audiosBorrar = [];
   const sel=$("#f-palo");
   if(EDITING){
     const it=byId(EDITING);
@@ -550,13 +590,10 @@ function abrir(id){
       $("#f-youtube").value=it.video_url||""; $("#f-autor").value=it.autor||"";
       $("#f-autor").readOnly = true; $("#lblAutor").innerHTML='Subido por <span class="opt">— no se cambia</span>';
       $("#campoEditor").style.display="block";
-      if(it.audio_url){
-        $("#audioActual").style.display="block";
-        $("#audioActualPlayer").innerHTML = `<audio controls preload="metadata" src="${escapar(it.audio_url)}"></audio>`;
-        $("#hintGrab").textContent="Sube otro audio para reemplazar el actual · máximo 5 MB.";
-      }
+      audiosEstado = audiosDe(it).map(a=>({url:a.url, path:a.path||null, nombre:a.nombre||""}));
     }
   } else { sel.selectedIndex=0; }
+  pintarAudios();
   overlay.classList.add("open");
   $("#f-titulo").focus();
 }
@@ -582,23 +619,19 @@ $("#guardar").onclick = async ()=>{
   else { if(!autor)faltan.push("quién lo sube"); }
   if(faltan.length){ alert("Faltan campos obligatorios: "+faltan.join(", ")+"."); return; }
 
-  const grabFile=$("#f-grab-file").files[0];
-  if(grabFile){
-    if(MODO!=="nube"){ alert("Para subir audios necesitas conectar Supabase (ver README). De momento, usa el YouTube de referencia."); return; }
-    if(grabFile.size>MAX_MB*1024*1024){ alert(`Ese audio supera los ${MAX_MB} MB. Prueba con uno más corto o más comprimido.`); return; }
-  }
-
   const editIt = EDITING ? byId(EDITING) : null;
-  let audio_url = editIt ? (editIt.audio_url||"") : "";
-  let audio_path = editIt ? (editIt.audio_path||null) : null;
-  let oldPath = null;
 
   const btn=$("#guardar"); btn.disabled=true;
   try{
-    if(grabFile){ btn.textContent="Subiendo audio…"; const up=await subir(grabFile); oldPath=audio_path; audio_url=up.url; audio_path=up.path; }
-    else if(EDITING && $("#f-quitar-audio").checked){ oldPath=audio_path; audio_url=""; audio_path=null; }
+    // Subir audios pendientes y construir la lista final
+    const audios=[];
+    for(const a of audiosEstado){
+      if(a.file){ btn.textContent="Subiendo audio…"; const up=await subir(a.file); audios.push({url:up.url, path:up.path, nombre:(a.nombre||"").trim()}); }
+      else if(a.url){ audios.push({url:a.url, path:a.path||null, nombre:(a.nombre||"").trim()}); }
+    }
 
-    const datos={ palo, estilo, titulo, cantaor, letra, audio_url, audio_path, video_url:youtube, video_path:null };
+    const datos={ palo, estilo, titulo, cantaor, letra, video_url:youtube, video_path:null,
+      audios, audio_url:(audios[0]?.url||""), audio_path:(audios[0]?.path||null) };
     if(EDITING){
       const ahora=new Date().toISOString();
       const hist = Array.isArray(editIt.historial) ? editIt.historial.slice()
@@ -606,7 +639,7 @@ $("#guardar").onclick = async ()=>{
       hist.push({ por:editor, cuando:ahora });
       datos.autor = editIt.autor;
       datos.historial = hist;
-      datos.editor = editor; datos.editado = ahora;   // última edición (compatibilidad)
+      datos.editor = editor; datos.editado = ahora;
     } else {
       datos.autor = autor; datos.creado = new Date().toISOString();
     }
@@ -616,7 +649,7 @@ $("#guardar").onclick = async ()=>{
 
     const ok = EDITING ? await actualizar(EDITING, datos) : await anadir(datos);
     if(ok){
-      await borrarArchivo(oldPath);
+      for(const p of audiosBorrar) await borrarArchivo(p);
       const eraEdicion = !!EDITING;
       CUSTOM_PALOS = await listarPalos();
       DATOS = await listar();
