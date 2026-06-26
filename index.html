@@ -82,6 +82,7 @@
   .who{font-size:.8rem;color:var(--tinta-2);flex:1;min-width:0}
   .who b{color:var(--tinta);font-weight:600}
   .ver{font-size:.8rem;color:var(--palo,var(--oro));font-weight:600;white-space:nowrap}
+  .mk{font-size:.78rem;color:var(--palo,var(--oro));font-weight:700;line-height:1}
 
   .empty{text-align:center;padding:clamp(48px,10vw,72px) 20px;border:1px dashed var(--linea-2);border-radius:var(--r);color:var(--tinta-2);background:var(--papel-2)}
   .empty h3{font-family:"Bodoni Moda",serif;color:var(--tinta);font-size:1.6rem;margin:0 0 8px}
@@ -229,9 +230,14 @@
       <p class="hint">El cante de referencia en YouTube. No ocupa espacio tuyo.</p>
     </div>
 
-    <div class="field">
-      <label for="f-autor">Quién lo sube <span class="req">•</span></label>
+    <div class="field" id="campoAutor">
+      <label for="f-autor" id="lblAutor">Quién lo sube <span class="req">•</span></label>
       <input id="f-autor" placeholder="Tu nombre" maxlength="40" />
+    </div>
+
+    <div class="field" id="campoEditor" style="display:none">
+      <label for="f-editor">Quién lo edita <span class="req">•</span></label>
+      <input id="f-editor" placeholder="Tu nombre" maxlength="40" />
     </div>
 
     <div class="modal-actions">
@@ -343,8 +349,8 @@ function colorPalo(n){ let h=0; for(const c of (n||"")) h=(h+c.charCodeAt(0))%PA
 const $ = s => document.querySelector(s);
 function escapar(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function fecha(iso){ if(!iso) return ""; const d=new Date(iso); return isNaN(d)?"":d.toLocaleDateString("es-ES",{day:"numeric",month:"short",year:"numeric"}); }
-function esAudio(u){ return u && /\.(mp3|m4a|wav|ogg|oga|aac|opus|flac)$/.test(u.split("?")[0].toLowerCase()); }
-function esVideoFile(u){ return u && /\.(mp4|webm|mov|m4v)$/.test(u.split("?")[0].toLowerCase()); }
+function esAudio(u){ return u && /\.(mp3|m4a|m4b|wav|ogg|oga|aac|opus|flac|weba|amr|mka|aiff?)$/.test(u.split("?")[0].toLowerCase()); }
+function esVideoFile(u){ return u && /\.(mp4|webm|mov|m4v|mkv|avi|ogv)$/.test(u.split("?")[0].toLowerCase()); }
 function youtubeId(u){ if(!u) return null; const m=u.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/); return m?m[1]:null; }
 function byId(id){ return DATOS.find(x=>String(x.id)===String(id)); }
 
@@ -354,11 +360,15 @@ function tarjeta(it){
   const col=colorPalo(it.palo);
   const titulo=it.titulo||it.estilo||it.palo||"Sin título";
   const estilo=(it.estilo && it.estilo!==titulo)?`<div class="metaline">${escapar(it.estilo)}</div>`:"";
+  const marcas=[];
+  if(it.audio_url) marcas.push(esVideoFile(it.audio_url)?'<span class="mk" title="Tiene vídeo">▶</span>':'<span class="mk" title="Tiene audio">♪</span>');
+  if(youtubeId(it.video_url)) marcas.push('<span class="mk" title="Tiene YouTube">YT</span>');
   return `<article class="card" style="--palo:${col}" tabindex="0" role="button" onclick="verCante('${it.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();verCante('${it.id}')}">
     <h3>${escapar(titulo)}</h3>
     ${estilo}
     <div class="foot">
       <span class="who">${it.autor?`<b>${escapar(it.autor)}</b> · `:""}${fecha(it.creado)}</span>
+      ${marcas.join("")}
       <span class="ver">Ver →</span>
     </div>
   </article>`;
@@ -392,9 +402,12 @@ function render(){
 /* ---------- Página de detalle ---------- */
 function mediaHTML(it){
   let grab="";
-  if(esAudio(it.audio_url)) grab=`<div class="dmedia"><span class="cap">Grabación</span><audio controls preload="none" src="${escapar(it.audio_url)}"></audio></div>`;
-  else if(esVideoFile(it.audio_url)) grab=`<div class="dmedia"><span class="cap">Grabación</span><div class="video-embed"><video controls preload="none" src="${escapar(it.audio_url)}" style="position:absolute;inset:0;width:100%;height:100%"></video></div></div>`;
-  else if(it.audio_url) grab=`<div class="dmedia"><a class="back" href="${escapar(it.audio_url)}" target="_blank" rel="noopener">Abrir grabación →</a></div>`;
+  if(it.audio_url){
+    if(esVideoFile(it.audio_url))
+      grab=`<div class="dmedia"><span class="cap">Grabación</span><div class="video-embed"><video controls preload="metadata" src="${escapar(it.audio_url)}" style="position:absolute;inset:0;width:100%;height:100%"></video></div></div>`;
+    else
+      grab=`<div class="dmedia"><span class="cap">Grabación</span><audio controls preload="metadata" src="${escapar(it.audio_url)}"></audio><div style="margin-top:8px"><a class="open" href="${escapar(it.audio_url)}" target="_blank" rel="noopener" style="font-size:.8rem">Descargar / abrir en otra pestaña</a></div></div>`;
+  }
   let ref=""; const yt=youtubeId(it.video_url);
   if(yt) ref=`<div class="dmedia"><span class="cap">Referencia</span><div class="video-embed"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${yt}" title="Referencia" allow="encrypted-media;picture-in-picture" allowfullscreen></iframe></div></div>`;
   else if(it.video_url) ref=`<div class="dmedia"><a class="back" href="${escapar(it.video_url)}" target="_blank" rel="noopener">Ver referencia →</a></div>`;
@@ -416,7 +429,7 @@ function renderDetalle(id){
     ${it.letra?`<div class="dletra">${escapar(it.letra)}</div>`:""}
     ${mediaHTML(it)}
     <div class="dfoot">
-      <span>Subido por <b>${escapar(it.autor||"—")}</b> · ${fecha(it.creado)}</span>
+      <span>Subido por <b>${escapar(it.autor||"—")}</b> · ${fecha(it.creado)}${it.editor?` &nbsp;·&nbsp; Editado por <b>${escapar(it.editor)}</b> · ${fecha(it.editado)}`:""}</span>
       <div class="dactions">
         <button class="btn btn-ghost" onclick="editarCante('${it.id}')">Editar</button>
         <button class="btn danger" onclick="borrarCante('${it.id}')">Borrar</button>
@@ -484,10 +497,11 @@ function abrir(id){
   pintarSelectPalo();
   $("#modalTit").textContent = EDITING ? "Editar cante" : "Añadir un cante";
   $("#guardar").textContent = EDITING ? "Guardar cambios" : "Guardar cante";
-  ["f-estilo","f-titulo","f-cantaor","f-letra","f-youtube","f-autor"].forEach(i=>$("#"+i).value="");
+  ["f-estilo","f-titulo","f-cantaor","f-letra","f-youtube","f-autor","f-editor"].forEach(i=>$("#"+i).value="");
   $("#f-grab-file").value=""; $("#f-palo-nuevo").value=""; $("#f-palo-nuevo").style.display="none";
   $("#f-quitar-audio").checked=false; $("#audioActual").style.display="none"; $("#audioActualPlayer").innerHTML="";
   $("#hintGrab").textContent="Audio de WhatsApp o un vídeo corto de clase · hasta 50 MB por archivo.";
+  $("#f-autor").readOnly = false; $("#campoEditor").style.display="none"; $("#lblAutor").innerHTML='Quién lo sube <span class="req">•</span>';
   const sel=$("#f-palo");
   if(EDITING){
     const it=byId(EDITING);
@@ -496,11 +510,13 @@ function abrir(id){
       $("#f-estilo").value=it.estilo||""; $("#f-titulo").value=it.titulo||"";
       $("#f-cantaor").value=it.cantaor||""; $("#f-letra").value=it.letra||"";
       $("#f-youtube").value=it.video_url||""; $("#f-autor").value=it.autor||"";
+      $("#f-autor").readOnly = true; $("#lblAutor").innerHTML='Subido por <span class="opt">— no se cambia</span>';
+      $("#campoEditor").style.display="block";
       if(it.audio_url){
         $("#audioActual").style.display="block";
-        $("#audioActualPlayer").innerHTML = esAudio(it.audio_url)
-          ? `<audio controls preload="none" src="${escapar(it.audio_url)}"></audio>`
-          : `<a href="${escapar(it.audio_url)}" target="_blank" rel="noopener" style="color:var(--vino)">Abrir grabación actual →</a>`;
+        $("#audioActualPlayer").innerHTML = esVideoFile(it.audio_url)
+          ? `<video controls preload="metadata" src="${escapar(it.audio_url)}" style="width:100%;max-height:200px"></video>`
+          : `<audio controls preload="metadata" src="${escapar(it.audio_url)}"></audio>`;
         $("#hintGrab").textContent="Sube otro archivo para reemplazar el actual · hasta 50 MB.";
       }
     }
@@ -521,10 +537,13 @@ $("#guardar").onclick = async ()=>{
   const estilo=$("#f-estilo").value.trim(), titulo=$("#f-titulo").value.trim();
   const letra=$("#f-letra").value.trim(), autor=$("#f-autor").value.trim();
   const cantaor=$("#f-cantaor").value.trim(), youtube=$("#f-youtube").value.trim();
+  const editor=$("#f-editor").value.trim();
 
   const faltan=[];
   if(!palo)faltan.push("palo"); if(!estilo)faltan.push("estilo"); if(!titulo)faltan.push("título");
-  if(!letra)faltan.push("letra"); if(!autor)faltan.push("quién lo sube");
+  if(!letra)faltan.push("letra");
+  if(EDITING){ if(!editor)faltan.push("quién lo edita"); }
+  else { if(!autor)faltan.push("quién lo sube"); }
   if(faltan.length){ alert("Faltan campos obligatorios: "+faltan.join(", ")+"."); return; }
 
   const grabFile=$("#f-grab-file").files[0];
@@ -543,12 +562,14 @@ $("#guardar").onclick = async ()=>{
     if(grabFile){ btn.textContent="Subiendo audio…"; const up=await subir(grabFile); oldPath=audio_path; audio_url=up.url; audio_path=up.path; }
     else if(EDITING && $("#f-quitar-audio").checked){ oldPath=audio_path; audio_url=""; audio_path=null; }
 
-    const datos={ palo, estilo, titulo, cantaor, letra, audio_url, audio_path, video_url:youtube, video_path:null, autor };
+    const datos={ palo, estilo, titulo, cantaor, letra, audio_url, audio_path, video_url:youtube, video_path:null };
+    if(EDITING){ datos.autor = editIt.autor; datos.editor = editor; datos.editado = new Date().toISOString(); }
+    else { datos.autor = autor; datos.creado = new Date().toISOString(); }
 
     btn.textContent="Guardando…";
     if(paloNuevo && palo===paloNuevo) await guardarPaloDB(paloNuevo);
 
-    const ok = EDITING ? await actualizar(EDITING, datos) : await anadir({...datos, creado:new Date().toISOString()});
+    const ok = EDITING ? await actualizar(EDITING, datos) : await anadir(datos);
     if(ok){
       await borrarArchivo(oldPath);
       const eraEdicion = !!EDITING;
