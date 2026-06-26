@@ -215,13 +215,13 @@
     </div>
 
     <div class="media-box">
-      <label id="lblGrab">Subir grabación <span class="opt">— audio o vídeo, opcional</span></label>
+      <label id="lblGrab">Subir audio <span class="opt">— solo audios, opcional</span></label>
       <div id="audioActual" style="display:none;margin-bottom:6px">
         <div id="audioActualPlayer"></div>
         <label class="chk"><input type="checkbox" id="f-quitar-audio" /> Quitar la grabación actual</label>
       </div>
-      <input id="f-grab-file" type="file" accept="audio/*,video/*" />
-      <p class="hint" id="hintGrab">Audio de WhatsApp o un vídeo corto de clase · hasta 50 MB por archivo.</p>
+      <input id="f-grab-file" type="file" accept="audio/*,.mp4,.m4a,.opus,.ogg,.aac" />
+      <p class="hint" id="hintGrab">Sube <b>solo audios</b> (vale el .mp4 de WhatsApp) · máximo 5 MB.</p>
     </div>
 
     <div class="media-box">
@@ -265,7 +265,7 @@ const CONFIG = Object.assign({
 
 const BASE_PALOS = ["Soleá","Seguiriya","Bulerías","Tangos","Tientos","Fandangos","Fandangos de Huelva","Alegrías","Cantiñas","Tarantos","Malagueñas","Granaínas","Peteneras","Caña","Polo","Serranas","Saetas","Sevillanas","Tonás","Martinetes","Rumba"];
 const PALETA = ["#A12B38","#B5852F","#AA4F2A","#6E7A35","#2F6F8F","#8C5A2C","#7A2230","#9E7A2C","#5A4E86"];
-const MAX_MB = 50, BUCKET = "material";
+const MAX_MB = 5, BUCKET = "material";
 const LS_MAT = "cuchillo_materiales_v1", LS_PALOS = "cuchillo_palos_v1";
 const COMPAS_ACC = [3,7,8,10,12];
 
@@ -361,7 +361,7 @@ function tarjeta(it){
   const titulo=it.titulo||it.estilo||it.palo||"Sin título";
   const estilo=(it.estilo && it.estilo!==titulo)?`<div class="metaline">${escapar(it.estilo)}</div>`:"";
   const marcas=[];
-  if(it.audio_url) marcas.push(esVideoFile(it.audio_url)?'<span class="mk" title="Tiene vídeo">▶</span>':'<span class="mk" title="Tiene audio">♪</span>');
+  if(it.audio_url) marcas.push('<span class="mk" title="Tiene audio">♪</span>');
   if(youtubeId(it.video_url)) marcas.push('<span class="mk" title="Tiene YouTube">YT</span>');
   return `<article class="card" style="--palo:${col}" tabindex="0" role="button" onclick="verCante('${it.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();verCante('${it.id}')}">
     <h3>${escapar(titulo)}</h3>
@@ -403,10 +403,7 @@ function render(){
 function mediaHTML(it){
   let grab="";
   if(it.audio_url){
-    if(esVideoFile(it.audio_url))
-      grab=`<div class="dmedia"><span class="cap">Grabación</span><div class="video-embed"><video controls preload="metadata" src="${escapar(it.audio_url)}" style="position:absolute;inset:0;width:100%;height:100%"></video></div></div>`;
-    else
-      grab=`<div class="dmedia"><span class="cap">Grabación</span><audio controls preload="metadata" src="${escapar(it.audio_url)}"></audio><div style="margin-top:8px"><a class="open" href="${escapar(it.audio_url)}" target="_blank" rel="noopener" style="font-size:.8rem">Descargar / abrir en otra pestaña</a></div></div>`;
+    grab=`<div class="dmedia"><span class="cap">Grabación</span><audio controls preload="metadata" src="${escapar(it.audio_url)}"></audio><div style="margin-top:8px"><a class="open" href="${escapar(it.audio_url)}" target="_blank" rel="noopener" style="font-size:.8rem">Descargar / abrir en otra pestaña</a></div></div>`;
   }
   let ref=""; const yt=youtubeId(it.video_url);
   if(yt) ref=`<div class="dmedia"><span class="cap">Referencia</span><div class="video-embed"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${yt}" title="Referencia" allow="encrypted-media;picture-in-picture" allowfullscreen></iframe></div></div>`;
@@ -487,7 +484,7 @@ function pintarEstado(){
   const el=$("#estado"), txt=$("#estadoTxt");
   if(MODO==="nube"){ el.classList.remove("local"); txt.innerHTML="Conectado · el cuaderno se comparte con <b>toda la clase</b>"; }
   else{ el.classList.add("local"); txt.innerHTML="Modo local · solo se guarda en <b>este dispositivo</b>. Revisa que <b>config.js</b> tenga tus claves de Supabase.";
-    const hg=$("#hintGrab"); if(hg) hg.innerHTML="Para subir archivos necesitas Supabase. En modo local, usa el YouTube de referencia."; }
+    const hg=$("#hintGrab"); if(hg) hg.innerHTML="Para subir audios necesitas Supabase. En modo local, usa el YouTube de referencia."; }
 }
 
 /* ---------- Modal añadir/editar ---------- */
@@ -500,7 +497,7 @@ function abrir(id){
   ["f-estilo","f-titulo","f-cantaor","f-letra","f-youtube","f-autor","f-editor"].forEach(i=>$("#"+i).value="");
   $("#f-grab-file").value=""; $("#f-palo-nuevo").value=""; $("#f-palo-nuevo").style.display="none";
   $("#f-quitar-audio").checked=false; $("#audioActual").style.display="none"; $("#audioActualPlayer").innerHTML="";
-  $("#hintGrab").textContent="Audio de WhatsApp o un vídeo corto de clase · hasta 50 MB por archivo.";
+  $("#hintGrab").innerHTML="Sube <b>solo audios</b> (vale el .mp4 de WhatsApp) · máximo 5 MB.";
   $("#f-autor").readOnly = false; $("#campoEditor").style.display="none"; $("#lblAutor").innerHTML='Quién lo sube <span class="req">•</span>';
   const sel=$("#f-palo");
   if(EDITING){
@@ -514,10 +511,8 @@ function abrir(id){
       $("#campoEditor").style.display="block";
       if(it.audio_url){
         $("#audioActual").style.display="block";
-        $("#audioActualPlayer").innerHTML = esVideoFile(it.audio_url)
-          ? `<video controls preload="metadata" src="${escapar(it.audio_url)}" style="width:100%;max-height:200px"></video>`
-          : `<audio controls preload="metadata" src="${escapar(it.audio_url)}"></audio>`;
-        $("#hintGrab").textContent="Sube otro archivo para reemplazar el actual · hasta 50 MB.";
+        $("#audioActualPlayer").innerHTML = `<audio controls preload="metadata" src="${escapar(it.audio_url)}"></audio>`;
+        $("#hintGrab").textContent="Sube otro audio para reemplazar el actual · máximo 5 MB.";
       }
     }
   } else { sel.selectedIndex=0; }
@@ -548,8 +543,8 @@ $("#guardar").onclick = async ()=>{
 
   const grabFile=$("#f-grab-file").files[0];
   if(grabFile){
-    if(MODO!=="nube"){ alert("Para subir archivos necesitas conectar Supabase (ver README). De momento, usa el YouTube de referencia."); return; }
-    if(grabFile.size>MAX_MB*1024*1024){ alert(`El archivo supera los ${MAX_MB} MB. Para vídeos largos, usa un enlace de YouTube de referencia.`); return; }
+    if(MODO!=="nube"){ alert("Para subir audios necesitas conectar Supabase (ver README). De momento, usa el YouTube de referencia."); return; }
+    if(grabFile.size>MAX_MB*1024*1024){ alert(`Ese audio supera los ${MAX_MB} MB. Prueba con uno más corto o más comprimido.`); return; }
   }
 
   const editIt = EDITING ? byId(EDITING) : null;
