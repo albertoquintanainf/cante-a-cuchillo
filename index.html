@@ -78,6 +78,7 @@
   .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--palo,var(--oro))}
   .card h3{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.3rem;margin:0;line-height:1.15;color:var(--tinta);word-break:break-word}
   .card .metaline{font-size:.86rem;color:var(--tinta-2)}
+  .card .metaline.editado{font-size:.78rem;color:#9a8b75;font-style:italic}
   .card .foot{margin-top:auto;display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--linea)}
   .who{font-size:.8rem;color:var(--tinta-2);flex:1;min-width:0}
   .who b{color:var(--tinta);font-weight:600}
@@ -358,7 +359,14 @@ function escapar(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;
 function fecha(iso){ if(!iso) return ""; const d=new Date(iso); return isNaN(d)?"":d.toLocaleDateString("es-ES",{day:"numeric",month:"short",year:"numeric"}); }
 function esAudio(u){ return u && /\.(mp3|m4a|m4b|wav|ogg|oga|aac|opus|flac|weba|amr|mka|aiff?)$/.test(u.split("?")[0].toLowerCase()); }
 function esVideoFile(u){ return u && /\.(mp4|webm|mov|m4v|mkv|avi|ogv)$/.test(u.split("?")[0].toLowerCase()); }
-function youtubeId(u){ if(!u) return null; const m=u.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/); return m?m[1]:null; }
+function youtubeId(u){
+  if(!u) return null;
+  let m = u.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|shorts\/|live\/|v\/))([A-Za-z0-9_-]{11})/);
+  if(m) return m[1];
+  m = u.match(/[?&]v=([A-Za-z0-9_-]{11})/);
+  if(m) return m[1];
+  return null;
+}
 function byId(id){ return DATOS.find(x=>String(x.id)===String(id)); }
 
 /* ---------- Tablón (compacto) ---------- */
@@ -367,12 +375,16 @@ function tarjeta(it){
   const col=colorPalo(it.palo);
   const titulo=it.titulo||it.estilo||it.palo||"Sin título";
   const estilo=(it.estilo && it.estilo!==titulo)?`<div class="metaline">${escapar(it.estilo)}</div>`:"";
+  const hist=Array.isArray(it.historial)?it.historial:(it.editor?[{por:it.editor,cuando:it.editado}]:[]);
+  const ult=hist[hist.length-1];
+  const editado=ult?`<div class="metaline editado">Editado por ${escapar(ult.por||"—")} · ${fecha(ult.cuando)}</div>`:"";
   const marcas=[];
   if(it.audio_url) marcas.push('<span class="mk" title="Tiene audio">♪</span>');
   if(youtubeId(it.video_url)) marcas.push('<span class="mk" title="Tiene YouTube">YT</span>');
   return `<article class="card" style="--palo:${col}" tabindex="0" role="button" onclick="verCante('${it.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();verCante('${it.id}')}">
     <h3>${escapar(titulo)}</h3>
     ${estilo}
+    ${editado}
     <div class="foot">
       <span class="who">${it.autor?`<b>${escapar(it.autor)}</b> · `:""}${fecha(it.creado)}</span>
       ${marcas.join("")}
@@ -418,8 +430,7 @@ function mediaHTML(it){
         <button data-r="1" class="on">1×</button>
         <button data-r="1.25">1.25×</button>
         <button data-r="1.5">1.5×</button>
-      </div>
-      <div style="margin-top:8px"><a class="open" href="${escapar(it.audio_url)}" target="_blank" rel="noopener" style="font-size:.8rem">Descargar / abrir en otra pestaña</a></div></div>`;
+      </div></div>`;
   }
   let ref=""; const yt=youtubeId(it.video_url);
   if(yt) ref=`<div class="dmedia"><span class="cap">Referencia</span><div class="video-embed"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${yt}" title="Referencia" allow="encrypted-media;picture-in-picture" allowfullscreen></iframe></div></div>`;
