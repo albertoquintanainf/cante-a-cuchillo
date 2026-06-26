@@ -4,137 +4,147 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>El cante a cuchillo · La clase de El Cuchillero</title>
-<meta name="description" content="El cuaderno vivo de la clase de cante de El Cuchillero, organizado por palos: estilo, lugar, letra, cantaor de referencia, audio y vídeo." />
+<meta name="description" content="El cuaderno vivo de la clase de cante de El Cuchillero, organizado por palos." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;0,6..96,900;1,6..96,500;1,6..96,700&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;0,6..96,900;1,6..96,500;1,6..96,700&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   :root{
-    --tinta:#17110E; --tinta-2:#211711; --tinta-3:#2C2018;
-    --crema:#F2E8D5; --crema-2:#C9B79A;
-    --vino:#8E1E2C; --vino-claro:#B5384A;
-    --oro:#C99A4B; --oro-claro:#E2BE7C;
+    --cal:#F6F1E6;        /* fondo de cal cálido */
+    --papel:#FFFFFF;      /* fichas */
+    --papel-2:#FBF6EC;    /* superficies suaves */
+    --linea:#E6DCC8;      /* hairlines */
+    --linea-2:#D8CCB4;
+    --tinta:#2A211A;      /* texto principal */
+    --tinta-2:#7A6C59;    /* texto secundario */
+    --vino:#8E1E2C; --vino-claro:#AE2E3E;
+    --oro:#B5852F; --oro-claro:#D3A546;
+    --azulejo:#2F6F8F;
     --maxw:1180px; --r:14px;
-    --sombra:0 18px 40px -22px rgba(0,0,0,.8);
-    --paper:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+    --sombra:0 14px 34px -20px rgba(70,45,20,.45);
+    --sombra-sm:0 6px 18px -12px rgba(70,45,20,.4);
+    --paper:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
   }
   *{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
   body{
     margin:0;
     background:
-      radial-gradient(1200px 700px at 78% -8%, rgba(142,30,44,.18), transparent 60%),
-      radial-gradient(900px 600px at 6% 4%, rgba(201,154,75,.10), transparent 55%),
-      var(--tinta);
-    color:var(--crema); font-family:"Spectral",Georgia,serif; line-height:1.55; min-height:100vh;
+      radial-gradient(1100px 600px at 82% -6%, rgba(142,30,44,.07), transparent 60%),
+      radial-gradient(900px 540px at 2% 2%, rgba(181,133,47,.08), transparent 55%),
+      var(--cal);
+    color:var(--tinta); font-family:"Spectral",Georgia,serif; line-height:1.55; min-height:100vh;
   }
-  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:var(--paper);mix-blend-mode:soft-light;opacity:.9}
-  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px;position:relative;z-index:1}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:var(--paper);mix-blend-mode:multiply;opacity:.5}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(16px,4vw,22px);position:relative;z-index:1}
   a{color:inherit}
   button{font-family:inherit}
 
   /* Hero */
-  header.hero{padding:46px 0 22px}
-  .eyebrow{font-size:.78rem;letter-spacing:.32em;text-transform:uppercase;color:var(--oro);font-weight:500;margin:0 0 14px;display:flex;align-items:center;gap:12px}
-  .eyebrow::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--oro),transparent)}
-  h1.title{font-family:"Bodoni Moda",serif;font-weight:900;font-size:clamp(2.8rem,8.5vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em;color:var(--crema);text-shadow:0 1px 0 rgba(0,0,0,.4)}
-  h1.title em{font-style:italic;font-weight:700;color:var(--oro-claro)}
-  .lede{margin:18px 0 0;max-width:54ch;font-size:1.12rem;color:var(--crema-2);font-weight:300}
+  header.hero{padding:clamp(30px,6vw,48px) 0 18px}
+  .eyebrow{font-size:.76rem;letter-spacing:.3em;text-transform:uppercase;color:var(--vino);font-weight:600;margin:0 0 14px;display:flex;align-items:center;gap:12px}
+  .eyebrow::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--linea-2),transparent)}
+  h1.title{font-family:"Bodoni Moda",serif;font-weight:900;font-size:clamp(2.5rem,9vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em;color:var(--tinta)}
+  h1.title em{font-style:italic;font-weight:700;color:var(--vino)}
+  .lede{margin:16px 0 0;max-width:54ch;font-size:clamp(1rem,2.6vw,1.12rem);color:var(--tinta-2);font-weight:400}
 
-  /* Compás */
-  .compas{margin:28px 0 4px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .compas .lbl{font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--crema-2)}
-  .beats{display:flex;gap:10px;align-items:center}
-  .beat{width:10px;height:10px;border-radius:50%;background:var(--tinta-3);border:1px solid rgba(201,154,75,.25);transition:transform .25s,background .25s,box-shadow .25s}
-  .beat.acc{width:14px;height:14px;background:rgba(201,154,75,.30);border-color:var(--oro)}
-  .beat.on{background:var(--oro);box-shadow:0 0 14px rgba(201,154,75,.7);transform:scale(1.25)}
-  .beat.acc.on{background:var(--oro-claro)}
+  /* Compás (sin título, golpes en 7 y 8) */
+  .compas{margin:26px 0 4px;display:flex;align-items:center;gap:10px}
+  .beat{width:11px;height:11px;border-radius:50%;background:#E7DCC6;border:1px solid var(--linea-2);transition:transform .25s,background .25s,box-shadow .25s,border-color .25s;cursor:default}
+  .beat.acc{width:15px;height:15px;background:var(--vino);border-color:var(--vino)}
+  .beat.on{background:var(--oro);border-color:var(--oro);box-shadow:0 0 12px rgba(181,133,47,.55);transform:scale(1.22)}
+  .beat.acc.on{background:var(--vino-claro);box-shadow:0 0 14px rgba(174,46,62,.5)}
+  .beat:hover{transform:scale(1.18)}
 
   /* Toolbar */
-  .toolbar{position:sticky;top:0;z-index:5;margin:16px 0 10px;padding:14px 0;background:linear-gradient(180deg,var(--tinta) 70%,rgba(23,17,14,0));display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-  .search{flex:1 1 240px;display:flex;align-items:center;gap:10px;background:var(--tinta-2);border:1px solid var(--tinta-3);border-radius:999px;padding:10px 16px;min-width:0}
-  .search input{flex:1;background:none;border:0;outline:0;color:var(--crema);font-family:"Spectral",serif;font-size:1rem;min-width:0}
-  .search input::placeholder{color:#8a7a64}
-  .search svg{flex:none;opacity:.6}
-  .btn{cursor:pointer;border:0;border-radius:999px;padding:11px 18px;font-family:"Spectral",serif;font-size:.95rem;font-weight:500;transition:transform .15s,filter .15s,background .15s,color .15s}
+  .toolbar{position:sticky;top:0;z-index:5;margin:14px 0 8px;padding:12px 0;background:linear-gradient(180deg,var(--cal) 72%,rgba(246,241,230,0));display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .search{flex:1 1 240px;display:flex;align-items:center;gap:10px;background:var(--papel);border:1px solid var(--linea);border-radius:999px;padding:11px 16px;min-width:0;box-shadow:var(--sombra-sm)}
+  .search input{flex:1;background:none;border:0;outline:0;color:var(--tinta);font-family:"Spectral",serif;font-size:1rem;min-width:0}
+  .search input::placeholder{color:#9a8b75}
+  .search svg{flex:none;color:var(--tinta-2)}
+  .btn{cursor:pointer;border:0;border-radius:999px;padding:11px 20px;font-family:"Spectral",serif;font-size:.96rem;font-weight:500;transition:transform .15s,filter .15s,background .15s,color .15s}
   .btn:active{transform:translateY(1px)}
-  .btn-oro{background:linear-gradient(180deg,var(--oro-claro),var(--oro));color:#2a1c08}
-  .btn-oro:hover{filter:brightness(1.06)}
-  .btn-ghost{background:transparent;color:var(--crema-2);border:1px solid var(--tinta-3)}
-  .btn-ghost:hover{color:var(--crema);border-color:var(--crema-2)}
-  .btn-vino{background:var(--vino);color:var(--crema)}
+  .btn-vino{background:var(--vino);color:#fff;box-shadow:var(--sombra-sm)}
   .btn-vino:hover{background:var(--vino-claro)}
+  .btn-ghost{background:var(--papel);color:var(--tinta-2);border:1px solid var(--linea)}
+  .btn-ghost:hover{color:var(--tinta);border-color:var(--linea-2)}
 
-  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 6px}
-  .chip{border:1px solid var(--tinta-3);background:var(--tinta-2);color:var(--crema-2);padding:7px 14px;border-radius:999px;font-size:.86rem;cursor:pointer;font-family:"Spectral",serif;transition:all .18s;white-space:nowrap}
-  .chip:hover{color:var(--crema);border-color:var(--oro)}
-  .chip[aria-pressed="true"]{background:var(--crema);color:var(--tinta);border-color:var(--crema);font-weight:500}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 4px}
+  .chip{border:1px solid var(--linea);background:var(--papel);color:var(--tinta-2);padding:7px 14px;border-radius:999px;font-size:.86rem;cursor:pointer;font-family:"Spectral",serif;transition:all .18s;white-space:nowrap}
+  .chip:hover{color:var(--tinta);border-color:var(--oro)}
+  .chip[aria-pressed="true"]{background:var(--tinta);color:var(--cal);border-color:var(--tinta);font-weight:500}
 
-  .estado{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;color:var(--crema-2);margin:6px 0 10px;padding:7px 13px;border-radius:999px;background:var(--tinta-2);border:1px solid var(--tinta-3)}
+  .estado{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;color:var(--tinta-2);margin:6px 0 8px;padding:7px 13px;border-radius:999px;background:var(--papel);border:1px solid var(--linea)}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--oro)}
-  .estado.local .dot{background:#B5562F}
-  .estado b{color:var(--crema);font-weight:500}
+  .estado.local .dot{background:var(--vino)}
+  .estado b{color:var(--tinta);font-weight:500}
 
   /* Secciones por palo */
-  .palo-sec{margin:30px 0 8px}
+  .palo-sec{margin:28px 0 6px}
   .palo-head{display:flex;align-items:baseline;gap:14px;margin:0 0 16px}
-  .palo-head h2{font-family:"Bodoni Moda",serif;font-weight:700;font-size:clamp(1.5rem,3.4vw,2.1rem);margin:0;color:var(--crema);letter-spacing:.01em}
-  .palo-head .n{font-size:.8rem;color:var(--crema-2);letter-spacing:.06em}
-  .palo-head .rule{flex:1;height:0;border-top:1px solid var(--tinta-3);position:relative;top:-4px}
+  .palo-head h2{font-family:"Bodoni Moda",serif;font-weight:700;font-size:clamp(1.45rem,4.5vw,2.1rem);margin:0;color:var(--tinta)}
+  .palo-head .n{font-size:.8rem;color:var(--tinta-2);letter-spacing:.05em;white-space:nowrap}
+  .palo-head .rule{flex:1;height:0;border-top:1px solid var(--linea);position:relative;top:-4px;min-width:24px}
   .palo-head .rule::after{content:"";position:absolute;left:0;top:0;width:46px;border-top:2px solid var(--palo,var(--oro))}
 
-  .grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
-  .card{background:var(--tinta-2);border:1px solid var(--tinta-3);border-radius:var(--r);padding:20px 20px 16px;position:relative;overflow:hidden;box-shadow:var(--sombra);display:flex;flex-direction:column;gap:11px}
+  .grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr))}
+  .card{background:var(--papel);border:1px solid var(--linea);border-radius:var(--r);padding:20px 20px 16px;position:relative;overflow:hidden;box-shadow:var(--sombra);display:flex;flex-direction:column;gap:11px}
   .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--palo,var(--oro))}
-  .card h3{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.4rem;margin:0;line-height:1.12;color:var(--crema)}
-  .card .metaline{font-size:.84rem;color:var(--crema-2);letter-spacing:.02em}
-  .card .metaline b{color:var(--oro-claro);font-weight:500}
-  .card .letra{margin:0;color:var(--crema-2);font-size:.98rem;white-space:pre-wrap;font-style:italic;border-left:2px solid var(--tinta-3);padding-left:12px;display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden}
+  .card h3{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.4rem;margin:0;line-height:1.14;color:var(--tinta);word-break:break-word}
+  .card .metaline{font-size:.85rem;color:var(--tinta-2);letter-spacing:.02em}
+  .card .metaline b{color:var(--vino);font-weight:600}
+  .card .letra{margin:0;color:#4a4035;font-size:.99rem;white-space:pre-wrap;font-style:italic;border-left:2px solid var(--linea-2);padding-left:12px;display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden}
   .card audio{width:100%;height:38px}
   .card .video-embed{position:relative;width:100%;padding-top:56.25%;border-radius:8px;overflow:hidden;background:#000}
   .card .video-embed iframe,.card .video-embed video{position:absolute;inset:0;width:100%;height:100%;border:0}
-  .card .foot{margin-top:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--tinta-3)}
-  .who{font-size:.82rem;color:var(--crema-2);flex:1;min-width:0}
-  .who b{color:var(--oro-claro);font-weight:500}
-  .open{text-decoration:none;font-size:.84rem;color:var(--crema);background:var(--tinta-3);padding:7px 12px;border-radius:8px;display:inline-flex;gap:7px;align-items:center;transition:background .15s}
-  .open:hover{background:#3a2c20}
-  .del{background:none;border:0;color:#7a6a58;cursor:pointer;font-size:.95rem;padding:6px;line-height:1;border-radius:6px}
-  .del:hover{color:var(--vino-claro)}
+  .card .foot{margin-top:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--linea)}
+  .who{font-size:.82rem;color:var(--tinta-2);flex:1;min-width:0}
+  .who b{color:var(--tinta);font-weight:600}
+  .open{text-decoration:none;font-size:.84rem;color:var(--tinta);background:var(--papel-2);border:1px solid var(--linea);padding:7px 12px;border-radius:8px;display:inline-flex;gap:7px;align-items:center;transition:background .15s}
+  .open:hover{background:#f1e9da}
+  .del{background:none;border:0;color:#b0a08c;cursor:pointer;font-size:.95rem;padding:6px;line-height:1;border-radius:6px}
+  .del:hover{color:var(--vino)}
 
-  .empty{text-align:center;padding:70px 20px;border:1px dashed var(--tinta-3);border-radius:var(--r);color:var(--crema-2)}
-  .empty h3{font-family:"Bodoni Moda",serif;color:var(--crema);font-size:1.6rem;margin:0 0 8px}
-  .empty p{margin:0 0 22px;max-width:42ch;margin-inline:auto}
+  .empty{text-align:center;padding:clamp(48px,10vw,72px) 20px;border:1px dashed var(--linea-2);border-radius:var(--r);color:var(--tinta-2);background:var(--papel-2)}
+  .empty h3{font-family:"Bodoni Moda",serif;color:var(--tinta);font-size:1.6rem;margin:0 0 8px}
+  .empty p{margin:0 auto 22px;max-width:42ch}
 
   /* Modal */
-  .overlay{position:fixed;inset:0;z-index:50;display:none;align-items:flex-start;justify-content:center;background:rgba(8,5,3,.66);backdrop-filter:blur(3px);padding:28px 16px;overflow-y:auto}
+  .overlay{position:fixed;inset:0;z-index:50;display:none;align-items:flex-start;justify-content:center;background:rgba(42,33,26,.45);backdrop-filter:blur(3px);padding:clamp(14px,4vw,28px) 14px;overflow-y:auto}
   .overlay.open{display:flex}
-  .modal{width:100%;max-width:600px;background:var(--tinta-2);border:1px solid var(--tinta-3);border-radius:18px;box-shadow:var(--sombra);padding:26px;position:relative}
-  .modal.sm{max-width:420px}
-  .modal h2{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.7rem;margin:0 0 4px}
-  .modal .sub{color:var(--crema-2);font-size:.92rem;margin:0 0 20px}
+  .modal{width:100%;max-width:600px;background:var(--cal);border:1px solid var(--linea);border-radius:18px;box-shadow:0 30px 60px -24px rgba(40,26,12,.5);padding:clamp(20px,4vw,26px);position:relative}
+  .modal h2{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.7rem;margin:0 0 4px;color:var(--tinta)}
+  .modal .sub{color:var(--tinta-2);font-size:.92rem;margin:0 0 20px}
   .field{margin-bottom:15px}
-  .field label{display:block;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--crema-2);margin:0 0 7px}
-  .field input,.field select,.field textarea{width:100%;background:var(--tinta);border:1px solid var(--tinta-3);border-radius:10px;color:var(--crema);padding:11px 13px;font-family:"Spectral",serif;font-size:1rem;outline:none;transition:border-color .15s}
-  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--oro)}
+  .field label{display:block;font-size:.77rem;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta-2);margin:0 0 7px}
+  .field label .req{color:var(--vino)}
+  .field label .opt{color:#a99a83;font-weight:400;text-transform:none;letter-spacing:0}
+  .field input,.field select,.field textarea{width:100%;background:var(--papel);border:1px solid var(--linea-2);border-radius:10px;color:var(--tinta);padding:11px 13px;font-family:"Spectral",serif;font-size:1rem;outline:none;transition:border-color .15s,box-shadow .15s}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--oro);box-shadow:0 0 0 3px rgba(181,133,47,.15)}
   .field textarea{min-height:120px;resize:vertical;line-height:1.5}
-  .field input[type=file]{padding:9px 12px;color:var(--crema-2);cursor:pointer;margin-top:8px}
-  .field input[type=file]::file-selector-button{font-family:"Spectral",serif;background:var(--tinta-3);color:var(--crema);border:0;border-radius:8px;padding:7px 13px;margin-right:12px;cursor:pointer}
-  .field input[type=file]::file-selector-button:hover{background:#3a2c20}
+  .field input[type=file]{padding:9px 12px;color:var(--tinta-2);cursor:pointer;margin-top:8px;background:var(--papel-2)}
+  .field input[type=file]::file-selector-button{font-family:"Spectral",serif;background:var(--tinta);color:var(--cal);border:0;border-radius:8px;padding:7px 13px;margin-right:12px;cursor:pointer}
+  .field input[type=file]::file-selector-button:hover{background:#41342a}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .media-box{border:1px solid var(--tinta-3);border-radius:12px;padding:13px 14px;margin-bottom:15px;background:rgba(0,0,0,.12)}
-  .media-box > label{display:block;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--oro);margin:0 0 8px}
+  .media-box{border:1px solid var(--linea);border-radius:12px;padding:13px 14px;margin-bottom:15px;background:var(--papel-2)}
+  .media-box > label{display:block;font-size:.77rem;letter-spacing:.1em;text-transform:uppercase;color:var(--oro);margin:0 0 8px;font-weight:600}
+  .media-box > label .opt{color:#a99a83;font-weight:400;text-transform:none;letter-spacing:0}
   .modal-actions{display:flex;gap:12px;margin-top:8px;justify-content:flex-end;flex-wrap:wrap}
-  .close-x{position:absolute;top:16px;right:16px;background:none;border:0;color:var(--crema-2);font-size:1.6rem;cursor:pointer;line-height:1}
-  .close-x:hover{color:var(--crema)}
-  .hint{font-size:.78rem;color:#8a7a64;margin:6px 0 0}
+  .close-x{position:absolute;top:14px;right:14px;background:none;border:0;color:var(--tinta-2);font-size:1.7rem;cursor:pointer;line-height:1}
+  .close-x:hover{color:var(--tinta)}
+  .hint{font-size:.78rem;color:#a08f78;margin:6px 0 0}
 
-  footer{border-top:1px solid var(--tinta-3);padding:30px 0 50px;margin-top:30px;color:var(--crema-2);font-size:.86rem;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center}
+  footer{border-top:1px solid var(--linea);padding:28px 0 46px;margin-top:30px;color:var(--tinta-2);font-size:.86rem;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center}
   footer .mini-compas{display:flex;gap:7px}
-  footer .mini-compas span{width:7px;height:7px;border-radius:50%;background:var(--tinta-3)}
-  footer .mini-compas span.a{background:var(--oro)}
+  footer .mini-compas span{width:7px;height:7px;border-radius:50%;background:var(--linea-2)}
+  footer .mini-compas span.a{background:var(--vino)}
 
   :focus-visible{outline:2px solid var(--oro);outline-offset:2px}
-  @media (max-width:560px){header.hero{padding:34px 0 16px}.row2{grid-template-columns:1fr}.modal{padding:22px 18px}}
+  @media (max-width:600px){
+    .row2{grid-template-columns:1fr}
+    .toolbar .btn{flex:1 1 auto;text-align:center}
+    footer{flex-direction:column;align-items:flex-start;gap:12px}
+  }
   @media (prefers-reduced-motion:reduce){.beat{transition:none}}
 </style>
 </head>
@@ -144,11 +154,8 @@
   <header class="hero">
     <p class="eyebrow" id="eyebrow">Tablón de la clase · El Cuchillero</p>
     <h1 class="title" id="titulo">El cante <em>a cuchillo</em></h1>
-    <p class="lede" id="lede">El cuaderno vivo de la clase, ordenado por palos. Cada cante con su estilo, su tierra, su letra, su cantaor de referencia y sus grabaciones. Lo llenamos entre todos.</p>
-    <div class="compas" aria-hidden="true">
-      <span class="lbl">Compás por soleá</span>
-      <div class="beats" id="beats"></div>
-    </div>
+    <p class="lede" id="lede">El cuaderno vivo de la clase, ordenado por palos. Cada cante con su título, su letra y sus grabaciones. Lo llenamos entre todos.</p>
+    <div class="compas" id="compas" aria-hidden="true"></div>
   </header>
 
   <div class="estado" id="estado"><span class="dot"></span><span id="estadoTxt">Comprobando…</span></div>
@@ -156,10 +163,9 @@
   <div class="toolbar">
     <label class="search">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-      <input id="buscar" type="search" placeholder="Buscar por palo, estilo, cantaor, letra…" aria-label="Buscar" />
+      <input id="buscar" type="search" placeholder="Buscar por palo, título, cantaor, letra…" aria-label="Buscar" />
     </label>
-    <button class="btn btn-ghost" id="abrirPalo">＋ Palo</button>
-    <button class="btn btn-oro" id="abrirAdd">＋ Añadir cante</button>
+    <button class="btn btn-vino" id="abrirAdd">＋ Añadir cante</button>
   </div>
   <div class="chips" id="chips"></div>
 
@@ -168,7 +174,7 @@
   <footer>
     <span>El cante a cuchillo · sube tu cante cuando lo tengas.</span>
     <div class="mini-compas" aria-hidden="true">
-      <span></span><span></span><span class="a"></span><span></span><span></span><span class="a"></span><span></span><span class="a"></span><span></span><span class="a"></span><span></span><span class="a"></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span><span class="a"></span><span class="a"></span><span></span><span></span><span></span><span></span>
     </div>
   </footer>
 </div>
@@ -178,75 +184,57 @@
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTit">
     <button class="close-x" id="cerrar" aria-label="Cerrar">×</button>
     <h2 id="modalTit">Añadir un cante</h2>
-    <p class="sub">Rellena lo que tengas. Cuanto más completo, mejor cuaderno.</p>
+    <p class="sub">Los campos con <span style="color:var(--vino)">•</span> son obligatorios.</p>
 
     <div class="row2">
       <div class="field">
-        <label for="f-palo">Palo</label>
+        <label for="f-palo">Palo <span class="req">•</span></label>
         <select id="f-palo"></select>
         <input id="f-palo-nuevo" type="text" placeholder="Nombre del palo nuevo" style="display:none;margin-top:8px" maxlength="40" />
       </div>
       <div class="field">
-        <label for="f-estilo">Estilo</label>
-        <input id="f-estilo" placeholder="Ej. de Alcalá, apolá, de Triana…" maxlength="80" />
-      </div>
-    </div>
-
-    <div class="row2">
-      <div class="field">
-        <label for="f-lugar">Lugar</label>
-        <input id="f-lugar" placeholder="Ej. Alcalá de Guadaíra" maxlength="80" />
-      </div>
-      <div class="field">
-        <label for="f-cantaor">Cantaor de referencia</label>
-        <input id="f-cantaor" placeholder="Ej. Antonio Mairena" maxlength="80" />
+        <label for="f-estilo">Estilo <span class="req">•</span></label>
+        <input id="f-estilo" placeholder="Ej. de Alcalá, apolá…" maxlength="80" />
       </div>
     </div>
 
     <div class="field">
-      <label for="f-letra">Letra</label>
+      <label for="f-titulo">Título <span class="req">•</span> <span class="opt">— lo que se ve en el tablón</span></label>
+      <input id="f-titulo" placeholder="Ej. Soleá de Alcalá de Joaquín el de la Paula" maxlength="100" />
+    </div>
+
+    <div class="field">
+      <label for="f-letra">Letra <span class="req">•</span></label>
       <textarea id="f-letra" placeholder="Pega aquí la copla o la letra…"></textarea>
     </div>
 
+    <div class="field">
+      <label for="f-cantaor">Cantaor de referencia <span class="opt">— opcional</span></label>
+      <input id="f-cantaor" placeholder="Ej. Antonio Mairena" maxlength="80" />
+    </div>
+
     <div class="media-box">
-      <label>Audio</label>
+      <label>Audio <span class="opt">— opcional</span></label>
       <input id="f-audio-url" type="url" placeholder="Enlace (SoundCloud, Drive…)" />
       <input id="f-audio-file" type="file" accept="audio/*" />
       <p class="hint" id="hintAudio">O sube un archivo de audio · hasta 50 MB.</p>
     </div>
 
     <div class="media-box">
-      <label>Vídeo</label>
+      <label>Vídeo <span class="opt">— opcional</span></label>
       <input id="f-video-url" type="url" placeholder="Enlace de YouTube (se ve dentro de la web)" />
       <input id="f-video-file" type="file" accept="video/*" />
-      <p class="hint" id="hintVideo">Para vídeos largos, mejor un enlace de YouTube que subir el archivo.</p>
+      <p class="hint" id="hintVideo">Para vídeos largos, mejor un enlace de YouTube.</p>
     </div>
 
     <div class="field">
-      <label for="f-autor">Tu nombre</label>
-      <input id="f-autor" placeholder="¿Quién lo sube?" maxlength="40" />
+      <label for="f-autor">Quién lo sube <span class="req">•</span></label>
+      <input id="f-autor" placeholder="Tu nombre" maxlength="40" />
     </div>
 
     <div class="modal-actions">
       <button class="btn btn-ghost" id="cancelar">Cancelar</button>
       <button class="btn btn-vino" id="guardar">Guardar cante</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: nuevo palo -->
-<div class="overlay" id="overlayPalo">
-  <div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="paloTit">
-    <button class="close-x" id="cerrarPalo" aria-label="Cerrar">×</button>
-    <h2 id="paloTit">Nuevo palo</h2>
-    <p class="sub">Añade un palo a la lista de la clase.</p>
-    <div class="field">
-      <label for="np-nombre">Nombre del palo</label>
-      <input id="np-nombre" placeholder="Ej. Cantiñas, Caña, Petenera…" maxlength="40" />
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" id="cancelarPalo">Cancelar</button>
-      <button class="btn btn-oro" id="guardarPaloBtn">Añadir palo</button>
     </div>
   </div>
 </div>
@@ -259,17 +247,16 @@
 const CONFIG = {
   NOMBRE_CLASE: "El cante a cuchillo",
   PROFESOR: "El Cuchillero",
-  // Para compartir entre TODA la clase, crea un proyecto gratis en supabase.com
-  // y pega aquí las dos claves (ver README). Vacías = modo local (solo este equipo).
-  SUPABASE_URL: "https://hrrlgriqtasuueimebei.supabase.co",
-  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhycmxncmlxdGFzdXVlaW1lYmVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0NTc1ODksImV4cCI6MjA5ODAzMzU4OX0.tHmlB4ETmbweuSpp-QMSqc7KkxIGyzVh88cnCsErkPU"
+  SUPABASE_URL: "",
+  SUPABASE_ANON_KEY: ""
 };
 /* ========================================================================= */
 
 const BASE_PALOS = ["Soleá","Seguiriya","Bulerías","Tangos","Tientos","Fandangos","Fandangos de Huelva","Alegrías","Cantiñas","Tarantos","Malagueñas","Granaínas","Peteneras","Caña","Polo","Serranas","Saetas","Sevillanas","Tonás","Martinetes","Rumba"];
-const PALETA = ["#B5384A","#C99A4B","#B5562F","#7E7A45","#5E7A86","#9C6B3F","#8E1E2C","#A8843C","#6E5A86"];
+const PALETA = ["#A12B38","#B5852F","#AA4F2A","#6E7A35","#2F6F8F","#8C5A2C","#7A2230","#9E7A2C","#5A4E86"];
 const MAX_MB = 50, BUCKET = "material";
 const LS_MAT = "cuchillo_materiales_v1", LS_PALOS = "cuchillo_palos_v1";
+const COMPAS_ACC = [7,8]; // golpes marcados
 
 /* ---------- Conexión ---------- */
 let sb = null, MODO = "local";
@@ -337,17 +324,10 @@ let DATOS = [], CUSTOM_PALOS = [], filtro = "todo", q = "";
 
 function palosConocidos(){
   const usados = DATOS.map(d=>d.palo).filter(Boolean);
-  const set = [...new Set([...BASE_PALOS, ...CUSTOM_PALOS, ...usados])];
-  return set;
+  return [...new Set([...BASE_PALOS, ...CUSTOM_PALOS, ...usados])];
 }
-function ordenPalo(nombre){
-  const i = BASE_PALOS.indexOf(nombre);
-  return i>=0 ? i : 1000 + nombre.toLowerCase().charCodeAt(0);
-}
-function colorPalo(nombre){
-  let h=0; for(const c of (nombre||"")) h=(h+c.charCodeAt(0))%PALETA.length;
-  return PALETA[h];
-}
+function ordenPalo(n){ const i=BASE_PALOS.indexOf(n); return i>=0?i:1000+(n||"").toLowerCase().charCodeAt(0); }
+function colorPalo(n){ let h=0; for(const c of (n||"")) h=(h+c.charCodeAt(0))%PALETA.length; return PALETA[h]; }
 
 /* ---------- Helpers ---------- */
 const $ = s => document.querySelector(s);
@@ -355,29 +335,24 @@ function escapar(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;
 function fecha(iso){ if(!iso) return ""; const d=new Date(iso); return isNaN(d)?"":d.toLocaleDateString("es-ES",{day:"numeric",month:"short"}); }
 function esAudio(u){ return u && /\.(mp3|m4a|wav|ogg|oga|aac|opus|flac)$/.test(u.split("?")[0].toLowerCase()); }
 function esVideoFile(u){ return u && /\.(mp4|webm|mov|m4v)$/.test(u.split("?")[0].toLowerCase()); }
-function youtubeId(u){
-  if(!u) return null;
-  const m = u.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
-  return m ? m[1] : null;
-}
+function youtubeId(u){ if(!u) return null; const m=u.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/); return m?m[1]:null; }
 
 /* ---------- Render ---------- */
 const board = $("#board");
 
 function tarjeta(it){
   const col = colorPalo(it.palo);
-  const titulo = it.estilo || it.cantaor || it.palo || "Sin estilo";
+  const titulo = it.titulo || it.estilo || it.palo || "Sin título";
   const metaParts = [];
-  if(it.lugar) metaParts.push(escapar(it.lugar));
-  if(it.cantaor && it.cantaor!==titulo) metaParts.push(`<b>${escapar(it.cantaor)}</b>`);
+  if(it.estilo && it.estilo!==titulo) metaParts.push(escapar(it.estilo));
+  if(it.cantaor) metaParts.push(`<b>${escapar(it.cantaor)}</b>`);
   const meta = metaParts.length ? `<div class="metaline">${metaParts.join(" · ")}</div>` : "";
 
-  // audio
   let audio = "";
   if(esAudio(it.audio_url)) audio = `<audio controls preload="none" src="${escapar(it.audio_url)}"></audio>`;
   else if(it.audio_url) audio = `<a class="open" href="${escapar(it.audio_url)}" target="_blank" rel="noopener">Escuchar
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></a>`;
-  // video
+
   let video = "", videoLink = "";
   const yt = youtubeId(it.video_url);
   if(yt) video = `<div class="video-embed"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${yt}" title="Vídeo" allow="encrypted-media;picture-in-picture" allowfullscreen></iframe></div>`;
@@ -404,14 +379,14 @@ function render(){
   const items = DATOS.filter(it=>{
     if(filtro!=="todo" && (it.palo||"")!==filtro) return false;
     if(!ql) return true;
-    return [it.palo,it.estilo,it.lugar,it.cantaor,it.letra,it.autor].join(" ").toLowerCase().includes(ql);
+    return [it.palo,it.titulo,it.estilo,it.cantaor,it.letra,it.autor].join(" ").toLowerCase().includes(ql);
   });
 
   if(!items.length){
     board.innerHTML = `<div class="empty">
       <h3>${DATOS.length?"Nada por aquí":"El tablón aún está sin estrenar"}</h3>
       <p>${DATOS.length?"Prueba con otro palo o con otra búsqueda.":"Sube el primer cante: por soleá, por seguiriya, por lo que toque en clase."}</p>
-      <button class="btn btn-oro" onclick="document.getElementById('abrirAdd').click()">＋ Añadir el primero</button>
+      <button class="btn btn-vino" onclick="document.getElementById('abrirAdd').click()">＋ Añadir el primero</button>
     </div>`;
     return;
   }
@@ -422,14 +397,13 @@ function render(){
 
   board.innerHTML = claves.map(palo=>{
     const col = colorPalo(palo), arr = grupos[palo];
-    const cards = arr.map(tarjeta).join("");
     return `<section class="palo-sec">
       <div class="palo-head" style="--palo:${col}">
         <h2>${escapar(palo)}</h2>
         <span class="n">${arr.length} ${arr.length===1?"cante":"cantes"}</span>
         <span class="rule"></span>
       </div>
-      <div class="grid">${cards}</div>
+      <div class="grid">${arr.map(tarjeta).join("")}</div>
     </section>`;
   }).join("");
 }
@@ -450,17 +424,13 @@ function pintarChips(){
   const usados = [...new Set(DATOS.map(d=>d.palo).filter(Boolean))].sort((a,b)=>ordenPalo(a)-ordenPalo(b));
   const all = [{k:"todo",l:"Todos"}].concat(usados.map(p=>({k:p,l:p})));
   $("#chips").innerHTML = all.map(c=>`<button class="chip" data-f="${escapar(c.k)}" aria-pressed="${c.k===filtro}">${escapar(c.l)}</button>`).join("");
-  $("#chips").querySelectorAll(".chip").forEach(b=>{
-    b.onclick = ()=>{ filtro = b.dataset.f; pintarChips(); render(); };
-  });
+  $("#chips").querySelectorAll(".chip").forEach(b=>{ b.onclick=()=>{ filtro=b.dataset.f; pintarChips(); render(); }; });
 }
 
-/* ---------- Selects de palo ---------- */
+/* ---------- Select de palo ---------- */
 function pintarSelectPalo(){
-  const sel = $("#f-palo");
-  const prev = sel.value;
-  const opts = palosConocidos().sort((a,b)=>ordenPalo(a)-ordenPalo(b))
-    .map(p=>`<option>${escapar(p)}</option>`).join("");
+  const sel = $("#f-palo"), prev = sel.value;
+  const opts = palosConocidos().sort((a,b)=>ordenPalo(a)-ordenPalo(b)).map(p=>`<option>${escapar(p)}</option>`).join("");
   sel.innerHTML = opts + `<option value="__nuevo__">➕ Nuevo palo…</option>`;
   if(prev && prev!=="__nuevo__") sel.value = prev;
   sel.onchange = ()=>{
@@ -472,10 +442,10 @@ function pintarSelectPalo(){
 
 /* ---------- Compás / estado ---------- */
 function pintarCompas(){
-  const acc=[3,6,8,10,12], beats=$("#beats");
-  beats.innerHTML = Array.from({length:12},(_,i)=>`<span class="beat ${acc.includes(i+1)?'acc':''}"></span>`).join("");
+  const cont = $("#compas");
+  cont.innerHTML = Array.from({length:12},(_,i)=>`<span class="beat ${COMPAS_ACC.includes(i+1)?'acc':''}"></span>`).join("");
   if(window.matchMedia("(prefers-reduced-motion:reduce)").matches) return;
-  const all=[...beats.children]; let i=0;
+  const all=[...cont.children]; let i=0;
   setInterval(()=>{ all.forEach(b=>b.classList.remove("on")); all[i].classList.add("on"); i=(i+1)%12; },360);
 }
 function pintarEstado(){
@@ -494,21 +464,29 @@ function abrir(){ pintarSelectPalo(); overlay.classList.add("open"); $("#f-estil
 function cerrar(){ overlay.classList.remove("open"); }
 $("#abrirAdd").onclick=abrir; $("#cerrar").onclick=cerrar; $("#cancelar").onclick=cerrar;
 overlay.addEventListener("click",e=>{ if(e.target===overlay) cerrar(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") cerrar(); });
+$("#buscar").addEventListener("input",e=>{ q=e.target.value; render(); });
 
 $("#guardar").onclick = async ()=>{
   let palo = $("#f-palo").value;
   const paloNuevo = $("#f-palo-nuevo").value.trim();
-  if(palo==="__nuevo__"){
-    if(!paloNuevo){ alert("Escribe el nombre del palo nuevo."); return; }
-    palo = paloNuevo;
-  }
-  const estilo=$("#f-estilo").value.trim(), letra=$("#f-letra").value.trim();
-  const audioFile=$("#f-audio-file").files[0], videoFile=$("#f-video-file").files[0];
-  const audioUrl=$("#f-audio-url").value.trim(), videoUrl=$("#f-video-url").value.trim();
+  if(palo==="__nuevo__") palo = paloNuevo;
 
-  if(!estilo && !letra && !audioUrl && !videoUrl && !audioFile && !videoFile){
-    alert("Pon al menos el estilo, la letra o una grabación."); return;
-  }
+  const estilo=$("#f-estilo").value.trim();
+  const titulo=$("#f-titulo").value.trim();
+  const letra=$("#f-letra").value.trim();
+  const autor=$("#f-autor").value.trim();
+  const cantaor=$("#f-cantaor").value.trim();
+
+  const faltan=[];
+  if(!palo) faltan.push("palo");
+  if(!estilo) faltan.push("estilo");
+  if(!titulo) faltan.push("título");
+  if(!letra) faltan.push("letra");
+  if(!autor) faltan.push("quién lo sube");
+  if(faltan.length){ alert("Faltan campos obligatorios: "+faltan.join(", ")+"."); return; }
+
+  const audioFile=$("#f-audio-file").files[0], videoFile=$("#f-video-file").files[0];
   for(const f of [audioFile, videoFile]){
     if(f){
       if(MODO!=="nube"){ alert("Para subir archivos necesitas conectar Supabase (ver README). Mientras tanto, usa un enlace."); return; }
@@ -517,14 +495,10 @@ $("#guardar").onclick = async ()=>{
   }
 
   const item = {
-    palo, estilo,
-    lugar:$("#f-lugar").value.trim(),
-    cantaor:$("#f-cantaor").value.trim(),
-    letra,
-    audio_url:audioUrl, audio_path:null,
-    video_url:videoUrl, video_path:null,
-    autor:$("#f-autor").value.trim(),
-    creado:new Date().toISOString()
+    palo, estilo, titulo, cantaor, letra,
+    audio_url:$("#f-audio-url").value.trim(), audio_path:null,
+    video_url:$("#f-video-url").value.trim(), video_path:null,
+    autor, creado:new Date().toISOString()
   };
 
   const btn=$("#guardar"); btn.disabled=true;
@@ -532,12 +506,12 @@ $("#guardar").onclick = async ()=>{
     if(audioFile){ btn.textContent="Subiendo audio…"; const up=await subir(audioFile); item.audio_url=up.url; item.audio_path=up.path; }
     if(videoFile){ btn.textContent="Subiendo vídeo…"; const up=await subir(videoFile); item.video_url=up.url; item.video_path=up.path; }
     btn.textContent="Guardando…";
-    if(palo===paloNuevo && paloNuevo) await guardarPaloDB(paloNuevo);
+    if(paloNuevo && palo===paloNuevo) await guardarPaloDB(paloNuevo);
     const saved = await anadir(item);
     if(saved){
       CUSTOM_PALOS = await listarPalos();
       DATOS = await listar();
-      ["f-estilo","f-lugar","f-cantaor","f-letra","f-audio-url","f-video-url"].forEach(id=>$("#"+id).value="");
+      ["f-estilo","f-titulo","f-cantaor","f-letra","f-audio-url","f-video-url","f-autor"].forEach(id=>$("#"+id).value="");
       $("#f-audio-file").value=""; $("#f-video-file").value=""; $("#f-palo-nuevo").value=""; $("#f-palo-nuevo").style.display="none";
       pintarChips(); render(); cerrar();
     }
@@ -545,34 +519,9 @@ $("#guardar").onclick = async ()=>{
   finally{ btn.disabled=false; btn.textContent="Guardar cante"; }
 };
 
-/* ---------- Modal nuevo palo ---------- */
-const overlayPalo=$("#overlayPalo");
-$("#abrirPalo").onclick=()=>{ overlayPalo.classList.add("open"); $("#np-nombre").focus(); };
-function cerrarPalo(){ overlayPalo.classList.remove("open"); $("#np-nombre").value=""; }
-$("#cerrarPalo").onclick=cerrarPalo; $("#cancelarPalo").onclick=cerrarPalo;
-overlayPalo.addEventListener("click",e=>{ if(e.target===overlayPalo) cerrarPalo(); });
-$("#guardarPaloBtn").onclick = async ()=>{
-  const n = $("#np-nombre").value.trim();
-  if(!n){ alert("Escribe un nombre."); return; }
-  if(palosConocidos().some(p=>p.toLowerCase()===n.toLowerCase())){ alert("Ese palo ya está en la lista."); return; }
-  const btn=$("#guardarPaloBtn"); btn.disabled=true; btn.textContent="Añadiendo…";
-  await guardarPaloDB(n);
-  CUSTOM_PALOS = await listarPalos();
-  if(!CUSTOM_PALOS.includes(n)) CUSTOM_PALOS.push(n);
-  btn.disabled=false; btn.textContent="Añadir palo";
-  pintarSelectPalo();
-  cerrarPalo();
-};
-
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ cerrar(); cerrarPalo(); } });
-$("#buscar").addEventListener("input",e=>{ q=e.target.value; render(); });
-
 /* ---------- Arranque ---------- */
 (async function(){
-  $("#titulo").innerHTML = `El cante <em>a cuchillo</em>`;
-  if(CONFIG.NOMBRE_CLASE && CONFIG.NOMBRE_CLASE!=="El cante a cuchillo"){
-    $("#titulo").textContent = CONFIG.NOMBRE_CLASE;
-  }
+  if(CONFIG.NOMBRE_CLASE && CONFIG.NOMBRE_CLASE!=="El cante a cuchillo") $("#titulo").textContent = CONFIG.NOMBRE_CLASE;
   $("#eyebrow").textContent = `Tablón de la clase · ${CONFIG.PROFESOR}`;
   document.title = `${CONFIG.NOMBRE_CLASE} · La clase de ${CONFIG.PROFESOR}`;
   initStore();
