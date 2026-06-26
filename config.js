@@ -13,6 +13,6 @@ window.CONFIG = {
   NOMBRE_CLASE: "El cante a cuchillo",
   PROFESOR: "El Cuchillero",
 
-  SUPABASE_URL: "",        // p. ej. "https://xxxx.supabase.co"
-  SUPABASE_ANON_KEY: ""    // tu clave anon (eyJ...) o publishable (sb_publishable_...)
+  SUPABASE_URL: "https://hrrlgriqtasuueimebei.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_vxF-17T5ITLaXDDkq6MT5A_ORbSi7PK"
 };
