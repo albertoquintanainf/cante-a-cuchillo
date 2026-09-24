@@ -21,7 +21,8 @@
     --paper:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
   }
   *{box-sizing:border-box}
-  html{-webkit-text-size-adjust:100%}
+  html{-webkit-text-size-adjust:100%;overflow-x:hidden}
+  body{overflow-wrap:break-word}
   body{margin:0;background:radial-gradient(1100px 600px at 82% -6%, rgba(142,30,44,.07), transparent 60%),radial-gradient(900px 540px at 2% 2%, rgba(181,133,47,.08), transparent 55%),var(--cal);color:var(--tinta);font-family:"Spectral",Georgia,serif;line-height:1.55;min-height:100vh;display:flex;flex-direction:column}
   #contenido{flex:1 0 auto}
   body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:var(--paper);mix-blend-mode:multiply;opacity:.5}
@@ -30,12 +31,12 @@
   button{font-family:inherit}
 
   header.hero{padding:clamp(30px,6vw,48px) 0 18px}
-  .eyebrow{font-size:.76rem;letter-spacing:.3em;text-transform:uppercase;color:var(--vino);font-weight:600;margin:0 0 14px;display:flex;align-items:center;gap:12px}
+  .eyebrow{font-size:.76rem;letter-spacing:.2em;text-transform:uppercase;color:var(--vino);font-weight:600;margin:0 0 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
   .eyebrow::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--linea-2),transparent)}
   h1.title{font-family:"Bodoni Moda",serif;font-weight:900;font-size:clamp(2.5rem,9vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em;color:var(--tinta)}
   h1.title em{font-style:italic;font-weight:700;color:var(--vino)}
   .lede{margin:16px 0 0;font-size:clamp(1rem,2.6vw,1.12rem);color:var(--tinta-2)}
-  @media (min-width:620px){ .lede{white-space:nowrap} }
+  @media (min-width:900px){ .lede{white-space:nowrap} }
 
   /* Compás: golpes 3,7,8,10,12 resaltados solo al pasar */
   .compas{margin:26px 0 4px;display:flex;align-items:center;gap:10px}
@@ -51,7 +52,7 @@
   .topbar{position:sticky;top:0;z-index:5;margin:6px 0;padding:10px 0;background:linear-gradient(180deg,var(--cal) 78%,rgba(246,241,230,0));display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .topbar .search{flex:1 1 180px;padding:8px 14px}
   .topbar .search input{font-size:.95rem}
-  .topbar-title{flex:1 1 auto;font-family:"Bodoni Moda",serif;font-weight:700;font-size:clamp(1.5rem,5.5vw,2.2rem);margin:0;color:var(--tinta);line-height:1.05;border-left:4px solid var(--palo,var(--oro));padding-left:12px}
+  .topbar-title{flex:1 1 auto;min-width:0;overflow-wrap:anywhere;font-family:"Bodoni Moda",serif;font-weight:700;font-size:clamp(1.5rem,5.5vw,2.2rem);margin:0;color:var(--tinta);line-height:1.05;border-left:4px solid var(--palo,var(--oro));padding-left:12px}
   /* En páginas de palo: el buscador se hace pequeño y va a la derecha */
   .topbar.con-titulo .search{flex:0 1 200px;order:3}
   .topbar.con-titulo .btn-sm{order:4}
@@ -156,7 +157,7 @@
   .back{background:none;border:0;color:var(--tinta-2);font-family:"Spectral",serif;font-size:.96rem;cursor:pointer;padding:8px 0;margin-bottom:14px}
   .back:hover{color:var(--vino)}
   .detalle .eyebrow{color:var(--palo,var(--vino))}
-  .dtitulo{font-family:"Bodoni Moda",serif;font-weight:900;font-size:clamp(2rem,6.5vw,3.4rem);line-height:1.03;margin:4px 0 8px;color:var(--tinta)}
+  .dtitulo{font-family:"Bodoni Moda",serif;font-weight:900;font-size:clamp(2rem,6.5vw,3.4rem);line-height:1.03;margin:4px 0 8px;color:var(--tinta);overflow-wrap:anywhere}
   .dmeta{color:var(--tinta-2);font-size:1.05rem;margin-bottom:26px}
   .dmeta b{color:var(--vino);font-weight:600}
   .dletra{font-family:"Spectral",serif;font-style:italic;font-size:clamp(1.1rem,3vw,1.28rem);line-height:1.75;white-space:pre-wrap;color:#3c332a;border-left:3px solid var(--palo,var(--oro));padding:6px 0 6px 18px;margin:0 0 28px}
@@ -168,7 +169,7 @@
   .audio-r2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .audio-r1 .audio-nombre-in{flex:1;margin:0;border:0;background:transparent;padding:6px 4px}
   .audio-nombre-in:focus{box-shadow:none}
-  .audio-r2 select,.audio-r2 .audio-ton-otro{flex:1 1 130px;min-width:110px;background:var(--papel-2);border:1px solid var(--linea-2);border-radius:8px;color:var(--tinta);padding:8px 10px;font-family:"Spectral",serif;font-size:.9rem;outline:none}
+  .audio-r2 select,.audio-r2 .audio-ton-otro{flex:1 1 120px;min-width:0;max-width:100%;background:var(--papel-2);border:1px solid var(--linea-2);border-radius:8px;color:var(--tinta);padding:8px 10px;font-family:"Spectral",serif;font-size:.9rem;outline:none}
   .audio-r2 select:focus,.audio-r2 .audio-ton-otro:focus{border-color:var(--oro)}
   .audio-tag{font-size:.74rem;color:var(--tinta-2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .audio-del{background:none;border:0;color:#b0a08c;cursor:pointer;font-size:.95rem;padding:4px 6px;border-radius:6px}
@@ -191,7 +192,9 @@
   /* Modal */
   .overlay{position:fixed;inset:0;z-index:50;display:none;align-items:flex-start;justify-content:center;background:rgba(42,33,26,.45);backdrop-filter:blur(3px);padding:clamp(14px,4vw,28px) 14px;overflow-y:auto}
   .overlay.open{display:flex}
-  .modal{width:100%;max-width:600px;background:var(--cal);border:1px solid var(--linea);border-radius:18px;box-shadow:0 30px 60px -24px rgba(40,26,12,.5);padding:clamp(20px,4vw,26px);position:relative}
+  .modal{width:100%;max-width:600px;background:var(--cal);border:1px solid var(--linea);border-radius:18px;box-shadow:0 30px 60px -24px rgba(40,26,12,.5);padding:clamp(20px,4vw,26px);position:relative;overflow-x:hidden}
+  .modal .row2{max-width:100%}
+  .modal input,.modal select,.modal textarea{max-width:100%}
   .modal h2{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.7rem;margin:0 0 4px;color:var(--tinta)}
   .modal .sub{color:var(--tinta-2);font-size:.92rem;margin:0 0 20px}
   .field{margin-bottom:15px}
