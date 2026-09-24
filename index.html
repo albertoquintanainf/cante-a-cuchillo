@@ -658,9 +658,6 @@ function tarjeta(it, opts){
   if(opts.mostrarCurso && it.curso) info.push(`<span class="curso-tag">${escapar(it.curso)}</span>`);
   if(it.fecha_clase) info.push(`Clase ${fecha(it.fecha_clase)}`);
   const infoLine = info.length?`<div class="metaline info">${info.join(" · ")}</div>`:"";
-  const hist=Array.isArray(it.historial)?it.historial:(it.editor?[{por:it.editor,cuando:it.editado}]:[]);
-  const ult=hist[hist.length-1];
-  const editado=ult?`<div class="metaline editado">Editado por ${escapar(ult.por||"—")} · ${fecha(ult.cuando)}</div>`:"";
   const marcas=[];
   const nAud = Array.isArray(it.audios)? it.audios.length : (it.audio_url?1:0);
   if(nAud) marcas.push(`<span class="mk" title="Audios">♪${nAud>1?nAud:""}</span>`);
@@ -670,7 +667,6 @@ function tarjeta(it, opts){
     <h3>${escapar(titulo)}</h3>
     ${estilo}
     ${infoLine}
-    ${editado}
     <div class="foot">
       <span class="who"></span>
       ${marcas.join("")}
@@ -721,9 +717,13 @@ function render(){
     board.innerHTML=agrupadoPorPalo(items, true);
     return;
   }
-  // Recientes (principal): 10 últimas actualizaciones
+  // Principal: cantes de las últimas clases (por fecha de la clase)
   if(vista.tipo==="recientes"){
-    const recientes=[...DATOS].sort((a,b)=>ultimaActividad(b)-ultimaActividad(a)).slice(0,10);
+    const N_CLASES = 5;
+    const fechas = [...new Set(DATOS.map(it=>it.fecha_clase).filter(Boolean))].sort().reverse().slice(0, N_CLASES);
+    const setF = new Set(fechas);
+    const recientes = DATOS.filter(it=>it.fecha_clase && setF.has(it.fecha_clase))
+                           .sort((a,b)=>fechaClaseTs(b)-fechaClaseTs(a));
     if(!recientes.length) return vacio();
     board.innerHTML=seccion("Últimas actualizaciones", "var(--vino)", recientes, {mostrarPalo:true, mostrarCurso:true});
     return;
@@ -796,7 +796,8 @@ function renderDetalle(id){
   const eyebrow = [paloLink, it.curso?`<span class="curso-tag">${escapar(it.curso)}</span>`:""].filter(Boolean).join(" · ");
   const fClase = it.fecha_clase?`<div class="dclase">Clase del ${fecha(it.fecha_clase)}</div>`:"";
   const hist = Array.isArray(it.historial) ? it.historial : (it.editor ? [{por:it.editor, cuando:it.editado}] : []);
-  const edits = hist.map(h=>`<span class="edit-line">Editado por <b>${escapar(h.por||"—")}</b> · ${fecha(h.cuando)}</span>`).join("");
+  const ultEd = hist.length ? hist[hist.length-1] : null;
+  const edits = ultEd ? `<span class="edit-line">Última edición por <b>${escapar(ultEd.por||"—")}</b> · ${fecha(ultEd.cuando)}</span>` : "";
   cont.innerHTML=`<div class="detalle" style="--palo:${col}">
     <button class="back" onclick="volver()">← Volver al tablón</button>
     <p class="eyebrow">${eyebrow}</p>
