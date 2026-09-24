@@ -94,7 +94,7 @@
   .menu-item:hover{background:var(--papel-2)}
   .menu-item.on{background:var(--papel);border-left-color:var(--palo,var(--vino));font-weight:600}
   .menu-item .cnt{font-size:.78rem;color:var(--tinta-2);background:var(--papel-2);border:1px solid var(--linea);border-radius:999px;padding:1px 9px}
-  .menu-sep{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-2);margin:14px 12px 4px}
+  .menu-sep{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--vino);font-weight:700;margin:16px 12px 4px}
   .ptag{display:inline-block;font-size:.88rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--palo,var(--oro));margin-bottom:2px}
 
   .estado{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;color:var(--tinta-2);margin:6px 0 8px;padding:7px 13px;border-radius:999px;background:var(--papel);border:1px solid var(--linea)}
@@ -258,7 +258,7 @@
   @media (max-width:600px){
     .topbar.con-titulo{flex-wrap:wrap}
     .topbar.con-titulo .topbar-title{flex:1 1 100%;order:0}
-    .topbar.con-titulo .search{flex:1 1 auto;min-width:0;order:1}
+    .topbar.con-titulo .search{flex:1 1 0;min-width:0;order:1}
     .topbar.con-titulo .btn-sm{flex:0 0 auto;order:2;padding:9px 12px}
     .topbar.con-titulo .btn-icon{flex:0 0 auto;order:3}
   }
@@ -731,7 +731,7 @@ function setTopHeader(){
     return;
   }
   let titulo, col, n;
-  if(vista.tipo==="todo"){ titulo="Todos los palos"; col="var(--vino)"; n=DATOS.length; }
+  if(vista.tipo==="todo"){ titulo="Todos los cantes"; col="var(--vino)"; n=DATOS.length; }
   else if(vista.tipo==="curso"){ titulo=vista.valor; col="var(--oro)"; n=DATOS.filter(it=>it.curso===vista.valor).length; }
   else { titulo=vista.valor; col=colorPalo(vista.valor); n=DATOS.filter(it=>(it.palo||"")===vista.valor).length; }
   tt.textContent=titulo; tt.style.display="";
@@ -963,7 +963,7 @@ function pintarMenu(){
   const cursos=cursosConocidos().map(c=>c.nombre);
   const act = (tipo,val)=> (vista.tipo===tipo && (val===undefined || vista.valor===val)) ? "on" : "";
   let html =`<button class="menu-item ${act('recientes')}" data-t="recientes">Últimas actualizaciones</button>`;
-  html+=`<button class="menu-item ${act('todo')}" data-t="todo">Todos los palos <span class="cnt">${DATOS.length}</span></button>`;
+  html+=`<button class="menu-item ${act('todo')}" data-t="todo">Todos los cantes <span class="cnt">${DATOS.length}</span></button>`;
   if(cursos.length){
     html+=`<div class="menu-sep">Cursos</div>`;
     html+=cursos.map(c=>`<button class="menu-item ${act('curso',c)}" data-t="curso" data-v="${escapar(c)}" style="--palo:var(--oro)">${escapar(c)} <span class="cnt">${cUsados[c]||0}</span></button>`).join("");
