@@ -197,11 +197,11 @@
   .modal input,.modal select,.modal textarea{max-width:100%}
   .modal h2{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.7rem;margin:0 0 4px;color:var(--tinta)}
   .modal .sub{color:var(--tinta-2);font-size:.92rem;margin:0 0 20px}
-  .field{margin-bottom:15px}
+  .field{margin-bottom:15px;min-width:0}
   .field label{display:block;font-size:.77rem;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta-2);margin:0 0 7px}
   .field label .req{color:var(--vino)}
   .field label .opt{color:#a99a83;font-weight:400;text-transform:none;letter-spacing:0}
-  .field input,.field select,.field textarea{width:100%;background:var(--papel);border:1px solid var(--linea-2);border-radius:10px;color:var(--tinta);padding:11px 13px;font-family:"Spectral",serif;font-size:1rem;outline:none;transition:border-color .15s,box-shadow .15s}
+  .field input,.field select,.field textarea{width:100%;min-width:0;max-width:100%;background:var(--papel);border:1px solid var(--linea-2);border-radius:10px;color:var(--tinta);padding:11px 13px;font-family:"Spectral",serif;font-size:1rem;outline:none;transition:border-color .15s,box-shadow .15s}
   .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--oro);box-shadow:0 0 0 3px rgba(181,133,47,.15)}
   .field textarea{min-height:120px;resize:vertical;line-height:1.5}
   .field input[type=file]{padding:9px 12px;color:var(--tinta-2);cursor:pointer;margin-top:8px;background:var(--papel-2)}
@@ -220,7 +220,7 @@
   .hint{font-size:.78rem;color:#a08f78;margin:6px 0 0}
 
   footer{border-top:1px solid var(--linea);margin-top:30px;color:var(--tinta-2);font-size:.86rem;flex:none;position:relative;z-index:1}
-  .footer-inner{padding:24px 0 40px;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center}
+  .footer-inner{padding-top:24px;padding-bottom:40px;display:flex;justify-content:space-between;gap:14px 18px;flex-wrap:wrap;align-items:center}
   .buzon-link{background:none;border:0;color:var(--vino);font-family:"Spectral",serif;font-size:.9rem;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
   .buzon-link:hover{color:var(--vino-claro)}
   .buzon-item{color:var(--vino) !important;font-weight:500}
@@ -229,7 +229,7 @@
   footer .mini-compas span.a{background:var(--vino)}
 
   :focus-visible{outline:2px solid var(--oro);outline-offset:2px}
-  @media (max-width:600px){.row2{grid-template-columns:1fr}.toolbar .btn{flex:1 1 auto;text-align:center}footer{flex-direction:column;align-items:flex-start;gap:12px}}
+  @media (max-width:600px){.row2{grid-template-columns:1fr}.toolbar .btn{flex:1 1 auto;text-align:center}.footer-inner{flex-direction:column;align-items:flex-start;gap:12px}}
   @media (prefers-reduced-motion:reduce){.beat{transition:none}}
 </style>
 </head>
