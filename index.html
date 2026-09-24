@@ -1093,7 +1093,7 @@ function pintarAudios(){
     }).join("");
     return `<div class="audio-row">
       <div class="audio-r1">
-        <input class="audio-nombre-in" data-i="${i}" placeholder="Nombre del audio (opcional)" value="${escapar(a.nombre||"")}" maxlength="40" />
+        <input class="audio-nombre-in" data-i="${i}" placeholder="Nombre (ej. Salida, 1er tercio, Estribillo, Valiente)" value="${escapar(a.nombre||"")}" maxlength="40" />
         <span class="audio-tag">${a.file? escapar(a.file.name) : "guardado"}</span>
         <button type="button" class="audio-del" data-i="${i}" title="Quitar">✕</button>
       </div>
