@@ -158,7 +158,9 @@
   .back:hover{color:var(--vino)}
   .detalle .eyebrow{color:var(--palo,var(--vino))}
   .dtitulo{font-family:"Bodoni Moda",serif;font-weight:900;font-size:clamp(2rem,6.5vw,3.4rem);line-height:1.03;margin:4px 0 8px;color:var(--tinta);overflow-wrap:anywhere}
-  .dmeta{color:var(--tinta-2);font-size:1.05rem;margin-bottom:26px}
+  .dmeta{margin-bottom:26px}
+  .dmeta-line{font-size:1.18rem;color:var(--tinta);margin-bottom:5px;line-height:1.5}
+  .dmeta-lbl{color:var(--tinta-2);font-weight:600}
   .dmeta b{color:var(--vino);font-weight:600}
   .dletra{font-family:"Spectral",serif;font-style:italic;font-size:clamp(1.1rem,3vw,1.28rem);line-height:1.75;white-space:pre-wrap;color:#3c332a;border-left:3px solid var(--palo,var(--oro));padding:6px 0 6px 18px;margin:0 0 28px}
   .dmedia{margin:0 0 22px}
@@ -789,10 +791,10 @@ function renderDetalle(id){
   const cont=$("#detail"); const it=byId(id);
   if(!it){ cont.innerHTML=`<div class="detalle"><button class="back" onclick="volver()">← Volver al tablón</button><p>Ese cante ya no está disponible.</p></div>`; return; }
   const col=colorPalo(it.palo);
-  const metaParts=[];
-  if(it.estilo) metaParts.push(escapar(it.estilo));
-  if(it.cantaor) metaParts.push(`<b>${escapar(it.cantaor)}</b>`);
-  const dmeta = metaParts.length?`<div class="dmeta">${metaParts.join(" · ")}</div>`:"";
+  const metaLineas=[];
+  if(it.estilo) metaLineas.push(`<div class="dmeta-line"><span class="dmeta-lbl">Estilo:</span> ${escapar(it.estilo)}</div>`);
+  if(it.cantaor) metaLineas.push(`<div class="dmeta-line"><span class="dmeta-lbl">Cantaor/cantaora de referencia:</span> ${escapar(it.cantaor)}</div>`);
+  const dmeta = metaLineas.length?`<div class="dmeta">${metaLineas.join("")}</div>`:"";
   const paloLink = it.palo ? `<a class="palo-link" href="#palo=${encodeURIComponent(it.palo)}">${escapar(it.palo)}</a>` : "";
   const eyebrow = [paloLink, it.curso?`<span class="curso-tag">${escapar(it.curso)}</span>`:""].filter(Boolean).join(" · ");
   const fClase = it.fecha_clase?`<div class="dclase">Clase del ${fecha(it.fecha_clase)}</div>`:"";
