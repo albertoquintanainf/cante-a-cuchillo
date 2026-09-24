@@ -33,7 +33,8 @@
   .eyebrow::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--linea-2),transparent)}
   h1.title{font-family:"Bodoni Moda",serif;font-weight:900;font-size:clamp(2.5rem,9vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em;color:var(--tinta)}
   h1.title em{font-style:italic;font-weight:700;color:var(--vino)}
-  .lede{margin:16px 0 0;max-width:54ch;font-size:clamp(1rem,2.6vw,1.12rem);color:var(--tinta-2)}
+  .lede{margin:16px 0 0;font-size:clamp(1rem,2.6vw,1.12rem);color:var(--tinta-2)}
+  @media (min-width:620px){ .lede{white-space:nowrap} }
 
   /* Compás: golpes 3,7,8,10,12 resaltados solo al pasar */
   .compas{margin:26px 0 4px;display:flex;align-items:center;gap:10px}
@@ -283,7 +284,7 @@
       <textarea id="bz-msg" placeholder="Escribe aquí tu propuesta o el fallo…"></textarea>
     </div>
     <div class="field">
-      <label for="bz-nombre">Tu nombre <span class="opt">— opcional</span></label>
+      <label for="bz-nombre">Tu nombre <span class="req">•</span></label>
       <input id="bz-nombre" placeholder="¿Quién lo envía?" maxlength="40" />
     </div>
     <div class="modal-actions">
@@ -296,7 +297,7 @@
 <!-- Menú lateral de palos -->
 <div class="drawer-overlay" id="menuDrawer">
   <nav class="drawer">
-    <div class="drawer-head"><span>Navegar</span><button class="close-x" id="cerrarMenu" aria-label="Cerrar">×</button></div>
+    <div class="drawer-head"><span>Menú</span><button class="close-x" id="cerrarMenu" aria-label="Cerrar">×</button></div>
     <div id="menuLista"></div>
   </nav>
 </div>
@@ -621,11 +622,7 @@ function seccion(titulo, col, arr, opts){
   </section>`;
 }
 function vacio(){
-  board.innerHTML=`<div class="empty">
-    <h3>${DATOS.length?"Nada por aquí":"El tablón aún está sin estrenar"}</h3>
-    <p>${DATOS.length?"Prueba con otro palo (menú ☰) o con otra búsqueda.":"Sube el primer cante: por soleá, por seguiriya, por lo que toque en clase."}</p>
-    <button class="btn btn-vino" onclick="document.getElementById('abrirAdd').click()">＋ Añadir el primero</button>
-  </div>`;
+  board.innerHTML=`<div class="empty"><p>Todavía no hay cantes que mostrar.</p></div>`;
 }
 function setTopHeader(){
   const tt=$("#topbarTitle"), ps=$("#paloSub"), tb=$("#topbar");
@@ -847,9 +844,10 @@ buzonOverlay.addEventListener("click",e=>{ if(e.target===buzonOverlay) cerrarBuz
 $("#enviarBuzon").onclick=async ()=>{
   const tipo=$("#bz-tipo").value, msg=$("#bz-msg").value.trim(), nombre=$("#bz-nombre").value.trim();
   if(!msg){ alert("Escribe tu sugerencia o el fallo que has visto."); return; }
+  if(!nombre){ alert("Pon tu nombre para enviar la sugerencia."); return; }
   const btn=$("#enviarBuzon"); btn.disabled=true; btn.textContent="Enviando…";
   try{
-    await enviarSugerencia({ tipo, mensaje:msg, nombre:nombre||null, estado:"pendiente" });
+    await enviarSugerencia({ tipo, mensaje:msg, nombre, estado:"pendiente" });
     cerrarBuzon();
     alert("¡Gracias! Tu sugerencia se ha enviado.");
   }catch(e){ alert("No se pudo enviar: "+e.message); }
