@@ -332,7 +332,7 @@
         </div>
       </div>
       <div class="field">
-        <label for="f-fecha">Fecha de la clase <span class="opt">— opcional</span></label>
+        <label for="f-fecha">Fecha de la clase <span class="req">•</span></label>
         <input id="f-fecha" type="date" />
       </div>
     </div>
@@ -362,7 +362,7 @@
     <div class="media-box">
       <label>YouTube de referencia <span class="opt">— opcional</span></label>
       <input id="f-youtube" type="url" placeholder="https://youtube.com/…  (se ve dentro de la web)" />
-      <p class="hint">El cante de referencia en YouTube. No ocupa espacio tuyo.</p>
+      <p class="hint">El cante de referencia en YouTube.</p>
     </div>
 
     <div class="field" id="campoAutor">
@@ -399,7 +399,7 @@ const CONFIG = Object.assign({
 }, (typeof window!=="undefined" && window.CONFIG) || {});
 /* ========================================================================= */
 
-const BASE_PALOS = ["Soleá","Seguiriya","Bulerías","Tangos","Tientos","Fandangos","Fandangos de Huelva","Alegrías","Cantiñas","Tarantos","Malagueñas","Granaínas","Peteneras","Caña","Polo","Serranas","Saetas","Sevillanas","Tonás","Martinetes","Rumba"];
+const BASE_PALOS = ["Soleá","Seguiriya","Bulerías","Tangos","Tientos","Fandango Natural","Fandangos de Huelva","Alegrías","Tarantos","Malagueñas","Granaínas","Peteneras","Caña","Polo"];
 const BASE_CURSOS = [
   { nombre:"Curso 2026-2027",        desde:"2026-09-01" },
   { nombre:"Curso Abr.26 - Jun.26",  desde:"2026-04-01" }
@@ -1068,7 +1068,7 @@ $("#guardar").onclick = async ()=>{
   const editor=$("#f-editor").value.trim();
 
   const faltan=[];
-  if(!palo)faltan.push("palo"); if(!curso)faltan.push("curso"); if(!estilo)faltan.push("estilo"); if(!titulo)faltan.push("título");
+  if(!palo)faltan.push("palo"); if(!curso)faltan.push("curso"); if(!fecha_clase)faltan.push("fecha de la clase"); if(!estilo)faltan.push("estilo"); if(!titulo)faltan.push("título");
   if(!letra)faltan.push("letra");
   if(EDITING){ if(!editor)faltan.push("quién lo edita"); }
   else { if(!autor)faltan.push("quién lo sube"); }
