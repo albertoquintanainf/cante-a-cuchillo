@@ -53,15 +53,17 @@
   .topbar{position:sticky;top:0;z-index:5;margin:6px 0;padding:10px 0;background:linear-gradient(180deg,var(--cal) 78%,rgba(246,241,230,0));display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .topbar .search{flex:1 1 180px;padding:8px 14px}
   .topbar .search input{font-size:.95rem}
-  .topbar-title{flex:1 1 auto;min-width:0;overflow-wrap:anywhere;font-family:"Bodoni Moda",serif;font-weight:700;font-size:clamp(1.5rem,5.5vw,2.2rem);margin:0;color:var(--tinta);line-height:1.05;border-left:4px solid var(--palo,var(--oro));padding-left:12px}
+  .topbar-title{flex:1 1 auto;min-width:0;overflow-wrap:anywhere;font-family:"Bodoni Moda",serif;font-weight:700;font-size:clamp(1.9rem,6.5vw,2.8rem);margin:0;color:var(--tinta);line-height:1.05;border-left:4px solid var(--palo,var(--oro));padding-left:12px}
   /* En páginas de palo: el buscador se hace pequeño y va a la derecha */
   .topbar.con-titulo .search{flex:0 1 200px;order:3}
   .topbar.con-titulo .btn-sm{order:4}
   .topbar.con-titulo .btn-icon{order:5}
   .palo-sub{display:flex;gap:14px;align-items:center;margin:4px 0 16px}
   .palo-desc{margin:0 0 22px}
-  .palo-link{color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--linea-2);cursor:pointer}
+  .palo-link{color:inherit;font-size:1.2rem;letter-spacing:.06em;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--linea-2);cursor:pointer}
   .palo-link:hover{color:var(--vino);text-decoration-color:var(--vino)}
+  .curso-link{cursor:pointer;text-decoration:none;transition:background .15s}
+  .curso-link:hover{background:rgba(181,133,47,.3)}
   .palo-desc-txt{color:#3f362c;line-height:1.65;font-size:1.02rem;white-space:pre-wrap;margin:0 0 10px;border-left:3px solid var(--palo,var(--oro));padding-left:14px}
   .palo-sub .back{padding:0;margin:0}
   .page-count{font-size:.85rem;color:var(--tinta-2)}
@@ -254,9 +256,11 @@
   :focus-visible{outline:2px solid var(--oro);outline-offset:2px}
   @media (max-width:600px){.row2{grid-template-columns:1fr}.toolbar .btn{flex:1 1 auto;text-align:center}.footer-inner{flex-direction:column;align-items:flex-start;gap:12px}}
   @media (max-width:600px){
-    .topbar.con-titulo .topbar-title{flex:1 1 100%}
-    .topbar.con-titulo .search{flex:1 1 auto;min-width:0}
-    .topbar.con-titulo .btn-sm,.topbar.con-titulo .btn-icon{flex:0 0 auto}
+    .topbar.con-titulo{flex-wrap:wrap}
+    .topbar.con-titulo .topbar-title{flex:1 1 100%;order:0}
+    .topbar.con-titulo .search{flex:1 1 auto;min-width:0;order:1}
+    .topbar.con-titulo .btn-sm{flex:0 0 auto;order:2;padding:9px 12px}
+    .topbar.con-titulo .btn-icon{flex:0 0 auto;order:3}
   }
   @media (prefers-reduced-motion:reduce){.beat{transition:none}}
 </style>
@@ -859,7 +863,8 @@ function renderDetalle(id){
   if(it.cantaor) metaLineas.push(`<div class="dmeta-line"><span class="dmeta-lbl">Cantaor/cantaora de referencia:</span> ${escapar(it.cantaor)}</div>`);
   const dmeta = metaLineas.length?`<div class="dmeta">${metaLineas.join("")}</div>`:"";
   const paloLink = it.palo ? `<a class="palo-link" href="#palo=${encodeURIComponent(it.palo)}">${escapar(it.palo)}</a>` : "";
-  const eyebrow = [paloLink, it.curso?`<span class="curso-tag">${escapar(it.curso)}</span>`:""].filter(Boolean).join(" · ");
+  const cursoLink = it.curso ? `<a class="curso-tag curso-link" href="#curso=${encodeURIComponent(it.curso)}">${escapar(it.curso)}</a>` : "";
+  const eyebrow = [paloLink, cursoLink].filter(Boolean).join(" · ");
   const fClase = it.fecha_clase?`<div class="dclase">Clase del ${fecha(it.fecha_clase)}</div>`:"";
   const hist = Array.isArray(it.historial) ? it.historial : (it.editor ? [{por:it.editor, cuando:it.editado}] : []);
   const ultEd = hist.length ? hist[hist.length-1] : null;
