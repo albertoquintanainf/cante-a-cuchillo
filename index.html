@@ -64,7 +64,7 @@
   .palo-sub .back{padding:0;margin:0}
   .page-count{font-size:.85rem;color:var(--tinta-2)}
   .page-kind{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--oro);border:1px solid var(--oro);border-radius:5px;padding:1px 7px}
-  .curso-tag{display:inline-block;font-size:.72em;letter-spacing:.04em;font-weight:600;color:#7a5a1e;background:rgba(181,133,47,.16);border:1px solid rgba(181,133,47,.4);border-radius:5px;padding:1px 7px}
+  .curso-tag{display:inline-block;font-size:.9em;letter-spacing:.04em;font-weight:600;color:#7a5a1e;background:rgba(181,133,47,.16);border:1px solid rgba(181,133,47,.4);border-radius:5px;padding:2px 8px}
   .search{flex:1 1 240px;display:flex;align-items:center;gap:10px;background:var(--papel);border:1px solid var(--linea);border-radius:999px;padding:11px 16px;min-width:0;box-shadow:var(--sombra-sm)}
   .search input{flex:1;background:none;border:0;outline:0;color:var(--tinta);font-family:"Spectral",serif;font-size:1rem;min-width:0}
   .search input::placeholder{color:#9a8b75}
@@ -805,7 +805,6 @@ function renderDetalle(id){
         ${edits}
       </div>
       <div class="dactions">
-        <button class="btn btn-vino" onclick="abrirNuevoDesde('${it.id}')">＋ Añadir otro</button>
         <button class="btn btn-ghost" onclick="editarCante('${it.id}')">Editar</button>
         <button class="btn danger" onclick="borrarCante('${it.id}')">Borrar</button>
       </div>
@@ -860,16 +859,6 @@ async function borrarCante(id){
 }
 function editarCante(id){ abrir(id); }
 window.borrarCante=borrarCante; window.editarCante=editarCante;
-function abrirNuevoDesde(id){
-  abrir(); // formulario nuevo, vacío
-  const it=byId(id); if(!it) return;
-  const selP=$("#f-palo"); if(it.palo && [...selP.options].some(o=>o.value===it.palo)) selP.value=it.palo;
-  const selC=$("#f-curso"); if(it.curso && [...selC.options].some(o=>o.value===it.curso)) selC.value=it.curso;
-  if(it.fecha_clase) $("#f-fecha").value=it.fecha_clase;
-  $("#f-cantaor").value=it.cantaor||"";
-  $("#f-titulo").focus();
-}
-window.abrirNuevoDesde=abrirNuevoDesde;
 
 /* ---------- Descripción del palo ---------- */
 let descPaloActual="";
