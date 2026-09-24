@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
 <title>El cante a cuchillo · Taller de cante flamenco</title>
 <meta name="description" content="El cuaderno vivo del taller de cante flamenco de El Cuchillero." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -453,7 +454,16 @@ const BASE_CURSOS = [
 const CEJILLAS = ["","Al aire","Al 1","Al 2","Al 3","Al 4","Al 5","Al 6","Al 7","Al 8","Al 9","Al 10","Al 11"];
 const TONALIDADES = ["","Por arriba","Por abajo","Granaína","Minera","Otro"];
 const TON_STD = ["Por arriba","Por abajo","Granaína","Minera"];
-const PALETA = ["#A12B38","#B5852F","#AA4F2A","#6E7A35","#2F6F8F","#8C5A2C","#7A2230","#9E7A2C","#5A4E86"];
+const PALO_COLOR = {
+  "Soleá":"#86592E", "Tarantos":"#86592E", "Caña":"#86592E", "Polo":"#86592E",   // marrón
+  "Bulerías":"#C9A227",                                                            // amarillo
+  "Malagueñas":"#55823A", "Granaínas":"#55823A",                                   // verde
+  "Tientos":"#2F6F8F", "Tangos":"#2F6F8F",                                         // azul
+  "Alegrías":"#CF6A28",                                                            // naranja
+  "Fandango Natural":"#A12B38", "Fandangos de Huelva":"#A12B38",                   // rojo
+  "Seguiriya":"#6A4E86", "Peteneras":"#6A4E86"                                     // morado (otros)
+};
+const COLOR_PALO_DEFECTO = "#FFFFFF";  // blanco para palos nuevos
 const MAX_MB = 5, BUCKET = "material";
 const LS_MAT = "cuchillo_materiales_v1", LS_PALOS = "cuchillo_palos_v1";
 const COMPAS_ACC = [3,7,8,10,12];
@@ -619,7 +629,7 @@ let DATOS = [], CUSTOM_PALOS = [], CURSOS = [], vista = {tipo:"recientes", valor
 
 function palosConocidos(){ const usados=DATOS.map(d=>d.palo).filter(Boolean); return [...new Set([...BASE_PALOS, ...CUSTOM_PALOS, ...usados])]; }
 function ordenPalo(n){ const i=BASE_PALOS.indexOf(n); return i>=0?i:1000+(n||"").toLowerCase().charCodeAt(0); }
-function colorPalo(n){ let h=0; for(const c of (n||"")) h=(h+c.charCodeAt(0))%PALETA.length; return PALETA[h]; }
+function colorPalo(n){ return PALO_COLOR[n] || COLOR_PALO_DEFECTO; }
 function cursosConocidos(){
   const map=new Map();
   for(const c of BASE_CURSOS) map.set(c.nombre, {nombre:c.nombre, desde:c.desde});
@@ -780,7 +790,7 @@ function mediaHTML(it){
     </div>`;
   }).join("");
   let ref=""; const yt=youtubeId(it.video_url);
-  if(yt) ref=`<div class="dmedia"><span class="cap">Referencia</span><div class="video-embed"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${yt}" title="Referencia" allow="encrypted-media;picture-in-picture" allowfullscreen></iframe></div></div>`;
+  if(yt) ref=`<div class="dmedia"><span class="cap">Referencia</span><div class="video-embed"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${yt}" title="Referencia" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div></div>`;
   else if(it.video_url) ref=`<div class="dmedia"><a class="back" href="${escapar(it.video_url)}" target="_blank" rel="noopener">Ver referencia →</a></div>`;
   return grab+ref;
 }
