@@ -746,7 +746,7 @@ function render(){
                            .sort((a,b)=>fechaClaseTs(b)-fechaClaseTs(a))
                            .slice(0, MAX_CANTES);
     if(!recientes.length) return vacio();
-    board.innerHTML=seccion("Últimas actualizaciones", "var(--vino)", recientes, {mostrarPalo:true, mostrarCurso:true});
+    board.innerHTML=seccion(`Últimas actualizaciones (últimas ${N_CLASES} clases)`, "var(--vino)", recientes, {mostrarPalo:true, mostrarCurso:true});
     return;
   }
   // Todos los palos
