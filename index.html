@@ -121,6 +121,16 @@
   /* Página de detalle */
   #detail{display:none}
   #adminView{display:none}
+  #ayudaView{display:none}
+  .ayuda .intro{font-size:1.1rem;color:var(--tinta-2);margin:0 0 26px}
+  .ayuda h2{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.4rem;color:var(--tinta);margin:28px 0 8px}
+  .ayuda p{color:#3f362c;line-height:1.7;margin:0 0 12px}
+  .ayuda ul{color:#3f362c;line-height:1.7;margin:0 0 12px;padding-left:20px}
+  .ayuda li{margin-bottom:6px}
+  .ayuda b{color:var(--tinta)}
+  .ayuda .callout{background:rgba(181,133,47,.1);border:1px solid rgba(181,133,47,.35);border-left:4px solid var(--oro);border-radius:12px;padding:16px 18px;margin:22px 0}
+  .ayuda .callout h2{margin-top:0;color:var(--vino)}
+  .ayuda .cierre{font-style:italic;color:var(--tinta-2);margin-top:24px}
   .chip{border:1px solid var(--linea);background:var(--papel);color:var(--tinta-2);padding:7px 14px;border-radius:999px;font-size:.86rem;cursor:pointer;font-family:"Spectral",serif;transition:all .18s;white-space:nowrap}
   .chip:hover{color:var(--tinta);border-color:var(--oro)}
   .chip.on{background:var(--tinta);color:var(--cal);border-color:var(--tinta);font-weight:500}
@@ -241,6 +251,7 @@
 
     <footer>
       <button class="buzon-link" id="abrirBuzon">✉ Buzón de sugerencias</button>
+      <button class="buzon-link" id="irAyuda">Cómo funciona</button>
       <button class="buzon-link admin-link" id="irAdmin">Admin</button>
       <div class="mini-compas" aria-hidden="true">
         <span></span><span></span><span class="a"></span><span></span><span></span><span></span><span class="a"></span><span class="a"></span><span></span><span class="a"></span><span></span><span class="a"></span>
@@ -250,6 +261,7 @@
 
   <div id="detail"></div>
   <div id="adminView"></div>
+  <div id="ayudaView"></div>
 </div>
 
 <!-- Buzón de sugerencias -->
@@ -743,10 +755,15 @@ function renderRoute(){
   pararMedios();
   const h=location.hash; let m;
   if(h==="#admin"){
-    $("#main").style.display="none"; $("#detail").style.display="none"; $("#detail").innerHTML="";
+    $("#main").style.display="none"; $("#detail").style.display="none"; $("#detail").innerHTML=""; $("#ayudaView").style.display="none";
     $("#adminView").style.display="block"; renderAdmin(); window.scrollTo(0,0); return;
   }
+  if(h==="#ayuda"){
+    $("#main").style.display="none"; $("#detail").style.display="none"; $("#detail").innerHTML=""; $("#adminView").style.display="none";
+    $("#ayudaView").style.display="block"; renderAyuda(); window.scrollTo(0,0); return;
+  }
   $("#adminView").style.display="none"; $("#adminView").innerHTML="";
+  $("#ayudaView").style.display="none"; $("#ayudaView").innerHTML="";
   if((m=h.match(/^#cante=(.+)$/))){
     renderDetalle(decodeURIComponent(m[1]));
     $("#main").style.display="none"; $("#detail").style.display="block"; window.scrollTo(0,0); return;
@@ -796,13 +813,14 @@ function pintarMenu(){
     html+=`<div class="menu-sep">Palos</div>`;
     html+=palos.map(p=>`<button class="menu-item ${act('palo',p)}" data-t="palo" data-v="${escapar(p)}" style="--palo:${colorPalo(p)}">${escapar(p)} <span class="cnt">${usados[p]}</span></button>`).join("");
   }
-  html+=`<div class="menu-sep"></div><button class="menu-item buzon-item" data-t="buzon">✉ Buzón de sugerencias</button>`;
+  html+=`<div class="menu-sep"></div><button class="menu-item" data-t="ayuda">❔ Cómo funciona</button><button class="menu-item buzon-item" data-t="buzon">✉ Buzón de sugerencias</button>`;
   $("#menuLista").innerHTML=html;
   $("#menuLista").querySelectorAll(".menu-item").forEach(b=>{
     b.onclick=()=>{
       const t=b.dataset.t, v=b.dataset.v;
       cerrarMenu();
       if(t==="buzon"){ abrirBuzon(); return; }
+      if(t==="ayuda"){ location.hash="ayuda"; return; }
       q=""; const buscar=$("#buscar"); if(buscar) buscar.value="";
       if(t==="recientes") location.hash="";
       else if(t==="todo") location.hash="todos";
@@ -907,6 +925,40 @@ async function toggleSug(id, estado){
   if(await marcarSugerencia(id, nuevo, quien)){ adminDatos = await listarSugerencias(); pintarAdmin(); }
 }
 window.adminSetFiltro=adminSetFiltro; window.toggleSug=toggleSug;
+
+/* ---------- Página de ayuda ---------- */
+$("#irAyuda").onclick=()=>{ location.hash="ayuda"; };
+function renderAyuda(){
+  $("#ayudaView").innerHTML=`<div class="detalle ayuda">
+    <button class="back" onclick="irInicio()">← Inicio</button>
+    <h1 class="dtitulo">Cómo funciona</h1>
+    <p class="intro">Esto es el cuaderno vivo de la clase: entre todos guardamos las letras, las grabaciones y las referencias de cada cante, ordenados por palo y por curso.</p>
+
+    <h2>Moverte por la web</h2>
+    <p>Al entrar ves las <b>Últimas actualizaciones</b>: los diez cantes que se han tocado más recientemente. Con el botón <b>☰</b> (arriba a la derecha) abres el menú, que tiene dos formas de mirar lo mismo:</p>
+    <ul>
+      <li><b>Cursos:</b> entras en un curso (por ejemplo, "Curso 2026-2027") y ves los cantes de esa edición.</li>
+      <li><b>Palos:</b> entras en un palo (soleá, bulerías…) y ves ese palo de <b>todos</b> los cursos, con una etiqueta que indica de cuál es cada cante.</li>
+    </ul>
+    <p>El <b>buscador</b> encuentra por título, palo, cantaor o letra. Y si pulsas cualquier ficha, se abre el cante con su letra completa, sus audios (con <b>control de velocidad</b>, para estudiar despacio) y el vídeo de referencia de YouTube.</p>
+
+    <h2>Añadir un cante</h2>
+    <p>Pulsa <b>＋ Añadir cante</b>. Hay que rellenar palo, curso, título, letra y quién lo sube. La fecha de la clase, el cantaor de referencia, los audios y el enlace de YouTube son opcionales. Puedes subir <b>varios audios</b> (por ejemplo, si el cante va por partes) y ponerle nombre a cada uno.</p>
+
+    <div class="callout">
+      <h2 style="margin-top:0">Entre todos: corregir y completar</h2>
+      <p><b>No hace falta que hayas subido tú el cante para mejorarlo.</b> Si ves una <b>errata o un fallo en la letra</b>, o quieres <b>añadir otra grabación</b> (o un vídeo de referencia), entra en el cante y pulsa <b>Editar</b>. Puedes hacerlo aunque lo subiera otra persona.</p>
+      <p>Solo te pedirá tu nombre, y cada cambio queda <b>registrado con quién y cuándo</b>, así que siempre se ve quién ha ido completando cada cante.</p>
+    </div>
+
+    <h2>Dudas o fallos: el buzón</h2>
+    <p>Si algo no funciona, tienes una duda o se te ocurre una mejora, usa el <b>Buzón de sugerencias</b> (abajo del todo o en el menú ☰). Escribes el mensaje y ya está: el administrador lo revisa y lo marca como resuelto cuando lo atiende.</p>
+
+    <p class="cierre">Y sobre todo: llenad el cuaderno. Cuanto más cante subamos entre todos, mejor. 🌹</p>
+    <button class="btn btn-vino" onclick="irInicio()" style="margin-top:10px">← Volver al inicio</button>
+  </div>`;
+}
+window.renderAyuda=renderAyuda;
 
 /* ---------- Select de palo ---------- */
 function pintarSelectPalo(){
