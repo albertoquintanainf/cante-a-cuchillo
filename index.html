@@ -676,8 +676,8 @@ function tarjeta(it, opts){
   const estilo=(it.estilo && it.estilo!==titulo)?`<div class="metaline">${escapar(it.estilo)}</div>`:"";
   const info=[];
   if(opts.mostrarCurso && it.curso) info.push(`<span class="curso-tag">${escapar(it.curso)}</span>`);
-  if(it.fecha_clase) info.push(`Clase ${fecha(it.fecha_clase)}`);
-  const infoLine = info.length?`<div class="metaline info">${info.join(" · ")}</div>`:"";
+  if(it.fecha_clase) info.push(`<span class="clase-fecha">Clase ${fecha(it.fecha_clase)}</span>`);
+  const infoLine = info.length?`<div class="metaline info">${info.join("")}</div>`:"";
   const marcas=[];
   const nAud = Array.isArray(it.audios)? it.audios.length : (it.audio_url?1:0);
   if(nAud) marcas.push(`<span class="mk" title="Audios">♪${nAud>1?nAud:""}</span>`);
@@ -1207,11 +1207,12 @@ $("#guardar").onclick = async ()=>{
   else { if(!autor)faltan.push("quién lo sube"); }
   if(faltan.length){ alert("Faltan campos obligatorios: "+faltan.join(", ")+"."); return; }
 
-  // Cada audio necesita cejilla y tonalidad
+  // Cada audio necesita cejilla; la tonalidad no es obligatoria si no hay guitarra o es desconocida
   for(let i=0;i<audiosEstado.length;i++){
     const a=audiosEstado[i], n=audiosEstado.length>1?` (audio ${i+1})`:"";
     if(!a.cejilla){ alert(`Indica la cejilla del audio${n}.`); return; }
-    if(!(a.tonalidad||"").trim()){ alert(`Indica la tonalidad del audio${n}.`); return; }
+    const sinTonalidad = a.cejilla==="Sin guitarra" || a.cejilla==="Desconocida";
+    if(!sinTonalidad && !(a.tonalidad||"").trim()){ alert(`Indica la tonalidad del audio${n}.`); return; }
   }
 
   const editIt = EDITING ? byId(EDITING) : null;
