@@ -316,7 +316,7 @@
         <input id="f-palo-nuevo" type="text" placeholder="Nombre del palo nuevo" style="display:none;margin-top:8px" maxlength="40" />
       </div>
       <div class="field">
-        <label for="f-estilo">Estilo <span class="req">•</span></label>
+        <label for="f-estilo">Estilo <span class="opt">— opcional</span></label>
         <input id="f-estilo" placeholder="Ej. de Alcalá, apolá…" maxlength="80" />
       </div>
     </div>
@@ -1068,7 +1068,7 @@ $("#guardar").onclick = async ()=>{
   const editor=$("#f-editor").value.trim();
 
   const faltan=[];
-  if(!palo)faltan.push("palo"); if(!curso)faltan.push("curso"); if(!fecha_clase)faltan.push("fecha de la clase"); if(!estilo)faltan.push("estilo"); if(!titulo)faltan.push("título");
+  if(!palo)faltan.push("palo"); if(!curso)faltan.push("curso"); if(!fecha_clase)faltan.push("fecha de la clase"); if(!titulo)faltan.push("título");
   if(!letra)faltan.push("letra");
   if(EDITING){ if(!editor)faltan.push("quién lo edita"); }
   else { if(!autor)faltan.push("quién lo sube"); }
