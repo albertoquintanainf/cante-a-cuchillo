@@ -93,7 +93,7 @@
   .menu-item.on{background:var(--papel);border-left-color:var(--palo,var(--vino));font-weight:600}
   .menu-item .cnt{font-size:.78rem;color:var(--tinta-2);background:var(--papel-2);border:1px solid var(--linea);border-radius:999px;padding:1px 9px}
   .menu-sep{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-2);margin:14px 12px 4px}
-  .ptag{display:inline-block;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--palo,var(--oro));margin-bottom:2px}
+  .ptag{display:inline-block;font-size:.88rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--palo,var(--oro));margin-bottom:2px}
 
   .estado{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;color:var(--tinta-2);margin:6px 0 8px;padding:7px 13px;border-radius:999px;background:var(--papel);border:1px solid var(--linea)}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--oro)}
@@ -739,11 +739,12 @@ function render(){
   }
   // Principal: cantes de las últimas clases (por fecha de la clase)
   if(vista.tipo==="recientes"){
-    const N_CLASES = 5;
+    const N_CLASES = 4, MAX_CANTES = 8;
     const fechas = [...new Set(DATOS.map(it=>it.fecha_clase).filter(Boolean))].sort().reverse().slice(0, N_CLASES);
     const setF = new Set(fechas);
     const recientes = DATOS.filter(it=>it.fecha_clase && setF.has(it.fecha_clase))
-                           .sort((a,b)=>fechaClaseTs(b)-fechaClaseTs(a));
+                           .sort((a,b)=>fechaClaseTs(b)-fechaClaseTs(a))
+                           .slice(0, MAX_CANTES);
     if(!recientes.length) return vacio();
     board.innerHTML=seccion("Últimas actualizaciones", "var(--vino)", recientes, {mostrarPalo:true, mostrarCurso:true});
     return;
