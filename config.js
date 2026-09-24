@@ -12,7 +12,7 @@
 window.CONFIG = {
   NOMBRE_CLASE: "El cante a cuchillo",
   PROFESOR: "El Cuchillero",
-  EMAIL_SUGERENCIAS: "alberto.quintanainf@gmail.com",  // a dónde llegan las sugerencias
+  ADMIN_PASSWORD: "tirititran",
 
   SUPABASE_URL: "https://hrrlgriqtasuueimebei.supabase.co",
   SUPABASE_ANON_KEY: "sb_publishable_vxF-17T5ITLaXDDkq6MT5A_ORbSi7PK"

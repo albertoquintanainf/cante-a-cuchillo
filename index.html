@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>El cante a cuchillo · La clase de El Cuchillero</title>
-<meta name="description" content="El cuaderno vivo de la clase de cante de El Cuchillero, organizado por palos." />
+<title>El cante a cuchillo · Taller de cante flamenco</title>
+<meta name="description" content="El cuaderno vivo del taller de cante flamenco de El Cuchillero." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;0,6..96,900;1,6..96,500;1,6..96,700&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
@@ -120,6 +120,22 @@
 
   /* Página de detalle */
   #detail{display:none}
+  #adminView{display:none}
+  .chip{border:1px solid var(--linea);background:var(--papel);color:var(--tinta-2);padding:7px 14px;border-radius:999px;font-size:.86rem;cursor:pointer;font-family:"Spectral",serif;transition:all .18s;white-space:nowrap}
+  .chip:hover{color:var(--tinta);border-color:var(--oro)}
+  .chip.on{background:var(--tinta);color:var(--cal);border-color:var(--tinta);font-weight:500}
+  .chip .cnt{opacity:.7}
+  .sug-card{background:var(--papel);border:1px solid var(--linea);border-radius:12px;padding:16px 18px;margin-bottom:14px;box-shadow:var(--sombra-sm)}
+  .sug-card.resuelta{opacity:.62}
+  .sug-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+  .sug-tipo{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#1a120c;background:var(--oro);padding:3px 9px;border-radius:5px}
+  .sug-fecha{font-size:.8rem;color:var(--tinta-2)}
+  .sug-msg{margin:0 0 12px;color:var(--tinta);white-space:pre-wrap}
+  .sug-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:.85rem;color:var(--tinta-2)}
+  .sug-de b{color:var(--tinta)}
+  .sug-foot .ok{color:#2f7a43;font-weight:600}
+  .admin-link{color:var(--tinta-2);text-decoration:none;font-size:.82rem}
+  .admin-link:hover{color:var(--vino)}
   .detalle{max-width:760px;margin:0 auto;padding:clamp(18px,4vw,36px) 0}
   .back{background:none;border:0;color:var(--tinta-2);font-family:"Spectral",serif;font-size:.96rem;cursor:pointer;padding:8px 0;margin-bottom:14px}
   .back:hover{color:var(--vino)}
@@ -197,9 +213,9 @@
 
   <div id="main">
     <header class="hero" id="hero">
-      <p class="eyebrow" id="eyebrow">Tablón de la clase · El Cuchillero</p>
+      <p class="eyebrow" id="eyebrow">Taller de cante flamenco · El Cuchillero · Espacio Loseta</p>
       <h1 class="title" id="titulo">El cante <em>a cuchillo</em></h1>
-      <p class="lede" id="lede">El cuaderno vivo de la clase, ordenado por palos. Pulsa un cante para ver la letra y escucharlo. Lo llenamos entre todos.</p>
+      <p class="lede" id="lede">El cuaderno vivo del taller de cante flamenco de El Cuchillero.</p>
       <div class="compas" id="compas" aria-hidden="true"></div>
     </header>
 
@@ -225,6 +241,7 @@
 
     <footer>
       <button class="buzon-link" id="abrirBuzon">✉ Buzón de sugerencias</button>
+      <button class="buzon-link admin-link" id="irAdmin">Admin</button>
       <div class="mini-compas" aria-hidden="true">
         <span></span><span></span><span class="a"></span><span></span><span></span><span></span><span class="a"></span><span class="a"></span><span></span><span class="a"></span><span></span><span class="a"></span>
       </div>
@@ -232,6 +249,7 @@
   </div>
 
   <div id="detail"></div>
+  <div id="adminView"></div>
 </div>
 
 <!-- Buzón de sugerencias -->
@@ -239,7 +257,7 @@
   <div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="bzTit">
     <button class="close-x" id="cerrarBuzon" aria-label="Cerrar">×</button>
     <h2 id="bzTit">Buzón de sugerencias</h2>
-    <p class="sub">¿Una idea de mejora, un fallo que has visto, algo que falta? Cuéntanoslo y llegará por correo.</p>
+    <p class="sub">¿Una idea de mejora, un fallo que has visto, algo que falta? Cuéntanoslo y el administrador lo revisará.</p>
     <div class="field">
       <label for="bz-tipo">Tipo</label>
       <select id="bz-tipo">
@@ -258,7 +276,7 @@
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="cancelarBuzon">Cancelar</button>
-      <button class="btn btn-vino" id="enviarBuzon">Enviar por correo</button>
+      <button class="btn btn-vino" id="enviarBuzon">Enviar</button>
     </div>
   </div>
 </div>
@@ -362,7 +380,7 @@
 const CONFIG = Object.assign({
   NOMBRE_CLASE: "El cante a cuchillo",
   PROFESOR: "El Cuchillero",
-  EMAIL_SUGERENCIAS: "alberto.quintanainf@gmail.com",
+  ADMIN_PASSWORD: "",
   SUPABASE_URL: "",
   SUPABASE_ANON_KEY: ""
 }, (typeof window!=="undefined" && window.CONFIG) || {});
@@ -479,6 +497,37 @@ async function listarCursos(){
 async function guardarCursoDB(nombre, desde){
   if(MODO==="nube"){ try{ const { error } = await sb.from("cursos").insert({ nombre, desde }); if(error) throw error; return; }catch(e){ console.warn(e.message); } }
   const a=leerCursosLocal(); if(!a.some(c=>c.nombre===nombre)){ a.push({nombre, desde}); guardarCursosLocal(a); }
+}
+
+/* ---------- Datos: sugerencias ---------- */
+const LS_SUG = "cuchillo_sugerencias_v1";
+async function enviarSugerencia(sug){
+  if(MODO==="nube"){
+    const { error } = await sb.from("sugerencias").insert(sug);
+    if(error) throw new Error(error.message);
+    return true;
+  }
+  const a=JSON.parse(localStorage.getItem(LS_SUG)||"[]"); sug.id="loc-"+Date.now(); sug.creado=new Date().toISOString(); a.unshift(sug); localStorage.setItem(LS_SUG, JSON.stringify(a)); return true;
+}
+async function listarSugerencias(){
+  if(MODO==="nube"){
+    const { data, error } = await sb.from("sugerencias").select("*").order("creado",{ascending:false});
+    if(error){ console.warn(error); return []; }
+    return data||[];
+  }
+  try{ return JSON.parse(localStorage.getItem(LS_SUG)||"[]"); }catch{ return []; }
+}
+async function marcarSugerencia(id, estado, quien){
+  const patch = estado==="solucionado"
+    ? { estado:"solucionado", resuelto_por:quien||null, resuelto_at:new Date().toISOString() }
+    : { estado:"pendiente", resuelto_por:null, resuelto_at:null };
+  if(MODO==="nube"){
+    const { error } = await sb.from("sugerencias").update(patch).eq("id", id);
+    if(error){ alert("No se pudo actualizar: "+error.message); return false; }
+    return true;
+  }
+  const a=JSON.parse(localStorage.getItem(LS_SUG)||"[]"); const i=a.findIndex(x=>String(x.id)===String(id));
+  if(i>=0){ a[i]={...a[i], ...patch}; localStorage.setItem(LS_SUG, JSON.stringify(a)); } return true;
 }
 
 /* ---------- Estado ---------- */
@@ -693,6 +742,11 @@ function pararMedios(){ document.querySelectorAll("#detail audio, #detail video"
 function renderRoute(){
   pararMedios();
   const h=location.hash; let m;
+  if(h==="#admin"){
+    $("#main").style.display="none"; $("#detail").style.display="none"; $("#detail").innerHTML="";
+    $("#adminView").style.display="block"; renderAdmin(); window.scrollTo(0,0); return;
+  }
+  $("#adminView").style.display="none"; $("#adminView").innerHTML="";
   if((m=h.match(/^#cante=(.+)$/))){
     renderDetalle(decodeURIComponent(m[1]));
     $("#main").style.display="none"; $("#detail").style.display="block"; window.scrollTo(0,0); return;
@@ -772,15 +826,87 @@ $("#abrirBuzon").onclick=abrirBuzon;
 $("#cerrarBuzon").onclick=cerrarBuzon;
 $("#cancelarBuzon").onclick=cerrarBuzon;
 buzonOverlay.addEventListener("click",e=>{ if(e.target===buzonOverlay) cerrarBuzon(); });
-$("#enviarBuzon").onclick=()=>{
+$("#enviarBuzon").onclick=async ()=>{
   const tipo=$("#bz-tipo").value, msg=$("#bz-msg").value.trim(), nombre=$("#bz-nombre").value.trim();
   if(!msg){ alert("Escribe tu sugerencia o el fallo que has visto."); return; }
-  const email=CONFIG.EMAIL_SUGERENCIAS || "alberto.quintanainf@gmail.com";
-  const asunto=`[${CONFIG.NOMBRE_CLASE}] ${tipo}`;
-  const cuerpo=`${msg}\n\n— ${nombre||"Anónimo"}`;
-  window.location.href=`mailto:${email}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-  cerrarBuzon();
+  const btn=$("#enviarBuzon"); btn.disabled=true; btn.textContent="Enviando…";
+  try{
+    await enviarSugerencia({ tipo, mensaje:msg, nombre:nombre||null, estado:"pendiente" });
+    cerrarBuzon();
+    alert("¡Gracias! Tu sugerencia se ha enviado.");
+  }catch(e){ alert("No se pudo enviar: "+e.message); }
+  finally{ btn.disabled=false; btn.textContent="Enviar"; }
 };
+
+/* ---------- Administración del buzón ---------- */
+let adminAuth=false, adminFiltro="pendientes", adminDatos=[];
+try{ adminAuth = sessionStorage.getItem("cuchillo_admin")==="1"; }catch{}
+$("#irAdmin").onclick=()=>{ location.hash="admin"; };
+function renderAdmin(){
+  const cont=$("#adminView");
+  if(!adminAuth){
+    cont.innerHTML=`<div class="detalle">
+      <button class="back" onclick="irInicio()">← Inicio</button>
+      <h1 class="dtitulo">Buzón · Administración</h1>
+      <p class="dmeta">Acceso solo para el administrador.</p>
+      <div class="field" style="max-width:320px">
+        <label for="admin-pass">Contraseña</label>
+        <input id="admin-pass" type="password" onkeydown="if(event.key==='Enter')entrarAdmin()" />
+      </div>
+      <button class="btn btn-vino" onclick="entrarAdmin()">Entrar</button>
+    </div>`;
+    setTimeout(()=>{ const p=$("#admin-pass"); if(p)p.focus(); },50);
+    return;
+  }
+  cont.innerHTML=`<div class="detalle"><button class="back" onclick="irInicio()">← Inicio</button><h1 class="dtitulo">Buzón · Administración</h1><p class="dmeta">Cargando…</p></div>`;
+  cargarAdmin();
+}
+function entrarAdmin(){
+  const pass=CONFIG.ADMIN_PASSWORD||"";
+  if(!pass){ alert("Primero define una contraseña de admin en config.js (ADMIN_PASSWORD)."); return; }
+  if(($("#admin-pass").value||"")===pass){ adminAuth=true; try{ sessionStorage.setItem("cuchillo_admin","1"); }catch{}; renderAdmin(); }
+  else alert("Contraseña incorrecta.");
+}
+window.entrarAdmin=entrarAdmin;
+async function cargarAdmin(){
+  adminDatos = await listarSugerencias();
+  pintarAdmin();
+}
+function pintarAdmin(){
+  const cont=$("#adminView");
+  const pend=adminDatos.filter(s=>s.estado!=="solucionado");
+  const res=adminDatos.filter(s=>s.estado==="solucionado");
+  const lista = adminFiltro==="pendientes"?pend : adminFiltro==="solucionadas"?res : adminDatos;
+  const chip=(k,l,n)=>`<button class="chip ${adminFiltro===k?'on':''}" onclick="adminSetFiltro('${k}')">${l}${n!=null?` <span class="cnt">${n}</span>`:""}</button>`;
+  const cards = lista.length ? lista.map(s=>{
+    const sol = s.estado==="solucionado";
+    return `<div class="sug-card ${sol?'resuelta':''}">
+      <div class="sug-top"><span class="sug-tipo">${escapar(s.tipo||"Sugerencia")}</span><span class="sug-fecha">${fecha(s.creado)}</span></div>
+      <p class="sug-msg">${escapar(s.mensaje||"")}</p>
+      <div class="sug-foot">
+        <span class="sug-de">${s.nombre?`De <b>${escapar(s.nombre)}</b>`:"Anónimo"}${sol?` · <span class="ok">Solucionado</span>${s.resuelto_at?` · ${fecha(s.resuelto_at)}`:""}`:""}</span>
+        <button class="btn ${sol?'btn-ghost':'btn-vino'} btn-sm" onclick="toggleSug('${s.id}','${s.estado||'pendiente'}')">${sol?"Reabrir":"Marcar solucionado"}</button>
+      </div>
+    </div>`;
+  }).join("") : `<div class="empty"><p>${adminFiltro==='pendientes'?"No hay sugerencias pendientes. ¡Al día!":"Nada por aquí."}</p></div>`;
+  cont.innerHTML=`<div class="detalle admin">
+    <button class="back" onclick="irInicio()">← Inicio</button>
+    <h1 class="dtitulo">Buzón · Administración</h1>
+    <div class="chips" style="margin:8px 0 18px">
+      ${chip("pendientes","Pendientes",pend.length)}
+      ${chip("solucionadas","Solucionadas",res.length)}
+      ${chip("todas","Todas",adminDatos.length)}
+    </div>
+    ${cards}
+  </div>`;
+}
+function adminSetFiltro(k){ adminFiltro=k; pintarAdmin(); }
+async function toggleSug(id, estado){
+  const nuevo = estado==="solucionado" ? "pendiente" : "solucionado";
+  const quien = nuevo==="solucionado" ? (CONFIG.PROFESOR||"admin") : null;
+  if(await marcarSugerencia(id, nuevo, quien)){ adminDatos = await listarSugerencias(); pintarAdmin(); }
+}
+window.adminSetFiltro=adminSetFiltro; window.toggleSug=toggleSug;
 
 /* ---------- Select de palo ---------- */
 function pintarSelectPalo(){
