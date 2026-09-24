@@ -22,7 +22,8 @@
   }
   *{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
-  body{margin:0;background:radial-gradient(1100px 600px at 82% -6%, rgba(142,30,44,.07), transparent 60%),radial-gradient(900px 540px at 2% 2%, rgba(181,133,47,.08), transparent 55%),var(--cal);color:var(--tinta);font-family:"Spectral",Georgia,serif;line-height:1.55;min-height:100vh}
+  body{margin:0;background:radial-gradient(1100px 600px at 82% -6%, rgba(142,30,44,.07), transparent 60%),radial-gradient(900px 540px at 2% 2%, rgba(181,133,47,.08), transparent 55%),var(--cal);color:var(--tinta);font-family:"Spectral",Georgia,serif;line-height:1.55;min-height:100vh;display:flex;flex-direction:column}
+  #contenido{flex:1 0 auto}
   body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:var(--paper);mix-blend-mode:multiply;opacity:.5}
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(16px,4vw,22px);position:relative;z-index:1}
   a{color:inherit}
@@ -56,6 +57,10 @@
   .topbar.con-titulo .btn-sm{order:4}
   .topbar.con-titulo .btn-icon{order:5}
   .palo-sub{display:flex;gap:14px;align-items:center;margin:4px 0 16px}
+  .palo-desc{margin:0 0 22px}
+  .palo-link{color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--linea-2);cursor:pointer}
+  .palo-link:hover{color:var(--vino);text-decoration-color:var(--vino)}
+  .palo-desc-txt{color:#3f362c;line-height:1.65;font-size:1.02rem;white-space:pre-wrap;margin:0 0 10px;border-left:3px solid var(--palo,var(--oro));padding-left:14px}
   .palo-sub .back{padding:0;margin:0}
   .page-count{font-size:.85rem;color:var(--tinta-2)}
   .page-kind{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--oro);border:1px solid var(--oro);border-radius:5px;padding:1px 7px}
@@ -158,12 +163,17 @@
   .dmedia{margin:0 0 22px}
   .dmedia audio{width:100%}
   .audio-item{margin-bottom:18px}
-  .audio-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;background:var(--papel);border:1px solid var(--linea);border-radius:10px;padding:6px 8px}
-  .audio-row .audio-nombre-in{flex:1;margin:0;border:0;background:transparent;padding:6px 4px}
-  .audio-row .audio-nombre-in:focus{box-shadow:none}
-  .audio-tag{font-size:.74rem;color:var(--tinta-2);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .audio-row{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;background:var(--papel);border:1px solid var(--linea);border-radius:10px;padding:10px}
+  .audio-r1{display:flex;align-items:center;gap:8px}
+  .audio-r2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .audio-r1 .audio-nombre-in{flex:1;margin:0;border:0;background:transparent;padding:6px 4px}
+  .audio-nombre-in:focus{box-shadow:none}
+  .audio-r2 select,.audio-r2 .audio-ton-otro{flex:1 1 130px;min-width:110px;background:var(--papel-2);border:1px solid var(--linea-2);border-radius:8px;color:var(--tinta);padding:8px 10px;font-family:"Spectral",serif;font-size:.9rem;outline:none}
+  .audio-r2 select:focus,.audio-r2 .audio-ton-otro:focus{border-color:var(--oro)}
+  .audio-tag{font-size:.74rem;color:var(--tinta-2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .audio-del{background:none;border:0;color:#b0a08c;cursor:pointer;font-size:.95rem;padding:4px 6px;border-radius:6px}
   .audio-del:hover{color:var(--vino)}
+  .audio-meta{font-size:.82rem;color:var(--tinta-2);margin:-2px 0 6px;letter-spacing:.02em}
   .speed{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap}
   .speed span{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-2);margin-right:4px}
   .speed button{font-family:"Spectral",serif;font-size:.82rem;border:1px solid var(--linea-2);background:var(--papel);color:var(--tinta-2);border-radius:999px;padding:4px 12px;cursor:pointer;transition:all .15s}
@@ -206,7 +216,8 @@
   .close-x:hover{color:var(--tinta)}
   .hint{font-size:.78rem;color:#a08f78;margin:6px 0 0}
 
-  footer{border-top:1px solid var(--linea);padding:28px 0 46px;margin-top:30px;color:var(--tinta-2);font-size:.86rem;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center}
+  footer{border-top:1px solid var(--linea);margin-top:30px;color:var(--tinta-2);font-size:.86rem;flex:none;position:relative;z-index:1}
+  .footer-inner{padding:24px 0 40px;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center}
   .buzon-link{background:none;border:0;color:var(--vino);font-family:"Spectral",serif;font-size:.9rem;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
   .buzon-link:hover{color:var(--vino-claro)}
   .buzon-item{color:var(--vino) !important;font-weight:500}
@@ -220,6 +231,7 @@
 </style>
 </head>
 <body>
+<div id="contenido">
 <div class="wrap">
 
   <div id="main">
@@ -249,21 +261,24 @@
     <div class="palo-sub" id="paloSub"></div>
 
     <div id="board"></div>
-
-    <footer>
-      <button class="buzon-link" id="abrirBuzon">✉ Buzón de sugerencias</button>
-      <button class="buzon-link" id="irAyuda">Cómo funciona</button>
-      <button class="buzon-link admin-link" id="irAdmin">Admin</button>
-      <div class="mini-compas" aria-hidden="true">
-        <span></span><span></span><span class="a"></span><span></span><span></span><span></span><span class="a"></span><span class="a"></span><span></span><span class="a"></span><span></span><span class="a"></span>
-      </div>
-    </footer>
   </div>
 
   <div id="detail"></div>
   <div id="adminView"></div>
   <div id="ayudaView"></div>
 </div>
+</div>
+
+<footer>
+  <div class="wrap footer-inner">
+    <button class="buzon-link" id="abrirBuzon">✉ Buzón de sugerencias</button>
+    <button class="buzon-link" id="irAyuda">Cómo funciona</button>
+    <button class="buzon-link admin-link" id="irAdmin">Admin</button>
+    <div class="mini-compas" aria-hidden="true">
+      <span></span><span></span><span class="a"></span><span></span><span></span><span></span><span class="a"></span><span class="a"></span><span></span><span class="a"></span><span></span><span class="a"></span>
+    </div>
+  </div>
+</footer>
 
 <!-- Buzón de sugerencias -->
 <div class="overlay" id="buzonOverlay">
@@ -290,6 +305,23 @@
     <div class="modal-actions">
       <button class="btn btn-ghost" id="cancelarBuzon">Cancelar</button>
       <button class="btn btn-vino" id="enviarBuzon">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Descripción del palo -->
+<div class="overlay" id="descOverlay">
+  <div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="descTit">
+    <button class="close-x" id="cerrarDesc" aria-label="Cerrar">×</button>
+    <h2 id="descTit">Descripción del palo</h2>
+    <p class="sub" id="descSub">Un texto breve sobre este palo, que verán todos antes de los cantes.</p>
+    <div class="field">
+      <label for="desc-txt">Descripción</label>
+      <textarea id="desc-txt" placeholder="Ej. Compás, origen, características, cómo se acompaña…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="cancelarDesc">Cancelar</button>
+      <button class="btn btn-vino" id="guardarDesc">Guardar</button>
     </div>
   </div>
 </div>
@@ -353,7 +385,7 @@
     </div>
 
     <div class="media-box">
-      <label id="lblGrab">Audios <span class="opt">— solo audios, opcional</span></label>
+      <label id="lblGrab">Audios de clase <span class="opt">— solo audios, opcional</span></label>
       <div id="audiosLista"></div>
       <input id="f-grab-file" type="file" accept="audio/*,.mp4,.m4a,.opus,.ogg,.aac" multiple />
       <p class="hint" id="hintGrab">Puedes añadir <b>varios</b> (si el cante va por partes) · máximo 5 MB cada uno.</p>
@@ -404,6 +436,9 @@ const BASE_CURSOS = [
   { nombre:"Curso 2026-2027",        desde:"2026-09-01" },
   { nombre:"Curso Abr.26 - Jun.26",  desde:"2026-04-01" }
 ];
+const CEJILLAS = ["","Al aire","Al 1","Al 2","Al 3","Al 4","Al 5","Al 6","Al 7","Al 8","Al 9","Al 10","Al 11"];
+const TONALIDADES = ["","Por arriba","Por abajo","Granaína","Minera","Otro"];
+const TON_STD = ["Por arriba","Por abajo","Granaína","Minera"];
 const PALETA = ["#A12B38","#B5852F","#AA4F2A","#6E7A35","#2F6F8F","#8C5A2C","#7A2230","#9E7A2C","#5A4E86"];
 const MAX_MB = 5, BUCKET = "material";
 const LS_MAT = "cuchillo_materiales_v1", LS_PALOS = "cuchillo_palos_v1";
@@ -484,16 +519,38 @@ async function borrarArchivo(path){ if(path && MODO==="nube"){ try{ await sb.sto
 /* ---------- Datos: palos ---------- */
 function leerPalosLocal(){ try{ return JSON.parse(localStorage.getItem(LS_PALOS)||"[]"); }catch{ return []; } }
 function guardarPalosLocal(a){ try{ localStorage.setItem(LS_PALOS, JSON.stringify(a)); }catch{} }
+const LS_PALODESC = "cuchillo_palodesc_v1";
+let PALO_DESC = {};
 async function listarPalos(){
   if(MODO==="nube"){
-    try{ const { data, error } = await sb.from("palos").select("nombre"); if(error) throw error; return (data||[]).map(r=>r.nombre); }
-    catch(e){ console.warn("¿tabla 'palos' creada?", e.message); return leerPalosLocal(); }
+    // intenta traer también la descripción; si la columna no existe, cae a solo nombre
+    try{
+      const { data, error } = await sb.from("palos").select("nombre,descripcion");
+      if(error) throw error;
+      PALO_DESC={}; (data||[]).forEach(r=>{ if(r.descripcion) PALO_DESC[r.nombre]=r.descripcion; });
+      return (data||[]).map(r=>r.nombre);
+    }catch(e){
+      try{ const { data, error } = await sb.from("palos").select("nombre"); if(error) throw error; return (data||[]).map(r=>r.nombre); }
+      catch(e2){ console.warn("¿tabla 'palos' creada?", e2.message); return leerPalosLocal(); }
+    }
   }
+  try{ PALO_DESC = JSON.parse(localStorage.getItem(LS_PALODESC)||"{}"); }catch{ PALO_DESC={}; }
   return leerPalosLocal();
 }
 async function guardarPaloDB(nombre){
   if(MODO==="nube"){ try{ const { error } = await sb.from("palos").insert({ nombre }); if(error) throw error; return; }catch(e){ console.warn(e.message); } }
   const a = leerPalosLocal(); if(!a.includes(nombre)){ a.push(nombre); guardarPalosLocal(a); }
+}
+async function guardarDescripcionPalo(nombre, texto){
+  PALO_DESC[nombre]=texto;
+  if(MODO==="nube"){
+    const { error } = await sb.from("palos").upsert({ nombre, descripcion:texto }, { onConflict:"nombre" });
+    if(error){ alert("No se pudo guardar la descripción: "+error.message); return false; }
+    return true;
+  }
+  let map={}; try{ map=JSON.parse(localStorage.getItem(LS_PALODESC)||"{}"); }catch{}
+  map[nombre]=texto; try{ localStorage.setItem(LS_PALODESC, JSON.stringify(map)); }catch{}
+  return true;
 }
 
 /* ---------- Datos: cursos ---------- */
@@ -609,7 +666,7 @@ function tarjeta(it, opts){
     ${infoLine}
     ${editado}
     <div class="foot">
-      <span class="who">${it.autor?`<b>${escapar(it.autor)}</b>`:""}</span>
+      <span class="who"></span>
       ${marcas.join("")}
       <span class="ver">Ver →</span>
     </div>
@@ -678,11 +735,16 @@ function render(){
       : `<div class="empty"><p>Todavía no hay ningún cante en este curso.</p><button class="btn btn-vino" onclick="document.getElementById('abrirAdd').click()">＋ Añadir uno</button></div>`;
     return;
   }
-  // Un palo (de todos los cursos): rejilla con etiqueta de curso
+  // Un palo (de todos los cursos): descripción + rejilla con etiqueta de curso
   const arr=DATOS.filter(it=>(it.palo||"")===vista.valor).sort((a,b)=>fechaClaseTs(b)-fechaClaseTs(a));
-  board.innerHTML = arr.length
+  const desc = PALO_DESC[vista.valor]||"";
+  const descHTML = `<div class="palo-desc">
+    ${desc?`<p class="palo-desc-txt">${escapar(desc)}</p>`:""}
+    <button class="btn btn-ghost btn-sm" onclick="editarDescPalo('${escapar(vista.valor).replace(/'/g,"\\'")}')">${desc?"Editar descripción":"＋ Añadir descripción del palo"}</button>
+  </div>`;
+  board.innerHTML = descHTML + (arr.length
     ? `<div class="grid">${arr.map(it=>tarjeta(it,{mostrarPalo:false, mostrarCurso:true})).join("")}</div>`
-    : `<div class="empty"><p>Todavía no hay ningún cante en este palo.</p><button class="btn btn-vino" onclick="document.getElementById('abrirAdd').click()">＋ Añadir uno</button></div>`;
+    : `<div class="empty"><p>Todavía no hay ningún cante en este palo.</p></div>`);
 }
 
 /* ---------- Página de detalle ---------- */
@@ -694,11 +756,15 @@ function audiosDe(it){
 const SPEED_BTNS = `<div class="speed"><span>Velocidad</span><button data-r="0.5">0.5×</button><button data-r="0.75">0.75×</button><button data-r="1" class="on">1×</button><button data-r="1.25">1.25×</button><button data-r="1.5">1.5×</button></div>`;
 function mediaHTML(it){
   const auds = audiosDe(it);
-  const grab = auds.map((a,i)=>`<div class="dmedia audio-item">
+  const grab = auds.map((a,i)=>{
+    const info=[a.cejilla, a.tonalidad].filter(Boolean).join(" · ");
+    return `<div class="dmedia audio-item">
       <span class="cap">${a.nombre? escapar(a.nombre) : (auds.length>1? "Grabación "+(i+1) : "Grabación")}</span>
+      ${info?`<div class="audio-meta">${escapar(info)}</div>`:""}
       <audio controls preload="metadata" src="${escapar(a.url)}"></audio>
       ${SPEED_BTNS}
-    </div>`).join("");
+    </div>`;
+  }).join("");
   let ref=""; const yt=youtubeId(it.video_url);
   if(yt) ref=`<div class="dmedia"><span class="cap">Referencia</span><div class="video-embed"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${yt}" title="Referencia" allow="encrypted-media;picture-in-picture" allowfullscreen></iframe></div></div>`;
   else if(it.video_url) ref=`<div class="dmedia"><a class="back" href="${escapar(it.video_url)}" target="_blank" rel="noopener">Ver referencia →</a></div>`;
@@ -720,7 +786,8 @@ function renderDetalle(id){
   if(it.estilo) metaParts.push(escapar(it.estilo));
   if(it.cantaor) metaParts.push(`<b>${escapar(it.cantaor)}</b>`);
   const dmeta = metaParts.length?`<div class="dmeta">${metaParts.join(" · ")}</div>`:"";
-  const eyebrow = [escapar(it.palo||""), it.curso?`<span class="curso-tag">${escapar(it.curso)}</span>`:""].filter(Boolean).join(" · ");
+  const paloLink = it.palo ? `<a class="palo-link" href="#palo=${encodeURIComponent(it.palo)}">${escapar(it.palo)}</a>` : "";
+  const eyebrow = [paloLink, it.curso?`<span class="curso-tag">${escapar(it.curso)}</span>`:""].filter(Boolean).join(" · ");
   const fClase = it.fecha_clase?`<div class="dclase">Clase del ${fecha(it.fecha_clase)}</div>`:"";
   const hist = Array.isArray(it.historial) ? it.historial : (it.editor ? [{por:it.editor, cuando:it.editado}] : []);
   const edits = hist.map(h=>`<span class="edit-line">Editado por <b>${escapar(h.por||"—")}</b> · ${fecha(h.cuando)}</span>`).join("");
@@ -738,6 +805,7 @@ function renderDetalle(id){
         ${edits}
       </div>
       <div class="dactions">
+        <button class="btn btn-vino" onclick="abrirNuevoDesde('${it.id}')">＋ Añadir otro</button>
         <button class="btn btn-ghost" onclick="editarCante('${it.id}')">Editar</button>
         <button class="btn danger" onclick="borrarCante('${it.id}')">Borrar</button>
       </div>
@@ -792,6 +860,39 @@ async function borrarCante(id){
 }
 function editarCante(id){ abrir(id); }
 window.borrarCante=borrarCante; window.editarCante=editarCante;
+function abrirNuevoDesde(id){
+  abrir(); // formulario nuevo, vacío
+  const it=byId(id); if(!it) return;
+  const selP=$("#f-palo"); if(it.palo && [...selP.options].some(o=>o.value===it.palo)) selP.value=it.palo;
+  const selC=$("#f-curso"); if(it.curso && [...selC.options].some(o=>o.value===it.curso)) selC.value=it.curso;
+  if(it.fecha_clase) $("#f-fecha").value=it.fecha_clase;
+  $("#f-cantaor").value=it.cantaor||"";
+  $("#f-titulo").focus();
+}
+window.abrirNuevoDesde=abrirNuevoDesde;
+
+/* ---------- Descripción del palo ---------- */
+let descPaloActual="";
+const descOverlay=$("#descOverlay");
+function editarDescPalo(nombre){
+  descPaloActual=nombre;
+  $("#descTit").textContent=nombre;
+  $("#desc-txt").value=PALO_DESC[nombre]||"";
+  descOverlay.classList.add("open");
+  setTimeout(()=>$("#desc-txt").focus(),50);
+}
+function cerrarDesc(){ descOverlay.classList.remove("open"); }
+$("#cerrarDesc").onclick=cerrarDesc; $("#cancelarDesc").onclick=cerrarDesc;
+descOverlay.addEventListener("click",e=>{ if(e.target===descOverlay) cerrarDesc(); });
+$("#guardarDesc").onclick=async ()=>{
+  const txt=$("#desc-txt").value.trim();
+  const btn=$("#guardarDesc"); btn.disabled=true; btn.textContent="Guardando…";
+  await guardarDescripcionPalo(descPaloActual, txt);
+  btn.disabled=false; btn.textContent="Guardar";
+  cerrarDesc();
+  if(vista.tipo==="palo") render();
+};
+window.editarDescPalo=editarDescPalo;
 
 /* ---------- Chips ---------- */
 function pintarMenu(){
@@ -993,12 +1094,34 @@ function pintarEstado(){
 const overlay=$("#overlay");
 function pintarAudios(){
   const cont=$("#audiosLista");
-  cont.innerHTML = audiosEstado.map((a,i)=>`<div class="audio-row">
-      <input class="audio-nombre-in" data-i="${i}" placeholder="Nombre (ej. Parte 1, opcional)" value="${escapar(a.nombre||"")}" maxlength="40" />
-      <span class="audio-tag">${a.file? escapar(a.file.name) : "guardado"}</span>
-      <button type="button" class="audio-del" data-i="${i}" title="Quitar">✕</button>
-    </div>`).join("");
+  cont.innerHTML = audiosEstado.map((a,i)=>{
+    const otro = a.tonalidad && !TON_STD.includes(a.tonalidad);
+    const cejOpts = CEJILLAS.map(c=>`<option value="${c}"${a.cejilla===c?' selected':''}>${c||"Cejilla…"}</option>`).join("");
+    const tonOpts = TONALIDADES.map(t=>{
+      const sel = (t==="Otro"&&otro) || (t!=="Otro"&&a.tonalidad===t);
+      return `<option value="${t}"${sel?' selected':''}>${t||"Tonalidad…"}</option>`;
+    }).join("");
+    return `<div class="audio-row">
+      <div class="audio-r1">
+        <input class="audio-nombre-in" data-i="${i}" placeholder="Nombre (ej. Parte 1, opcional)" value="${escapar(a.nombre||"")}" maxlength="40" />
+        <span class="audio-tag">${a.file? escapar(a.file.name) : "guardado"}</span>
+        <button type="button" class="audio-del" data-i="${i}" title="Quitar">✕</button>
+      </div>
+      <div class="audio-r2">
+        <select class="audio-cej" data-i="${i}">${cejOpts}</select>
+        <select class="audio-ton" data-i="${i}">${tonOpts}</select>
+        <input class="audio-ton-otro" data-i="${i}" placeholder="¿Qué tonalidad?" maxlength="30" value="${otro?escapar(a.tonalidad):''}" style="display:${otro?'block':'none'}" />
+      </div>
+    </div>`;
+  }).join("");
   cont.querySelectorAll(".audio-nombre-in").forEach(inp=>{ inp.oninput=()=>{ audiosEstado[+inp.dataset.i].nombre=inp.value; }; });
+  cont.querySelectorAll(".audio-cej").forEach(sel=>{ sel.onchange=()=>{ audiosEstado[+sel.dataset.i].cejilla=sel.value; }; });
+  cont.querySelectorAll(".audio-ton").forEach(sel=>{ sel.onchange=()=>{
+    const i=+sel.dataset.i, otroInp=cont.querySelector(`.audio-ton-otro[data-i="${i}"]`);
+    if(sel.value==="Otro"){ otroInp.style.display="block"; audiosEstado[i].tonalidad=otroInp.value.trim(); otroInp.focus(); }
+    else { otroInp.style.display="none"; otroInp.value=""; audiosEstado[i].tonalidad=sel.value; }
+  }; });
+  cont.querySelectorAll(".audio-ton-otro").forEach(inp=>{ inp.oninput=()=>{ audiosEstado[+inp.dataset.i].tonalidad=inp.value.trim(); }; });
   cont.querySelectorAll(".audio-del").forEach(b=>{ b.onclick=()=>{
     const i=+b.dataset.i, a=audiosEstado[i];
     if(a && a.path) audiosBorrar.push(a.path);
@@ -1009,7 +1132,7 @@ $("#f-grab-file").onchange=()=>{
   if(MODO!=="nube"){ alert("Para subir audios necesitas conectar Supabase (ver README). De momento, usa el YouTube de referencia."); $("#f-grab-file").value=""; return; }
   for(const f of [...$("#f-grab-file").files]){
     if(f.size>MAX_MB*1024*1024){ alert(`"${f.name}" supera los ${MAX_MB} MB y no se añade. Prueba con uno más corto.`); continue; }
-    audiosEstado.push({ file:f, nombre:"" });
+    audiosEstado.push({ file:f, nombre:"", cejilla:"", tonalidad:"" });
   }
   $("#f-grab-file").value=""; pintarAudios();
 };
@@ -1037,7 +1160,7 @@ function abrir(id){
       $("#f-youtube").value=it.video_url||""; $("#f-autor").value=it.autor||"";
       $("#f-autor").readOnly = true; $("#lblAutor").innerHTML='Subido por <span class="opt">— no se cambia</span>';
       $("#campoEditor").style.display="block";
-      audiosEstado = audiosDe(it).map(a=>({url:a.url, path:a.path||null, nombre:a.nombre||""}));
+      audiosEstado = audiosDe(it).map(a=>({url:a.url, path:a.path||null, nombre:a.nombre||"", cejilla:a.cejilla||"", tonalidad:a.tonalidad||""}));
     }
   } else {
     sel.selectedIndex=0;
@@ -1053,7 +1176,7 @@ $("#abrirAdd").onclick=()=>abrir();
 $("#abrirAddSm").onclick=()=>abrir();
 $("#cerrar").onclick=cerrar; $("#cancelar").onclick=cerrar;
 overlay.addEventListener("click",e=>{ if(e.target===overlay) cerrar(); });
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ cerrar(); cerrarMenu(); cerrarBuzon(); } });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ cerrar(); cerrarMenu(); cerrarBuzon(); cerrarDesc(); } });
 $("#buscar").addEventListener("input",e=>{ q=e.target.value; render(); });
 
 $("#guardar").onclick = async ()=>{
@@ -1081,8 +1204,10 @@ $("#guardar").onclick = async ()=>{
     // Subir audios pendientes y construir la lista final
     const audios=[];
     for(const a of audiosEstado){
-      if(a.file){ btn.textContent="Subiendo audio…"; const up=await subir(a.file); audios.push({url:up.url, path:up.path, nombre:(a.nombre||"").trim()}); }
-      else if(a.url){ audios.push({url:a.url, path:a.path||null, nombre:(a.nombre||"").trim()}); }
+      let url=a.url, path=a.path||null;
+      if(a.file){ btn.textContent="Subiendo audio…"; const up=await subir(a.file); url=up.url; path=up.path; }
+      if(!url) continue;
+      audios.push({ url, path, nombre:(a.nombre||"").trim(), cejilla:a.cejilla||"", tonalidad:(a.tonalidad||"").trim() });
     }
 
     const datos={ palo, curso, fecha_clase, estilo, titulo, cantaor, letra, video_url:youtube, video_path:null,
