@@ -57,6 +57,8 @@
   .palo-sub{display:flex;gap:14px;align-items:center;margin:4px 0 16px}
   .palo-sub .back{padding:0;margin:0}
   .page-count{font-size:.85rem;color:var(--tinta-2)}
+  .page-kind{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--oro);border:1px solid var(--oro);border-radius:5px;padding:1px 7px}
+  .curso-tag{display:inline-block;font-size:.72em;letter-spacing:.04em;font-weight:600;color:#7a5a1e;background:rgba(181,133,47,.16);border:1px solid rgba(181,133,47,.4);border-radius:5px;padding:1px 7px}
   .search{flex:1 1 240px;display:flex;align-items:center;gap:10px;background:var(--papel);border:1px solid var(--linea);border-radius:999px;padding:11px 16px;min-width:0;box-shadow:var(--sombra-sm)}
   .search input{flex:1;background:none;border:0;outline:0;color:var(--tinta);font-family:"Spectral",serif;font-size:1rem;min-width:0}
   .search input::placeholder{color:#9a8b75}
@@ -104,6 +106,8 @@
   .card h3{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.3rem;margin:0;line-height:1.15;color:var(--tinta);word-break:break-word}
   .card .metaline{font-size:.86rem;color:var(--tinta-2)}
   .card .metaline.editado{font-size:.78rem;color:#9a8b75;font-style:italic}
+  .card .metaline.info{font-size:.8rem;color:var(--tinta-2);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .dclase{font-size:.9rem;color:var(--tinta-2);margin:-14px 0 24px}
   .card .foot{margin-top:auto;display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--linea)}
   .who{font-size:.8rem;color:var(--tinta-2);flex:1;min-width:0}
   .who b{color:var(--tinta);font-weight:600}
@@ -176,6 +180,9 @@
   .hint{font-size:.78rem;color:#a08f78;margin:6px 0 0}
 
   footer{border-top:1px solid var(--linea);padding:28px 0 46px;margin-top:30px;color:var(--tinta-2);font-size:.86rem;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:center}
+  .buzon-link{background:none;border:0;color:var(--vino);font-family:"Spectral",serif;font-size:.9rem;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
+  .buzon-link:hover{color:var(--vino-claro)}
+  .buzon-item{color:var(--vino) !important;font-weight:500}
   footer .mini-compas{display:flex;gap:7px}
   footer .mini-compas span{width:7px;height:7px;border-radius:50%;background:var(--linea-2)}
   footer .mini-compas span.a{background:var(--vino)}
@@ -217,7 +224,7 @@
     <div id="board"></div>
 
     <footer>
-      <span>El cante a cuchillo · sube tu cante cuando lo tengas.</span>
+      <button class="buzon-link" id="abrirBuzon">✉ Buzón de sugerencias</button>
       <div class="mini-compas" aria-hidden="true">
         <span></span><span></span><span class="a"></span><span></span><span></span><span></span><span class="a"></span><span class="a"></span><span></span><span class="a"></span><span></span><span class="a"></span>
       </div>
@@ -225,6 +232,35 @@
   </div>
 
   <div id="detail"></div>
+</div>
+
+<!-- Buzón de sugerencias -->
+<div class="overlay" id="buzonOverlay">
+  <div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="bzTit">
+    <button class="close-x" id="cerrarBuzon" aria-label="Cerrar">×</button>
+    <h2 id="bzTit">Buzón de sugerencias</h2>
+    <p class="sub">¿Una idea de mejora, un fallo que has visto, algo que falta? Cuéntanoslo y llegará por correo.</p>
+    <div class="field">
+      <label for="bz-tipo">Tipo</label>
+      <select id="bz-tipo">
+        <option>Sugerencia de mejora</option>
+        <option>Fallo observado</option>
+        <option>Otro</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="bz-msg">Tu mensaje <span class="req">•</span></label>
+      <textarea id="bz-msg" placeholder="Escribe aquí tu propuesta o el fallo…"></textarea>
+    </div>
+    <div class="field">
+      <label for="bz-nombre">Tu nombre <span class="opt">— opcional</span></label>
+      <input id="bz-nombre" placeholder="¿Quién lo envía?" maxlength="40" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="cancelarBuzon">Cancelar</button>
+      <button class="btn btn-vino" id="enviarBuzon">Enviar por correo</button>
+    </div>
+  </div>
 </div>
 
 <!-- Menú lateral de palos -->
@@ -251,6 +287,22 @@
       <div class="field">
         <label for="f-estilo">Estilo <span class="req">•</span></label>
         <input id="f-estilo" placeholder="Ej. de Alcalá, apolá…" maxlength="80" />
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label for="f-curso">Curso <span class="req">•</span></label>
+        <select id="f-curso"></select>
+        <div id="cursoNuevoBox" style="display:none;margin-top:8px">
+          <input id="f-curso-nuevo" type="text" placeholder="Nombre del curso (ej. Curso septiembre 2026)" maxlength="60" style="margin-bottom:8px" />
+          <input id="f-curso-desde" type="date" aria-label="Inicio del curso" />
+          <p class="hint">Fecha de inicio del curso (para ordenarlos)</p>
+        </div>
+      </div>
+      <div class="field">
+        <label for="f-fecha">Fecha de la clase <span class="opt">— opcional</span></label>
+        <input id="f-fecha" type="date" />
       </div>
     </div>
 
@@ -310,12 +362,17 @@
 const CONFIG = Object.assign({
   NOMBRE_CLASE: "El cante a cuchillo",
   PROFESOR: "El Cuchillero",
+  EMAIL_SUGERENCIAS: "alberto.quintanainf@gmail.com",
   SUPABASE_URL: "",
   SUPABASE_ANON_KEY: ""
 }, (typeof window!=="undefined" && window.CONFIG) || {});
 /* ========================================================================= */
 
 const BASE_PALOS = ["Soleá","Seguiriya","Bulerías","Tangos","Tientos","Fandangos","Fandangos de Huelva","Alegrías","Cantiñas","Tarantos","Malagueñas","Granaínas","Peteneras","Caña","Polo","Serranas","Saetas","Sevillanas","Tonás","Martinetes","Rumba"];
+const BASE_CURSOS = [
+  { nombre:"Curso 2026-2027",        desde:"2026-09-01" },
+  { nombre:"Curso Abr.26 - Jul.26",  desde:"2026-04-01" }
+];
 const PALETA = ["#A12B38","#B5852F","#AA4F2A","#6E7A35","#2F6F8F","#8C5A2C","#7A2230","#9E7A2C","#5A4E86"];
 const MAX_MB = 5, BUCKET = "material";
 const LS_MAT = "cuchillo_materiales_v1", LS_PALOS = "cuchillo_palos_v1";
@@ -408,12 +465,38 @@ async function guardarPaloDB(nombre){
   const a = leerPalosLocal(); if(!a.includes(nombre)){ a.push(nombre); guardarPalosLocal(a); }
 }
 
+/* ---------- Datos: cursos ---------- */
+const LS_CURSOS = "cuchillo_cursos_v1";
+function leerCursosLocal(){ try{ return JSON.parse(localStorage.getItem(LS_CURSOS)||"[]"); }catch{ return []; } }
+function guardarCursosLocal(a){ try{ localStorage.setItem(LS_CURSOS, JSON.stringify(a)); }catch{} }
+async function listarCursos(){
+  if(MODO==="nube"){
+    try{ const { data, error } = await sb.from("cursos").select("nombre,desde"); if(error) throw error; return data||[]; }
+    catch(e){ console.warn("¿tabla 'cursos' creada?", e.message); return leerCursosLocal(); }
+  }
+  return leerCursosLocal();
+}
+async function guardarCursoDB(nombre, desde){
+  if(MODO==="nube"){ try{ const { error } = await sb.from("cursos").insert({ nombre, desde }); if(error) throw error; return; }catch(e){ console.warn(e.message); } }
+  const a=leerCursosLocal(); if(!a.some(c=>c.nombre===nombre)){ a.push({nombre, desde}); guardarCursosLocal(a); }
+}
+
 /* ---------- Estado ---------- */
-let DATOS = [], CUSTOM_PALOS = [], filtro = "recientes", q = "", EDITING = null, audiosEstado = [], audiosBorrar = [];
+let DATOS = [], CUSTOM_PALOS = [], CURSOS = [], vista = {tipo:"recientes", valor:null}, q = "", EDITING = null, audiosEstado = [], audiosBorrar = [];
 
 function palosConocidos(){ const usados=DATOS.map(d=>d.palo).filter(Boolean); return [...new Set([...BASE_PALOS, ...CUSTOM_PALOS, ...usados])]; }
 function ordenPalo(n){ const i=BASE_PALOS.indexOf(n); return i>=0?i:1000+(n||"").toLowerCase().charCodeAt(0); }
 function colorPalo(n){ let h=0; for(const c of (n||"")) h=(h+c.charCodeAt(0))%PALETA.length; return PALETA[h]; }
+function cursosConocidos(){
+  const map=new Map();
+  for(const c of BASE_CURSOS) map.set(c.nombre, {nombre:c.nombre, desde:c.desde});
+  for(const c of CURSOS) if(!map.has(c.nombre)) map.set(c.nombre, {nombre:c.nombre, desde:c.desde||null});
+  DATOS.map(d=>d.curso).filter(Boolean).forEach(n=>{ if(!map.has(n)) map.set(n, {nombre:n, desde:null}); });
+  const lista=[...map.values()];
+  lista.sort((a,b)=>{ const x=a.desde?Date.parse(a.desde):-Infinity, y=b.desde?Date.parse(b.desde):-Infinity; return (y||-Infinity)-(x||-Infinity); });
+  return lista;
+}
+function cursoActual(){ const l=cursosConocidos(); return l.length?l[0].nombre:""; }
 
 /* ---------- Helpers ---------- */
 const $ = s => document.querySelector(s);
@@ -433,17 +516,23 @@ function byId(id){ return DATOS.find(x=>String(x.id)===String(id)); }
 
 /* ---------- Tablón (compacto) ---------- */
 const board = $("#board");
+function fechaClaseTs(it){ const f=it.fecha_clase||it.creado; const t=f?Date.parse(f):0; return isNaN(t)?0:t; }
 function ultimaActividad(it){
   let t = it.creado ? new Date(it.creado).getTime() : 0;
   if(Array.isArray(it.historial)) for(const h of it.historial){ const x=h.cuando?new Date(h.cuando).getTime():0; if(x>t)t=x; }
   if(it.editado){ const x=new Date(it.editado).getTime(); if(x>t)t=x; }
   return t||0;
 }
-function tarjeta(it, mostrarPalo){
+function tarjeta(it, opts){
+  opts=opts||{};
   const col=colorPalo(it.palo);
   const titulo=it.titulo||it.estilo||it.palo||"Sin título";
-  const ptag = mostrarPalo ? `<div class="ptag" style="--palo:${col}">${escapar(it.palo||"")}</div>` : "";
+  const ptag = opts.mostrarPalo ? `<div class="ptag" style="--palo:${col}">${escapar(it.palo||"")}</div>` : "";
   const estilo=(it.estilo && it.estilo!==titulo)?`<div class="metaline">${escapar(it.estilo)}</div>`:"";
+  const info=[];
+  if(opts.mostrarCurso && it.curso) info.push(`<span class="curso-tag">${escapar(it.curso)}</span>`);
+  if(it.fecha_clase) info.push(`Clase ${fecha(it.fecha_clase)}`);
+  const infoLine = info.length?`<div class="metaline info">${info.join(" · ")}</div>`:"";
   const hist=Array.isArray(it.historial)?it.historial:(it.editor?[{por:it.editor,cuando:it.editado}]:[]);
   const ult=hist[hist.length-1];
   const editado=ult?`<div class="metaline editado">Editado por ${escapar(ult.por||"—")} · ${fecha(ult.cuando)}</div>`:"";
@@ -455,18 +544,19 @@ function tarjeta(it, mostrarPalo){
     ${ptag}
     <h3>${escapar(titulo)}</h3>
     ${estilo}
+    ${infoLine}
     ${editado}
     <div class="foot">
-      <span class="who">${it.autor?`<b>${escapar(it.autor)}</b> · `:""}${fecha(it.creado)}</span>
+      <span class="who">${it.autor?`<b>${escapar(it.autor)}</b>`:""}</span>
       ${marcas.join("")}
       <span class="ver">Ver →</span>
     </div>
   </article>`;
 }
-function seccion(titulo, col, arr, mostrarPalo){
+function seccion(titulo, col, arr, opts){
   return `<section class="palo-sec">
     <div class="palo-head" style="--palo:${col}"><h2>${escapar(titulo)}</h2><span class="n">${arr.length} ${arr.length===1?"cante":"cantes"}</span><span class="rule"></span></div>
-    <div class="grid">${arr.map(it=>tarjeta(it, mostrarPalo)).join("")}</div>
+    <div class="grid">${arr.map(it=>tarjeta(it, opts)).join("")}</div>
   </section>`;
 }
 function vacio(){
@@ -478,49 +568,62 @@ function vacio(){
 }
 function setTopHeader(){
   const tt=$("#topbarTitle"), ps=$("#paloSub"), tb=$("#topbar");
-  if(filtro==="recientes"){
+  if(vista.tipo==="recientes"){
     tt.style.display="none"; tt.textContent="";
     ps.innerHTML=""; ps.style.display="none";
     tb.classList.remove("con-titulo");
-  } else {
-    tt.textContent = filtro==="todo" ? "Todos los palos" : filtro;
-    tt.style.display="";
-    tb.style.setProperty("--palo", filtro==="todo" ? "var(--vino)" : colorPalo(filtro));
-    tb.classList.add("con-titulo");
-    const n = filtro==="todo" ? DATOS.length : DATOS.filter(it=>(it.palo||"")===filtro).length;
-    ps.innerHTML=`<button class="back" onclick="irInicio()">← Inicio</button><span class="page-count">${n} ${n===1?"cante":"cantes"}</span>`;
-    ps.style.display="";
+    return;
   }
+  let titulo, col, n;
+  if(vista.tipo==="todo"){ titulo="Todos los palos"; col="var(--vino)"; n=DATOS.length; }
+  else if(vista.tipo==="curso"){ titulo=vista.valor; col="var(--oro)"; n=DATOS.filter(it=>it.curso===vista.valor).length; }
+  else { titulo=vista.valor; col=colorPalo(vista.valor); n=DATOS.filter(it=>(it.palo||"")===vista.valor).length; }
+  tt.textContent=titulo; tt.style.display="";
+  tb.style.setProperty("--palo", col);
+  tb.classList.add("con-titulo");
+  const etiq = vista.tipo==="curso" ? "curso" : "";
+  ps.innerHTML=`<button class="back" onclick="irInicio()">← Inicio</button>${etiq?`<span class="page-kind">${etiq}</span>`:""}<span class="page-count">${n} ${n===1?"cante":"cantes"}</span>`;
+  ps.style.display="";
 }
 function render(){
   setTopHeader();
   const ql=q.trim().toLowerCase();
-  // Búsqueda: muestra todo lo que coincide, agrupado por palo
-  if(ql){
-    const items=DATOS.filter(it=>[it.palo,it.titulo,it.estilo,it.cantaor,it.letra,it.autor].join(" ").toLowerCase().includes(ql));
-    if(!items.length) return vacio();
+  const agrupadoPorPalo = (items, mostrarCurso)=>{
     const grupos={}; items.forEach(it=>{ const k=it.palo||"Sin clasificar"; (grupos[k]=grupos[k]||[]).push(it); });
-    board.innerHTML=Object.keys(grupos).sort((a,b)=>ordenPalo(a)-ordenPalo(b)).map(p=>seccion(p, colorPalo(p), grupos[p], false)).join("");
+    return Object.keys(grupos).sort((a,b)=>ordenPalo(a)-ordenPalo(b))
+      .map(p=>seccion(p, colorPalo(p), grupos[p].sort((a,b)=>fechaClaseTs(a)-fechaClaseTs(b)), {mostrarPalo:false, mostrarCurso})).join("");
+  };
+  // Búsqueda: todo lo que coincide, agrupado por palo (con etiqueta de curso)
+  if(ql){
+    const items=DATOS.filter(it=>[it.palo,it.curso,it.titulo,it.estilo,it.cantaor,it.letra,it.autor].join(" ").toLowerCase().includes(ql));
+    if(!items.length) return vacio();
+    board.innerHTML=agrupadoPorPalo(items, true);
     return;
   }
-  // Recientes (pantalla principal): 10 últimas actualizaciones
-  if(filtro==="recientes"){
+  // Recientes (principal): 10 últimas actualizaciones
+  if(vista.tipo==="recientes"){
     const recientes=[...DATOS].sort((a,b)=>ultimaActividad(b)-ultimaActividad(a)).slice(0,10);
     if(!recientes.length) return vacio();
-    board.innerHTML=seccion("Últimas actualizaciones", "var(--vino)", recientes, true);
+    board.innerHTML=seccion("Últimas actualizaciones", "var(--vino)", recientes, {mostrarPalo:true, mostrarCurso:true});
     return;
   }
-  // Todos los palos: agrupado (título y nº ya van arriba)
-  if(filtro==="todo"){
+  // Todos los palos
+  if(vista.tipo==="todo"){
     if(!DATOS.length) return vacio();
-    const grupos={}; DATOS.forEach(it=>{ const k=it.palo||"Sin clasificar"; (grupos[k]=grupos[k]||[]).push(it); });
-    board.innerHTML=Object.keys(grupos).sort((a,b)=>ordenPalo(a)-ordenPalo(b)).map(p=>seccion(p, colorPalo(p), grupos[p], false)).join("");
+    board.innerHTML=agrupadoPorPalo(DATOS, true);
     return;
   }
-  // Un palo concreto: solo la rejilla (el título va arriba)
-  const arr=DATOS.filter(it=>(it.palo||"")===filtro);
+  // Un curso: sus cantes, agrupados por palo, ordenados por fecha de clase
+  if(vista.tipo==="curso"){
+    const items=DATOS.filter(it=>it.curso===vista.valor);
+    board.innerHTML = items.length ? agrupadoPorPalo(items, false)
+      : `<div class="empty"><p>Todavía no hay ningún cante en este curso.</p><button class="btn btn-vino" onclick="document.getElementById('abrirAdd').click()">＋ Añadir uno</button></div>`;
+    return;
+  }
+  // Un palo (de todos los cursos): rejilla con etiqueta de curso
+  const arr=DATOS.filter(it=>(it.palo||"")===vista.valor).sort((a,b)=>fechaClaseTs(b)-fechaClaseTs(a));
   board.innerHTML = arr.length
-    ? `<div class="grid">${arr.map(it=>tarjeta(it,false)).join("")}</div>`
+    ? `<div class="grid">${arr.map(it=>tarjeta(it,{mostrarPalo:false, mostrarCurso:true})).join("")}</div>`
     : `<div class="empty"><p>Todavía no hay ningún cante en este palo.</p><button class="btn btn-vino" onclick="document.getElementById('abrirAdd').click()">＋ Añadir uno</button></div>`;
 }
 
@@ -559,13 +662,16 @@ function renderDetalle(id){
   if(it.estilo) metaParts.push(escapar(it.estilo));
   if(it.cantaor) metaParts.push(`<b>${escapar(it.cantaor)}</b>`);
   const dmeta = metaParts.length?`<div class="dmeta">${metaParts.join(" · ")}</div>`:"";
+  const eyebrow = [escapar(it.palo||""), it.curso?`<span class="curso-tag">${escapar(it.curso)}</span>`:""].filter(Boolean).join(" · ");
+  const fClase = it.fecha_clase?`<div class="dclase">Clase del ${fecha(it.fecha_clase)}</div>`:"";
   const hist = Array.isArray(it.historial) ? it.historial : (it.editor ? [{por:it.editor, cuando:it.editado}] : []);
   const edits = hist.map(h=>`<span class="edit-line">Editado por <b>${escapar(h.por||"—")}</b> · ${fecha(h.cuando)}</span>`).join("");
   cont.innerHTML=`<div class="detalle" style="--palo:${col}">
     <button class="back" onclick="volver()">← Volver al tablón</button>
-    <p class="eyebrow">${escapar(it.palo||"")}</p>
+    <p class="eyebrow">${eyebrow}</p>
     <h1 class="dtitulo">${escapar(it.titulo||it.estilo||"Sin título")}</h1>
     ${dmeta}
+    ${fClase}
     ${it.letra?`<div class="dletra">${escapar(it.letra)}</div>`:""}
     ${mediaHTML(it)}
     <div class="dfoot">
@@ -592,10 +698,11 @@ function renderRoute(){
     $("#main").style.display="none"; $("#detail").style.display="block"; window.scrollTo(0,0); return;
   }
   $("#detail").style.display="none"; $("#detail").innerHTML=""; $("#main").style.display="block";
-  if((m=h.match(/^#palo=(.+)$/))) filtro=decodeURIComponent(m[1]);
-  else if(h==="#todos") filtro="todo";
-  else filtro="recientes";
-  const home = (filtro==="recientes");
+  if((m=h.match(/^#palo=(.+)$/))) vista={tipo:"palo", valor:decodeURIComponent(m[1])};
+  else if((m=h.match(/^#curso=(.+)$/))) vista={tipo:"curso", valor:decodeURIComponent(m[1])};
+  else if(h==="#todos") vista={tipo:"todo", valor:null};
+  else vista={tipo:"recientes", valor:null};
+  const home = (vista.tipo==="recientes");
   $("#hero").style.display = home?"":"none";
   $("#estado").style.display = home?"":"none";
   $("#ctaHome").style.display = home?"":"none";
@@ -622,19 +729,31 @@ window.borrarCante=borrarCante; window.editarCante=editarCante;
 function pintarMenu(){
   const usados={}; DATOS.forEach(d=>{ if(d.palo) usados[d.palo]=(usados[d.palo]||0)+1; });
   const palos=Object.keys(usados).sort((a,b)=>ordenPalo(a)-ordenPalo(b));
-  let html =`<button class="menu-item ${filtro==='recientes'?'on':''}" data-f="recientes">Últimas actualizaciones</button>`;
-  html+=`<button class="menu-item ${filtro==='todo'?'on':''}" data-f="todo">Todos los palos <span class="cnt">${DATOS.length}</span></button>`;
-  if(palos.length) html+=`<div class="menu-sep">Por palo</div>`;
-  html+=palos.map(p=>`<button class="menu-item ${filtro===p?'on':''}" data-f="${escapar(p)}" style="--palo:${colorPalo(p)}">${escapar(p)} <span class="cnt">${usados[p]}</span></button>`).join("");
+  const cUsados={}; DATOS.forEach(d=>{ if(d.curso) cUsados[d.curso]=(cUsados[d.curso]||0)+1; });
+  const cursos=cursosConocidos().map(c=>c.nombre);
+  const act = (tipo,val)=> (vista.tipo===tipo && (val===undefined || vista.valor===val)) ? "on" : "";
+  let html =`<button class="menu-item ${act('recientes')}" data-t="recientes">Últimas actualizaciones</button>`;
+  html+=`<button class="menu-item ${act('todo')}" data-t="todo">Todos los palos <span class="cnt">${DATOS.length}</span></button>`;
+  if(cursos.length){
+    html+=`<div class="menu-sep">Cursos</div>`;
+    html+=cursos.map(c=>`<button class="menu-item ${act('curso',c)}" data-t="curso" data-v="${escapar(c)}" style="--palo:var(--oro)">${escapar(c)} <span class="cnt">${cUsados[c]||0}</span></button>`).join("");
+  }
+  if(palos.length){
+    html+=`<div class="menu-sep">Palos</div>`;
+    html+=palos.map(p=>`<button class="menu-item ${act('palo',p)}" data-t="palo" data-v="${escapar(p)}" style="--palo:${colorPalo(p)}">${escapar(p)} <span class="cnt">${usados[p]}</span></button>`).join("");
+  }
+  html+=`<div class="menu-sep"></div><button class="menu-item buzon-item" data-t="buzon">✉ Buzón de sugerencias</button>`;
   $("#menuLista").innerHTML=html;
   $("#menuLista").querySelectorAll(".menu-item").forEach(b=>{
     b.onclick=()=>{
-      const f=b.dataset.f;
-      q=""; const buscar=$("#buscar"); if(buscar) buscar.value="";
+      const t=b.dataset.t, v=b.dataset.v;
       cerrarMenu();
-      if(f==="recientes") location.hash="";
-      else if(f==="todo") location.hash="todos";
-      else location.hash="palo="+encodeURIComponent(f);
+      if(t==="buzon"){ abrirBuzon(); return; }
+      q=""; const buscar=$("#buscar"); if(buscar) buscar.value="";
+      if(t==="recientes") location.hash="";
+      else if(t==="todo") location.hash="todos";
+      else if(t==="curso") location.hash="curso="+encodeURIComponent(v);
+      else location.hash="palo="+encodeURIComponent(v);
       renderRoute();
     };
   });
@@ -645,6 +764,24 @@ $("#abrirMenu").onclick=abrirMenu;
 $("#cerrarMenu").onclick=cerrarMenu;
 $("#menuDrawer").addEventListener("click",e=>{ if(e.target===$("#menuDrawer")) cerrarMenu(); });
 
+/* ---------- Buzón de sugerencias ---------- */
+const buzonOverlay=$("#buzonOverlay");
+function abrirBuzon(){ $("#bz-msg").value=""; $("#bz-nombre").value=""; $("#bz-tipo").selectedIndex=0; buzonOverlay.classList.add("open"); setTimeout(()=>$("#bz-msg").focus(),50); }
+function cerrarBuzon(){ buzonOverlay.classList.remove("open"); }
+$("#abrirBuzon").onclick=abrirBuzon;
+$("#cerrarBuzon").onclick=cerrarBuzon;
+$("#cancelarBuzon").onclick=cerrarBuzon;
+buzonOverlay.addEventListener("click",e=>{ if(e.target===buzonOverlay) cerrarBuzon(); });
+$("#enviarBuzon").onclick=()=>{
+  const tipo=$("#bz-tipo").value, msg=$("#bz-msg").value.trim(), nombre=$("#bz-nombre").value.trim();
+  if(!msg){ alert("Escribe tu sugerencia o el fallo que has visto."); return; }
+  const email=CONFIG.EMAIL_SUGERENCIAS || "alberto.quintanainf@gmail.com";
+  const asunto=`[${CONFIG.NOMBRE_CLASE}] ${tipo}`;
+  const cuerpo=`${msg}\n\n— ${nombre||"Anónimo"}`;
+  window.location.href=`mailto:${email}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+  cerrarBuzon();
+};
+
 /* ---------- Select de palo ---------- */
 function pintarSelectPalo(){
   const sel=$("#f-palo"), prev=sel.value;
@@ -652,6 +789,13 @@ function pintarSelectPalo(){
   sel.innerHTML=opts+`<option value="__nuevo__">➕ Nuevo palo…</option>`;
   if(prev && prev!=="__nuevo__") sel.value=prev;
   sel.onchange=()=>{ const nuevo=sel.value==="__nuevo__"; $("#f-palo-nuevo").style.display=nuevo?"block":"none"; if(nuevo)$("#f-palo-nuevo").focus(); };
+}
+function pintarSelectCurso(){
+  const sel=$("#f-curso"), prev=sel.value;
+  const opts=cursosConocidos().map(c=>`<option>${escapar(c.nombre)}</option>`).join("");
+  sel.innerHTML=opts+`<option value="__nuevo__">➕ Nuevo curso…</option>`;
+  if(prev && prev!=="__nuevo__") sel.value=prev;
+  sel.onchange=()=>{ const nuevo=sel.value==="__nuevo__"; $("#cursoNuevoBox").style.display=nuevo?"block":"none"; if(nuevo)$("#f-curso-nuevo").focus(); };
 }
 
 /* ---------- Compás / estado ---------- */
@@ -695,19 +839,23 @@ $("#f-grab-file").onchange=()=>{
 };
 function abrir(id){
   EDITING = id || null;
-  pintarSelectPalo();
+  pintarSelectPalo(); pintarSelectCurso();
   $("#modalTit").textContent = EDITING ? "Editar cante" : "Añadir un cante";
   $("#guardar").textContent = EDITING ? "Guardar cambios" : "Guardar cante";
-  ["f-estilo","f-titulo","f-cantaor","f-letra","f-youtube","f-autor","f-editor"].forEach(i=>$("#"+i).value="");
+  ["f-estilo","f-titulo","f-cantaor","f-letra","f-youtube","f-autor","f-editor","f-fecha","f-curso-nuevo","f-curso-desde"].forEach(i=>$("#"+i).value="");
   $("#f-grab-file").value=""; $("#f-palo-nuevo").value=""; $("#f-palo-nuevo").style.display="none";
+  $("#cursoNuevoBox").style.display="none";
   $("#hintGrab").innerHTML="Puedes añadir <b>varios</b> (si el cante va por partes) · máximo 5 MB cada uno.";
   $("#f-autor").readOnly = false; $("#campoEditor").style.display="none"; $("#lblAutor").innerHTML='Quién lo sube <span class="req">•</span>';
   audiosEstado = []; audiosBorrar = [];
-  const sel=$("#f-palo");
+  const sel=$("#f-palo"), selC=$("#f-curso");
   if(EDITING){
     const it=byId(EDITING);
     if(it){
       if([...sel.options].some(o=>o.value===it.palo)) sel.value=it.palo;
+      if(it.curso && [...selC.options].some(o=>o.value===it.curso)) selC.value=it.curso;
+      else if(cursoActual()) selC.value=cursoActual();
+      $("#f-fecha").value=it.fecha_clase||"";
       $("#f-estilo").value=it.estilo||""; $("#f-titulo").value=it.titulo||"";
       $("#f-cantaor").value=it.cantaor||""; $("#f-letra").value=it.letra||"";
       $("#f-youtube").value=it.video_url||""; $("#f-autor").value=it.autor||"";
@@ -715,7 +863,11 @@ function abrir(id){
       $("#campoEditor").style.display="block";
       audiosEstado = audiosDe(it).map(a=>({url:a.url, path:a.path||null, nombre:a.nombre||""}));
     }
-  } else { sel.selectedIndex=0; }
+  } else {
+    sel.selectedIndex=0;
+    if(cursoActual()) selC.value=cursoActual();
+    $("#f-fecha").value=new Date().toISOString().slice(0,10); // hoy por defecto
+  }
   pintarAudios();
   overlay.classList.add("open");
   $("#f-titulo").focus();
@@ -725,19 +877,22 @@ $("#abrirAdd").onclick=()=>abrir();
 $("#abrirAddSm").onclick=()=>abrir();
 $("#cerrar").onclick=cerrar; $("#cancelar").onclick=cerrar;
 overlay.addEventListener("click",e=>{ if(e.target===overlay) cerrar(); });
-document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ cerrar(); cerrarMenu(); } });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ cerrar(); cerrarMenu(); cerrarBuzon(); } });
 $("#buscar").addEventListener("input",e=>{ q=e.target.value; render(); });
 
 $("#guardar").onclick = async ()=>{
   let palo=$("#f-palo").value; const paloNuevo=$("#f-palo-nuevo").value.trim();
   if(palo==="__nuevo__") palo=paloNuevo;
+  let curso=$("#f-curso").value; const cursoNuevo=$("#f-curso-nuevo").value.trim(); const cursoDesde=$("#f-curso-desde").value;
+  if(curso==="__nuevo__") curso=cursoNuevo;
+  const fecha_clase=$("#f-fecha").value || "";
   const estilo=$("#f-estilo").value.trim(), titulo=$("#f-titulo").value.trim();
   const letra=$("#f-letra").value.trim(), autor=$("#f-autor").value.trim();
   const cantaor=$("#f-cantaor").value.trim(), youtube=$("#f-youtube").value.trim();
   const editor=$("#f-editor").value.trim();
 
   const faltan=[];
-  if(!palo)faltan.push("palo"); if(!estilo)faltan.push("estilo"); if(!titulo)faltan.push("título");
+  if(!palo)faltan.push("palo"); if(!curso)faltan.push("curso"); if(!estilo)faltan.push("estilo"); if(!titulo)faltan.push("título");
   if(!letra)faltan.push("letra");
   if(EDITING){ if(!editor)faltan.push("quién lo edita"); }
   else { if(!autor)faltan.push("quién lo sube"); }
@@ -754,7 +909,7 @@ $("#guardar").onclick = async ()=>{
       else if(a.url){ audios.push({url:a.url, path:a.path||null, nombre:(a.nombre||"").trim()}); }
     }
 
-    const datos={ palo, estilo, titulo, cantaor, letra, video_url:youtube, video_path:null,
+    const datos={ palo, curso, fecha_clase, estilo, titulo, cantaor, letra, video_url:youtube, video_path:null,
       audios, audio_url:(audios[0]?.url||""), audio_path:(audios[0]?.path||null) };
     if(EDITING){
       const ahora=new Date().toISOString();
@@ -770,12 +925,14 @@ $("#guardar").onclick = async ()=>{
 
     btn.textContent="Guardando…";
     if(paloNuevo && palo===paloNuevo) await guardarPaloDB(paloNuevo);
+    if(cursoNuevo && curso===cursoNuevo) await guardarCursoDB(cursoNuevo, cursoDesde||null);
 
     const ok = EDITING ? await actualizar(EDITING, datos) : await anadir(datos);
     if(ok){
       for(const p of audiosBorrar) await borrarArchivo(p);
       const eraEdicion = !!EDITING;
       CUSTOM_PALOS = await listarPalos();
+      CURSOS = await listarCursos();
       DATOS = await listar();
       cerrar(); EDITING=null;
       if(eraEdicion && location.hash.startsWith("#cante=")) renderRoute(); else render();
@@ -792,6 +949,7 @@ $("#guardar").onclick = async ()=>{
   initStore();
   pintarCompas(); pintarEstado();
   CUSTOM_PALOS = await listarPalos();
+  CURSOS = await listarCursos();
   DATOS = await listar();
   render(); renderRoute();
 })();
