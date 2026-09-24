@@ -165,8 +165,14 @@
   .dmeta b{color:var(--vino);font-weight:600}
   .dletra{font-family:"Spectral",serif;font-style:italic;font-size:clamp(1.1rem,3vw,1.28rem);line-height:1.75;white-space:pre-wrap;color:#3c332a;border-left:3px solid var(--palo,var(--oro));padding:6px 0 6px 18px;margin:0 0 28px}
   .dmedia{margin:0 0 22px}
-  .dmedia audio{width:100%;height:48px;border-radius:12px;background:#fff;border:1px solid var(--linea-2);box-shadow:var(--sombra-sm)}
-  @media (max-width:600px){ .dmedia audio{height:52px} }
+  .dmedia audio.paudio{display:none}
+  .player{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--linea-2);border-radius:14px;padding:10px 14px;box-shadow:var(--sombra-sm)}
+  .pbtn{flex:none;width:46px;height:46px;border-radius:50%;border:0;background:var(--vino);color:#fff;font-size:1.15rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0}
+  .pbtn:hover{background:var(--vino-claro)}
+  .pbar{flex:1;height:9px;background:var(--linea);border-radius:999px;cursor:pointer;position:relative;min-width:0;touch-action:none}
+  .pfill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--vino);border-radius:999px}
+  .ptime{flex:none;font-size:.85rem;color:var(--tinta-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+  @media (max-width:600px){ .pbtn{width:54px;height:54px;font-size:1.35rem} .pbar{height:11px} .player{gap:14px;padding:12px 14px} }
   .audio-item{margin-bottom:18px}
   .audio-row{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;background:var(--papel);border:1px solid var(--linea);border-radius:10px;padding:10px}
   .audio-r1{display:flex;align-items:center;gap:8px}
@@ -785,7 +791,12 @@ function mediaHTML(it){
     return `<div class="dmedia audio-item">
       <span class="cap">${a.nombre? escapar(a.nombre) : (auds.length>1? "Grabación "+(i+1) : "Grabación")}</span>
       ${info?`<div class="audio-meta">${escapar(info)}</div>`:""}
-      <audio controls preload="metadata" src="${escapar(a.url)}"></audio>
+      <div class="player">
+        <button class="pbtn" type="button" aria-label="Reproducir">▶</button>
+        <div class="pbar"><div class="pfill"></div></div>
+        <span class="ptime"><span class="pcur">0:00</span> / <span class="pdur">0:00</span></span>
+      </div>
+      <audio class="paudio" preload="metadata" src="${escapar(a.url)}"></audio>
       ${SPEED_BTNS}
     </div>`;
   }).join("");
@@ -793,6 +804,33 @@ function mediaHTML(it){
   if(yt) ref=`<div class="dmedia"><span class="cap">Referencia</span><div class="video-embed"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/${yt}" title="Referencia" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div><a class="yt-link" href="https://www.youtube.com/watch?v=${yt}" target="_blank" rel="noopener">Ver en YouTube ↗</a></div>`;
   else if(it.video_url) ref=`<div class="dmedia"><a class="back" href="${escapar(it.video_url)}" target="_blank" rel="noopener">Ver referencia →</a></div>`;
   return grab+ref;
+}
+function fmtTime(s){ s=Math.max(0,Math.floor(s||0)); const m=Math.floor(s/60), ss=String(s%60).padStart(2,"0"); return m+":"+ss; }
+function wirePlayer(scope){
+  scope.querySelectorAll(".audio-item").forEach(item=>{
+    const audio=item.querySelector("audio.paudio"); if(!audio) return;
+    const btn=item.querySelector(".pbtn"), bar=item.querySelector(".pbar"), fill=item.querySelector(".pfill"),
+          cur=item.querySelector(".pcur"), dur=item.querySelector(".pdur");
+    const icon=()=>{ if(btn) btn.textContent = audio.paused ? "▶" : "⏸"; };
+    if(btn) btn.onclick=()=>{ if(audio.paused){ try{ audio.play(); }catch(e){} } else audio.pause(); };
+    audio.addEventListener("play", icon);
+    audio.addEventListener("pause", icon);
+    audio.addEventListener("ended", ()=>{ icon(); if(fill) fill.style.width="0%"; });
+    audio.addEventListener("loadedmetadata", ()=>{ if(dur && isFinite(audio.duration)) dur.textContent=fmtTime(audio.duration); });
+    audio.addEventListener("timeupdate", ()=>{
+      const d=audio.duration||0;
+      if(fill) fill.style.width=(d? Math.min(100,audio.currentTime/d*100):0)+"%";
+      if(cur) cur.textContent=fmtTime(audio.currentTime);
+    });
+    if(bar){
+      const seek=(x)=>{ const r=bar.getBoundingClientRect(); const p=Math.min(1,Math.max(0,(x-r.left)/(r.width||1))); if(isFinite(audio.duration)) audio.currentTime=p*audio.duration; };
+      let drag=false;
+      bar.addEventListener("pointerdown", e=>{ drag=true; try{bar.setPointerCapture(e.pointerId);}catch(_){} seek(e.clientX); });
+      bar.addEventListener("pointermove", e=>{ if(drag) seek(e.clientX); });
+      bar.addEventListener("pointerup", ()=>{ drag=false; });
+      bar.addEventListener("pointercancel", ()=>{ drag=false; });
+    }
+  });
 }
 function wireSpeed(scope){
   scope.querySelectorAll(".audio-item").forEach(item=>{
@@ -835,6 +873,7 @@ function renderDetalle(id){
     </div>
   </div>`;
   wireSpeed(cont);
+  wirePlayer(cont);
 }
 
 /* ---------- Rutas ---------- */
