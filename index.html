@@ -1121,9 +1121,8 @@ $("#guardar").onclick = async ()=>{
 
 /* ---------- Arranque ---------- */
 (async function(){
-  if(CONFIG.NOMBRE_CLASE && CONFIG.NOMBRE_CLASE!=="El cante a cuchillo") $("#titulo").textContent=CONFIG.NOMBRE_CLASE;
-  $("#eyebrow").textContent=`Tablón de la clase · ${CONFIG.PROFESOR}`;
-  document.title=`${CONFIG.NOMBRE_CLASE} · La clase de ${CONFIG.PROFESOR}`;
+  // Los textos de cabecera (subtítulo/lede) se editan directamente en el HTML de arriba.
+  document.title=`${CONFIG.NOMBRE_CLASE} · ${CONFIG.PROFESOR}`;
   initStore();
   pintarCompas(); pintarEstado();
   CUSTOM_PALOS = await listarPalos();
