@@ -167,7 +167,8 @@
   .audio-row{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;background:var(--papel);border:1px solid var(--linea);border-radius:10px;padding:10px}
   .audio-r1{display:flex;align-items:center;gap:8px}
   .audio-r2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .audio-r1 .audio-nombre-in{flex:1;margin:0;border:0;background:transparent;padding:6px 4px}
+  .audio-r1 .audio-nombre-in{flex:1;margin:0;background:var(--papel);border:1px solid var(--linea-2);border-radius:8px;padding:8px 10px;font-size:.92rem}
+  .audio-r1 .audio-nombre-in:focus{border-color:var(--oro)}
   .audio-nombre-in:focus{box-shadow:none}
   .audio-r2 select,.audio-r2 .audio-ton-otro{flex:1 1 120px;min-width:0;max-width:100%;background:var(--papel-2);border:1px solid var(--linea-2);border-radius:8px;color:var(--tinta);padding:8px 10px;font-family:"Spectral",serif;font-size:.9rem;outline:none}
   .audio-r2 select:focus,.audio-r2 .audio-ton-otro:focus{border-color:var(--oro)}
@@ -394,7 +395,7 @@
       <label id="lblGrab">Audios de clase <span class="opt">— solo audios, opcional</span></label>
       <div id="audiosLista"></div>
       <input id="f-grab-file" type="file" accept="audio/*,.mp4,.m4a,.opus,.ogg,.aac" multiple />
-      <p class="hint" id="hintGrab">Puedes añadir <b>varios</b> (si el cante va por partes) · máximo 5 MB cada uno.</p>
+      <p class="hint" id="hintGrab">Puedes añadir <b>varios</b> (si el cante va por partes) · máximo 5 MB cada uno. Indica <b>cejilla y tonalidad</b> de cada audio.</p>
     </div>
 
     <div class="media-box">
@@ -813,7 +814,6 @@ function renderDetalle(id){
       </div>
       <div class="dactions">
         <button class="btn btn-ghost" onclick="editarCante('${it.id}')">Editar</button>
-        <button class="btn danger" onclick="borrarCante('${it.id}')">Borrar</button>
       </div>
     </div>
   </div>`;
@@ -858,14 +858,8 @@ function irInicio(){ q=""; const b=$("#buscar"); if(b) b.value=""; location.hash
 function irPalo(p){ q=""; const b=$("#buscar"); if(b) b.value=""; location.hash="palo="+encodeURIComponent(p); }
 window.verCante=verCante; window.volver=volver; window.irInicio=irInicio; window.irPalo=irPalo;
 
-async function borrarCante(id){
-  const it=byId(id); if(!it) return;
-  if(!confirm("¿Quitar este cante del tablón?")) return;
-  for(const p of audiosDe(it).map(a=>a.path).filter(Boolean)) await borrarArchivo(p);
-  if(await borrar(id)){ DATOS=DATOS.filter(x=>String(x.id)!==String(id)); location.hash=""; render(); }
-}
 function editarCante(id){ abrir(id); }
-window.borrarCante=borrarCante; window.editarCante=editarCante;
+window.editarCante=editarCante;
 
 /* ---------- Descripción del palo ---------- */
 let descPaloActual="";
@@ -1099,7 +1093,7 @@ function pintarAudios(){
     }).join("");
     return `<div class="audio-row">
       <div class="audio-r1">
-        <input class="audio-nombre-in" data-i="${i}" placeholder="Nombre (ej. Parte 1, opcional)" value="${escapar(a.nombre||"")}" maxlength="40" />
+        <input class="audio-nombre-in" data-i="${i}" placeholder="Nombre del audio (opcional)" value="${escapar(a.nombre||"")}" maxlength="40" />
         <span class="audio-tag">${a.file? escapar(a.file.name) : "guardado"}</span>
         <button type="button" class="audio-del" data-i="${i}" title="Quitar">✕</button>
       </div>
@@ -1192,6 +1186,13 @@ $("#guardar").onclick = async ()=>{
   if(EDITING){ if(!editor)faltan.push("quién lo edita"); }
   else { if(!autor)faltan.push("quién lo sube"); }
   if(faltan.length){ alert("Faltan campos obligatorios: "+faltan.join(", ")+"."); return; }
+
+  // Cada audio necesita cejilla y tonalidad
+  for(let i=0;i<audiosEstado.length;i++){
+    const a=audiosEstado[i], n=audiosEstado.length>1?` (audio ${i+1})`:"";
+    if(!a.cejilla){ alert(`Indica la cejilla del audio${n}.`); return; }
+    if(!(a.tonalidad||"").trim()){ alert(`Indica la tonalidad del audio${n}.`); return; }
+  }
 
   const editIt = EDITING ? byId(EDITING) : null;
 
