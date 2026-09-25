@@ -94,6 +94,8 @@
   .menu-item:hover{background:var(--papel-2)}
   .menu-item.on{background:var(--papel);border-left-color:var(--palo,var(--vino));font-weight:600}
   .menu-item .cnt{font-size:.78rem;color:var(--tinta-2);background:var(--papel-2);border:1px solid var(--linea);border-radius:999px;padding:1px 9px}
+  .menu-item.curso-actual{background:rgba(181,133,47,.14);border-left-color:var(--oro);font-weight:600}
+  .badge-actual{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:#fff;background:var(--oro);border-radius:5px;padding:2px 7px;margin-left:6px;vertical-align:middle}
   .menu-sep{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--vino);font-weight:700;margin:16px 12px 4px}
   .ptag{display:inline-block;font-size:.88rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--palo,var(--oro));margin-bottom:2px}
 
@@ -965,8 +967,12 @@ function pintarMenu(){
   let html =`<button class="menu-item ${act('recientes')}" data-t="recientes">Últimas actualizaciones</button>`;
   html+=`<button class="menu-item ${act('todo')}" data-t="todo">Todos los cantes <span class="cnt">${DATOS.length}</span></button>`;
   if(cursos.length){
+    const cActual = cursoActual();
     html+=`<div class="menu-sep">Cursos</div>`;
-    html+=cursos.map(c=>`<button class="menu-item ${act('curso',c)}" data-t="curso" data-v="${escapar(c)}" style="--palo:var(--oro)">${escapar(c)} <span class="cnt">${cUsados[c]||0}</span></button>`).join("");
+    html+=cursos.map(c=>{
+      const esA = c===cActual;
+      return `<button class="menu-item ${esA?'curso-actual':''} ${act('curso',c)}" data-t="curso" data-v="${escapar(c)}" style="--palo:var(--oro)"><span>${escapar(c)}${esA?' <span class="badge-actual">Actual</span>':''}</span> <span class="cnt">${cUsados[c]||0}</span></button>`;
+    }).join("");
   }
   if(palos.length){
     html+=`<div class="menu-sep">Palos</div>`;
