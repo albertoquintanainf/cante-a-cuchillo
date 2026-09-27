@@ -189,6 +189,10 @@
   .audio-r1 .audio-nombre-in:focus{border-color:var(--oro)}
   .audio-nombre-in:focus{box-shadow:none}
   .audio-r2 select,.audio-r2 .audio-ton-otro{flex:1 1 120px;min-width:0;max-width:100%;background:var(--papel-2);border:1px solid var(--linea-2);border-radius:8px;color:var(--tinta);padding:8px 10px;font-family:"Spectral",serif;font-size:.9rem;outline:none}
+  .audio-r3{display:flex;gap:8px;flex-wrap:wrap}
+  .audio-r3 input{flex:1 1 140px;min-width:0;background:var(--papel-2);border:1px solid var(--linea-2);border-radius:8px;color:var(--tinta);padding:8px 10px;font-family:"Spectral",serif;font-size:.9rem;outline:none}
+  .audio-r3 input:focus{border-color:var(--oro)}
+  .audio-meta.audio-ct b{color:var(--tinta);font-weight:600}
   .audio-r2 select:focus,.audio-r2 .audio-ton-otro:focus{border-color:var(--oro)}
   .audio-tag{font-size:.74rem;color:var(--tinta-2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .audio-del{background:none;border:0;color:#b0a08c;cursor:pointer;font-size:.95rem;padding:4px 6px;border-radius:6px}
@@ -806,9 +810,13 @@ function mediaHTML(it){
   const auds = audiosDe(it);
   const grab = auds.map((a,i)=>{
     const info=[a.cejilla, a.tonalidad].filter(Boolean).join(" · ");
+    const ct=[];
+    if(a.cante) ct.push(`<b>Cante:</b> ${escapar(a.cante)}`);
+    if(a.toque) ct.push(`<b>Toque:</b> ${escapar(a.toque)}`);
     return `<div class="dmedia audio-item">
       <span class="cap">${a.nombre? escapar(a.nombre) : (auds.length>1? "Grabación "+(i+1) : "Grabación")}</span>
       ${info?`<div class="audio-meta">${escapar(info)}</div>`:""}
+      ${ct.length?`<div class="audio-meta audio-ct">${ct.join(" · ")}</div>`:""}
       <div class="player">
         <button class="pbtn" type="button" aria-label="Reproducir">${PLAY_SVG}</button>
         <div class="pbar"><div class="pfill"></div></div>
@@ -1183,9 +1191,15 @@ function pintarAudios(){
         <select class="audio-ton" data-i="${i}">${tonOpts}</select>
         <input class="audio-ton-otro" data-i="${i}" placeholder="¿Qué tonalidad?" maxlength="30" value="${otro?escapar(a.tonalidad):''}" style="display:${otro?'block':'none'}" />
       </div>
+      <div class="audio-r3">
+        <input class="audio-cante" data-i="${i}" placeholder="Cante: quién canta (opcional)" value="${escapar(a.cante||"")}" maxlength="60" />
+        <input class="audio-toque" data-i="${i}" placeholder="Toque: quién toca (opcional)" value="${escapar(a.toque||"")}" maxlength="60" />
+      </div>
     </div>`;
   }).join("");
   cont.querySelectorAll(".audio-nombre-in").forEach(inp=>{ inp.oninput=()=>{ audiosEstado[+inp.dataset.i].nombre=inp.value; }; });
+  cont.querySelectorAll(".audio-cante").forEach(inp=>{ inp.oninput=()=>{ audiosEstado[+inp.dataset.i].cante=inp.value; }; });
+  cont.querySelectorAll(".audio-toque").forEach(inp=>{ inp.oninput=()=>{ audiosEstado[+inp.dataset.i].toque=inp.value; }; });
   cont.querySelectorAll(".audio-cej").forEach(sel=>{ sel.onchange=()=>{ audiosEstado[+sel.dataset.i].cejilla=sel.value; }; });
   cont.querySelectorAll(".audio-ton").forEach(sel=>{ sel.onchange=()=>{
     const i=+sel.dataset.i, otroInp=cont.querySelector(`.audio-ton-otro[data-i="${i}"]`);
@@ -1203,7 +1217,7 @@ $("#f-grab-file").onchange=()=>{
   if(MODO!=="nube"){ alert("Para subir audios necesitas conectar Supabase (ver README). De momento, usa el YouTube de referencia."); $("#f-grab-file").value=""; return; }
   for(const f of [...$("#f-grab-file").files]){
     if(f.size>MAX_MB*1024*1024){ alert(`"${f.name}" supera los ${MAX_MB} MB y no se añade. Prueba con uno más corto.`); continue; }
-    audiosEstado.push({ file:f, nombre:"", cejilla:"", tonalidad:"" });
+    audiosEstado.push({ file:f, nombre:"", cejilla:"", tonalidad:"", cante:"", toque:"" });
   }
   $("#f-grab-file").value=""; pintarAudios();
 };
@@ -1231,7 +1245,7 @@ function abrir(id){
       $("#f-youtube").value=it.video_url||""; $("#f-autor").value=it.autor||"";
       $("#f-autor").readOnly = true; $("#lblAutor").innerHTML='Subido por <span class="opt">— no se cambia</span>';
       $("#campoEditor").style.display="block";
-      audiosEstado = audiosDe(it).map(a=>({url:a.url, path:a.path||null, nombre:a.nombre||"", cejilla:a.cejilla||"", tonalidad:a.tonalidad||""}));
+      audiosEstado = audiosDe(it).map(a=>({url:a.url, path:a.path||null, nombre:a.nombre||"", cejilla:a.cejilla||"", tonalidad:a.tonalidad||"", cante:a.cante||"", toque:a.toque||""}));
     }
   } else {
     sel.selectedIndex=0;
@@ -1286,7 +1300,7 @@ $("#guardar").onclick = async ()=>{
       let url=a.url, path=a.path||null;
       if(a.file){ btn.textContent="Subiendo audio…"; const up=await subir(a.file); url=up.url; path=up.path; }
       if(!url) continue;
-      audios.push({ url, path, nombre:(a.nombre||"").trim(), cejilla:a.cejilla||"", tonalidad:(a.tonalidad||"").trim() });
+      audios.push({ url, path, nombre:(a.nombre||"").trim(), cejilla:a.cejilla||"", tonalidad:(a.tonalidad||"").trim(), cante:(a.cante||"").trim(), toque:(a.toque||"").trim() });
     }
 
     const datos={ palo, curso, fecha_clase, estilo, titulo, cantaor, letra, video_url:youtube, video_path:null,
