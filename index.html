@@ -754,7 +754,7 @@ function render(){
   const ql=q.trim().toLowerCase();
   const agrupadoPorPalo = (items, mostrarCurso)=>{
     const grupos={}; items.forEach(it=>{ const k=it.palo||"Sin clasificar"; (grupos[k]=grupos[k]||[]).push(it); });
-    return Object.keys(grupos).sort((a,b)=>ordenPalo(a)-ordenPalo(b))
+    return Object.keys(grupos).sort((a,b)=>a.localeCompare(b,"es"))
       .map(p=>seccion(p, colorPalo(p), grupos[p].sort((a,b)=>fechaClaseTs(a)-fechaClaseTs(b)), {mostrarPalo:false, mostrarCurso})).join("");
   };
   // Búsqueda: todo lo que coincide, agrupado por palo (con etiqueta de curso)
