@@ -120,7 +120,7 @@
   .card h3{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.3rem;margin:0;line-height:1.15;color:var(--tinta);word-break:break-word}
   .card .metaline{font-size:.86rem;color:var(--tinta-2)}
   .card .metaline.editado{font-size:.78rem;color:#9a8b75;font-style:italic}
-  .card .metaline.info{font-size:.8rem;color:var(--tinta-2);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .card .metaline.info{font-size:.8rem;color:var(--tinta-2);display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:3px}
   .dclase{font-size:1.02rem;color:var(--tinta-2);margin:-14px 0 24px}
   .card .foot{margin-top:auto;display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--linea)}
   .who{font-size:.8rem;color:var(--tinta-2);flex:1;min-width:0}
@@ -701,10 +701,9 @@ function tarjeta(it, opts){
   const titulo=it.titulo||it.estilo||it.palo||"Sin título";
   const ptag = opts.mostrarPalo ? `<div class="ptag" style="--palo:${col}">${escapar(it.palo||"")}</div>` : "";
   const estilo=(it.estilo && it.estilo!==titulo)?`<div class="metaline">${escapar(it.estilo)}</div>`:"";
-  const info=[];
-  if(opts.mostrarCurso && it.curso) info.push(`<span class="curso-tag ${it.curso===cursoActual()?'curso-tag-actual':''}">${escapar(it.curso)}</span>`);
-  if(it.fecha_clase) info.push(`<span class="clase-fecha">Clase ${fecha(it.fecha_clase)}</span>`);
-  const infoLine = info.length?`<div class="metaline info">${info.join("")}</div>`:"";
+  const cursoLinea = it.curso ? `<div class="metaline info"><span class="curso-tag ${it.curso===cursoActual()?'curso-tag-actual':''}">${escapar(it.curso)}</span></div>` : "";
+  const fechaLinea = it.fecha_clase ? `<div class="metaline info clase-fecha">Clase ${fecha(it.fecha_clase)}</div>` : "";
+  const infoLine = cursoLinea + fechaLinea;
   const marcas=[];
   const nAud = Array.isArray(it.audios)? it.audios.length : (it.audio_url?1:0);
   if(nAud) marcas.push(`<span class="mk" title="Audios">♪${nAud>1?nAud:""}</span>`);
