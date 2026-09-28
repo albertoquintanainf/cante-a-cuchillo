@@ -895,6 +895,7 @@ function renderDetalle(id){
       </div>
       <div class="dactions">
         <button class="btn btn-ghost" onclick="editarCante('${it.id}')">Editar</button>
+        ${adminAuth?`<button class="btn danger" onclick="borrarCante('${it.id}')">Borrar (admin)</button>`:""}
       </div>
     </div>
   </div>`;
@@ -942,6 +943,14 @@ window.verCante=verCante; window.volver=volver; window.irInicio=irInicio; window
 
 function editarCante(id){ abrir(id); }
 window.editarCante=editarCante;
+async function borrarCante(id){
+  if(!adminAuth){ alert("Solo el administrador puede borrar cantes."); return; }
+  const it=byId(id); if(!it) return;
+  if(!confirm(`¿Eliminar definitivamente "${it.titulo||"este cante"}"? No se puede deshacer.`)) return;
+  for(const p of audiosDe(it).map(a=>a.path).filter(Boolean)) await borrarArchivo(p);
+  if(await borrar(id)){ DATOS=DATOS.filter(x=>String(x.id)!==String(id)); location.hash=""; render(); }
+}
+window.borrarCante=borrarCante;
 
 /* ---------- Descripción del palo ---------- */
 let descPaloActual="";
@@ -1086,6 +1095,7 @@ function pintarAdmin(){
   cont.innerHTML=`<div class="detalle admin">
     <button class="back" onclick="irInicio()">← Inicio</button>
     <h1 class="dtitulo">Buzón · Administración</h1>
+    <p class="dmeta">Has entrado como administrador. Ahora, en la página de cada cante, tienes también un botón <b>Borrar</b> para eliminarlo.</p>
     <div class="chips" style="margin:8px 0 18px">
       ${chip("pendientes","Pendientes",pend.length)}
       ${chip("solucionadas","Solucionadas",res.length)}
