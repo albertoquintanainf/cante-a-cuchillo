@@ -26,6 +26,13 @@
   body{overflow-wrap:break-word}
   body{margin:0;background:radial-gradient(1100px 600px at 82% -6%, rgba(142,30,44,.07), transparent 60%),radial-gradient(900px 540px at 2% 2%, rgba(181,133,47,.08), transparent 55%),var(--cal);color:var(--tinta);font-family:"Spectral",Georgia,serif;line-height:1.55;min-height:100vh;display:flex;flex-direction:column}
   #contenido{flex:1 0 auto}
+  .admin-bar{position:fixed;top:0;left:0;right:0;z-index:60;display:none;align-items:center;justify-content:flex-end;gap:12px;height:38px;padding:0 14px;background:var(--tinta);color:var(--cal);font-size:.85rem;box-shadow:0 2px 12px -4px rgba(0,0,0,.45)}
+  body.admin-activo .admin-bar{display:flex}
+  body.admin-activo #contenido{padding-top:38px}
+  body.admin-activo .topbar{top:38px}
+  .admin-bar .marca{font-weight:600;letter-spacing:.02em}
+  .admin-bar button{background:var(--vino);color:#fff;border:0;border-radius:999px;padding:5px 14px;font-family:"Spectral",serif;font-size:.82rem;cursor:pointer}
+  .admin-bar button:hover{background:var(--vino-claro)}
   body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:var(--paper);mix-blend-mode:multiply;opacity:.5}
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(16px,4vw,22px);position:relative;z-index:1}
   a{color:inherit}
@@ -274,6 +281,10 @@
 </style>
 </head>
 <body>
+<div class="admin-bar" id="adminBar">
+  <span class="marca">🔒 Modo admin</span>
+  <button type="button" id="salirAdmin">Cerrar sesión</button>
+</div>
 <div id="contenido">
 <div class="wrap">
 
@@ -1067,10 +1078,18 @@ function renderAdmin(){
 function entrarAdmin(){
   const pass=CONFIG.ADMIN_PASSWORD||"";
   if(!pass){ alert("Primero define una contraseña de admin en config.js (ADMIN_PASSWORD)."); return; }
-  if(($("#admin-pass").value||"")===pass){ adminAuth=true; try{ sessionStorage.setItem("cuchillo_admin","1"); }catch{}; renderAdmin(); }
+  if(($("#admin-pass").value||"")===pass){ adminAuth=true; try{ sessionStorage.setItem("cuchillo_admin","1"); }catch{}; actualizarAdminUI(); renderAdmin(); }
   else alert("Contraseña incorrecta.");
 }
 window.entrarAdmin=entrarAdmin;
+function actualizarAdminUI(){ document.body.classList.toggle("admin-activo", !!adminAuth); }
+function salirAdmin(){
+  adminAuth=false; try{ sessionStorage.removeItem("cuchillo_admin"); }catch{}
+  actualizarAdminUI();
+  if(location.hash==="#admin") location.hash=""; else renderRoute();
+}
+window.salirAdmin=salirAdmin;
+const _sa=$("#salirAdmin"); if(_sa) _sa.onclick=salirAdmin;
 async function cargarAdmin(){
   adminDatos = await listarSugerencias();
   pintarAdmin();
@@ -1348,6 +1367,7 @@ $("#guardar").onclick = async ()=>{
 (async function(){
   // Los textos de cabecera (subtítulo/lede) se editan directamente en el HTML de arriba.
   document.title=`${CONFIG.NOMBRE_CLASE} · ${CONFIG.PROFESOR}`;
+  actualizarAdminUI();
   initStore();
   pintarCompas(); pintarEstado();
   CUSTOM_PALOS = await listarPalos();
