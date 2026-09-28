@@ -1137,30 +1137,30 @@ function renderAyuda(){
   $("#ayudaView").innerHTML=`<div class="detalle ayuda">
     <button class="back" onclick="irInicio()">← Inicio</button>
     <h1 class="dtitulo">¿Cómo funciona?</h1>
-    <p class="intro">Esto es el cuaderno vivo de la clase: entre todos guardamos las letras, las grabaciones y las referencias de cada cante, ordenados por palo y por curso.</p>
+    <p class="intro">Esto es el cuaderno vivo del taller de cante flamenco de 'El Cuchillero': entre todos, guardamos las letras, las grabaciones y las referencias de cada cante aprendidos en el taller, ordenados por palo y clase.</p>
 
     <h2>Moverte por la web</h2>
-    <p>Al entrar ves las <b>Últimas actualizaciones</b>: los cantes de las <b>últimas clases</b> (por su fecha de clase). Con el botón <b>☰</b> (arriba a la derecha) abres el menú, que tiene dos formas de mirar lo mismo:</p>
+    <p>Al entrar, ves las <b>Últimas actualizaciones</b>: los cantes de las últimas clases (por su fecha de clase). En el botón <b>☰</b> (arriba a la derecha) abres el menú, que tiene dos formas de mirar lo mismo:</p>
     <ul>
       <li><b>Cursos:</b> entras en un curso (por ejemplo, "Curso 2026-2027") y ves los cantes de esa edición.</li>
-      <li><b>Palos:</b> entras en un palo (soleá, bulerías…) y ves ese palo de <b>todos</b> los cursos, con una etiqueta que indica de qué curso es cada cante. Arriba puedes añadir o editar una <b>descripción del palo</b>.</li>
+      <li><b>Palos:</b> entras en un palo (soleá, bulerías…) y ves todos los cantes de dicho palo, independientemente de cuándo se hayan aprendido. Arriba puedes añadir o editar una descripción del palo.</li>
     </ul>
-    <p>El <b>buscador</b> encuentra por título, palo, cantaor o letra. Si pulsas cualquier ficha, se abre el cante con su letra completa, sus audios (con <b>control de velocidad</b>, para estudiar despacio) y el vídeo de referencia de YouTube. Desde la página del cante, pulsando el <b>nombre del palo</b> (arriba) vas a su página.</p>
+    <p>El buscador encuentra por título, palo, cantaor o letra. Si pulsas cualquier ficha, se abre el cante con su letra completa, sus audios (con control de velocidad, para estudiar despacio) y el vídeo de referencia de YouTube si lo hubiera. Desde la página del cante, pulsando el nombre del palo (arriba) puedes ir directamente a su página.</p>
 
     <h2>Añadir un cante</h2>
-    <p>Pulsa <b>＋ Añadir cante</b>. Son obligatorios: <b>palo, curso, fecha de la clase, título, letra y quién lo sube</b>. El estilo, el cantaor de referencia, los audios y el enlace de YouTube son opcionales.</p>
-    <p>Puedes subir <b>varios audios</b> (por ejemplo, si el cante va por partes: salida, tercios, estribillo…). En cada audio hay que indicar la <b>cejilla</b> y la <b>tonalidad</b>; el nombre del audio es opcional.</p>
+    <p>Pulsa <b>＋ Añadir cante</b>. Son obligatorios: palo, curso, fecha de la clase, título, letra y quién lo sube. El estilo, el cantaor de referencia, los audios y el enlace de YouTube son opcionales.</p>
+    <p>Puedes subir varios audios (por ejemplo, si el cante va por partes: salida, tercios, estribillo…). En cada audio hay que indicar la cejilla y la tonalidad; el nombre del audio es opcional. No se permiten vídeos para evitar archivos muy pesados que llenen el espacio de almacenamiento.</p>
 
     <div class="callout">
       <h2 style="margin-top:0">Entre todos: corregir y completar</h2>
-      <p><b>No hace falta que hayas subido tú el cante para mejorarlo.</b> Si ves una <b>errata o un fallo en la letra</b>, o quieres <b>añadir otra grabación</b> (o un vídeo de referencia), entra en el cante y pulsa <b>Editar</b>. Puedes hacerlo aunque lo subiera otra persona.</p>
-      <p>Solo te pedirá tu nombre, y queda registrada la <b>última edición</b> (quién y cuándo). Los cantes <b>no se pueden borrar</b> desde la web, para evitar pérdidas por error. Si te has equivocado con algo y quieres que se elimine, indícalo en el <button type="button" class="link-buzon" onclick="abrirBuzon()">buzón de sugerencias</button>.</p>
+      <p>No hace falta que hayas subido tú el cante para mejorarlo. Si ves una errata o un fallo en la letra, o quieres añadir otra grabación (o un vídeo de referencia), entra en el cante y pulsa <b>Editar</b>. Puedes hacerlo aunque lo subiera otra persona.</p>
+      <p>Solo te pedirá tu nombre, y queda registrada la última edición (quién y cuándo). Los cantes no se pueden borrar desde la web, para evitar pérdidas por error. Si te has equivocado con algo y quieres que se elimine, indícalo en el <button type="button" class="link-buzon" onclick="abrirBuzon()">buzón de sugerencias</button> y se atenderá la incidencia cuanto antes.</p>
     </div>
 
     <h2>Dudas o fallos: el buzón</h2>
-    <p>Si algo no funciona, tienes una duda o se te ocurre una mejora, usa el <b><button type="button" class="link-buzon" onclick="abrirBuzon()">Buzón de sugerencias</button></b> (abajo del todo o en el menú ☰). Escribe tu <b>nombre</b> y el mensaje, y ya está: el administrador lo revisa y lo marca como resuelto cuando lo atiende.</p>
+    <p>Si algo no funciona, tienes una duda o se te ocurre una mejora, usa el <button type="button" class="link-buzon" onclick="abrirBuzon()">Buzón de sugerencias</button> (abajo del todo o en el menú ☰). Escribe tu nombre y el mensaje: el administrador lo revisará lo antes posible.</p>
 
-    <p class="cierre">Y sobre todo: llenad el cuaderno. Cuanto más cante subamos entre todos, mejor. 🌹</p>
+    <p class="cierre">Y sobre todo: llenad el cuaderno. Cuanto más cantes subamos entre todos, mejor. 🌹</p>
     <button class="btn btn-vino" onclick="irInicio()" style="margin-top:10px">← Volver al inicio</button>
   </div>`;
 }
