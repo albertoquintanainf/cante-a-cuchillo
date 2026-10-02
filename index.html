@@ -67,6 +67,18 @@
   .topbar.con-titulo .btn-icon{order:5}
   .palo-sub{display:flex;gap:14px;align-items:center;margin:4px 0 16px}
   .palo-desc{margin:0 0 22px}
+  .palo-sec{margin:0 0 22px}
+  .palo-sec-tit{font-family:"Spectral",Georgia,serif;font-size:1.25rem;color:var(--vino);margin:0 0 8px;letter-spacing:.01em}
+  .palo-sec-vacio{color:var(--tinta-2);font-style:italic;margin:0 0 10px}
+  .rec-list{display:flex;flex-direction:column;gap:10px;margin:0 0 12px}
+  .rec-item{position:relative;border-left:3px solid var(--palo,var(--oro));padding:8px 14px;background:var(--papel);border-radius:0 8px 8px 0;box-shadow:var(--sombra-sm)}
+  .rec-head{font-size:1.05rem;color:var(--tinta)}
+  .rec-head b{color:var(--vino)}
+  .rec-estilo{color:var(--tinta-2)}
+  .rec-disco{font-size:.95rem;color:var(--tinta-2);margin-top:2px}
+  .rec-enlace{display:inline-block;margin-top:4px;font-size:.92rem;color:var(--vino);text-decoration:underline;text-underline-offset:2px}
+  .rec-del{position:absolute;top:6px;right:8px;background:none;border:0;color:var(--vino);font-size:1.1rem;cursor:pointer;line-height:1;padding:2px 4px}
+  .rec-del:hover{color:var(--vino-claro)}
   .palo-link{color:inherit;font-size:1.2rem;letter-spacing:.06em;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--linea-2);cursor:pointer}
   .palo-link:hover{color:var(--vino);text-decoration-color:var(--vino)}
   .curso-link{cursor:pointer;text-decoration:none;transition:background .15s}
@@ -381,6 +393,35 @@
   </div>
 </div>
 
+<!-- Recomendación del palo -->
+<div class="overlay" id="recOverlay">
+  <div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="recTit">
+    <button class="close-x" id="cerrarRec" aria-label="Cerrar">×</button>
+    <h2 id="recTit">Añadir recomendación</h2>
+    <p class="sub" id="recSub">Un cantaor o cantaora de referencia para este palo.</p>
+    <div class="field">
+      <label for="rec-cantaor">Cantaor/cantaora <span class="req">*</span></label>
+      <input id="rec-cantaor" type="text" placeholder="Ej. Antonio Mairena" />
+    </div>
+    <div class="field">
+      <label for="rec-estilo">Estilo <span class="req">*</span></label>
+      <input id="rec-estilo" type="text" placeholder="Ej. Soleá de Alcalá" />
+    </div>
+    <div class="field">
+      <label for="rec-disco">Disco (opcional)</label>
+      <input id="rec-disco" type="text" placeholder="Ej. La fragua de los Mairena" />
+    </div>
+    <div class="field">
+      <label for="rec-enlace">Enlace YouTube / Spotify (opcional)</label>
+      <input id="rec-enlace" type="url" placeholder="https://…" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="cancelarRec">Cancelar</button>
+      <button class="btn btn-vino" id="guardarRec">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Menú lateral de palos -->
 <div class="drawer-overlay" id="menuDrawer">
   <nav class="drawer">
@@ -584,21 +625,33 @@ async function borrarArchivo(path){ if(path && MODO==="nube"){ try{ await sb.sto
 function leerPalosLocal(){ try{ return JSON.parse(localStorage.getItem(LS_PALOS)||"[]"); }catch{ return []; } }
 function guardarPalosLocal(a){ try{ localStorage.setItem(LS_PALOS, JSON.stringify(a)); }catch{} }
 const LS_PALODESC = "cuchillo_palodesc_v1";
+const LS_PALORECS = "cuchillo_palorecs_v1";
 let PALO_DESC = {};
+let PALO_RECS = {};
+function normRecs(v){ return Array.isArray(v) ? v : []; }
 async function listarPalos(){
   if(MODO==="nube"){
-    // intenta traer también la descripción; si la columna no existe, cae a solo nombre
+    // intenta traer descripción y recomendaciones; si alguna columna no existe, degrada paso a paso
     try{
-      const { data, error } = await sb.from("palos").select("nombre,descripcion");
+      const { data, error } = await sb.from("palos").select("nombre,descripcion,recomendaciones");
       if(error) throw error;
-      PALO_DESC={}; (data||[]).forEach(r=>{ if(r.descripcion) PALO_DESC[r.nombre]=r.descripcion; });
+      PALO_DESC={}; PALO_RECS={};
+      (data||[]).forEach(r=>{ if(r.descripcion) PALO_DESC[r.nombre]=r.descripcion; if(r.recomendaciones) PALO_RECS[r.nombre]=normRecs(r.recomendaciones); });
       return (data||[]).map(r=>r.nombre);
     }catch(e){
-      try{ const { data, error } = await sb.from("palos").select("nombre"); if(error) throw error; return (data||[]).map(r=>r.nombre); }
-      catch(e2){ console.warn("¿tabla 'palos' creada?", e2.message); return leerPalosLocal(); }
+      try{
+        const { data, error } = await sb.from("palos").select("nombre,descripcion");
+        if(error) throw error;
+        PALO_DESC={}; (data||[]).forEach(r=>{ if(r.descripcion) PALO_DESC[r.nombre]=r.descripcion; });
+        return (data||[]).map(r=>r.nombre);
+      }catch(e2){
+        try{ const { data, error } = await sb.from("palos").select("nombre"); if(error) throw error; return (data||[]).map(r=>r.nombre); }
+        catch(e3){ console.warn("¿tabla 'palos' creada?", e3.message); return leerPalosLocal(); }
+      }
     }
   }
   try{ PALO_DESC = JSON.parse(localStorage.getItem(LS_PALODESC)||"{}"); }catch{ PALO_DESC={}; }
+  try{ PALO_RECS = JSON.parse(localStorage.getItem(LS_PALORECS)||"{}"); }catch{ PALO_RECS={}; }
   return leerPalosLocal();
 }
 async function guardarPaloDB(nombre){
@@ -614,6 +667,17 @@ async function guardarDescripcionPalo(nombre, texto){
   }
   let map={}; try{ map=JSON.parse(localStorage.getItem(LS_PALODESC)||"{}"); }catch{}
   map[nombre]=texto; try{ localStorage.setItem(LS_PALODESC, JSON.stringify(map)); }catch{}
+  return true;
+}
+async function guardarRecsPalo(nombre, arr){
+  PALO_RECS[nombre]=arr;
+  if(MODO==="nube"){
+    const { error } = await sb.from("palos").upsert({ nombre, recomendaciones:arr }, { onConflict:"nombre" });
+    if(error){ alert("No se pudieron guardar las recomendaciones: "+error.message); return false; }
+    return true;
+  }
+  let map={}; try{ map=JSON.parse(localStorage.getItem(LS_PALORECS)||"{}"); }catch{}
+  map[nombre]=arr; try{ localStorage.setItem(LS_PALORECS, JSON.stringify(map)); }catch{}
   return true;
 }
 
@@ -684,6 +748,14 @@ function cursoActual(){ const l=cursosConocidos(); return l.length?l[0].nombre:"
 /* ---------- Helpers ---------- */
 const $ = s => document.querySelector(s);
 function escapar(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function recEnlaceHTML(url){
+  const u=(url||"").trim();
+  if(!/^https?:\/\//i.test(u)) return "";
+  let txt="Abrir enlace ↗";
+  if(/youtube\.com|youtu\.be/i.test(u)) txt="Ver en YouTube ↗";
+  else if(/spotify\.com/i.test(u)) txt="Escuchar en Spotify ↗";
+  return `<a class="rec-enlace" href="${escapar(u)}" target="_blank" rel="noopener">${txt}</a>`;
+}
 function fecha(iso){ if(!iso) return ""; const d=new Date(iso); return isNaN(d)?"":d.toLocaleDateString("es-ES",{day:"numeric",month:"short",year:"numeric"}); }
 function esAudio(u){ return u && /\.(mp3|m4a|m4b|wav|ogg|oga|aac|opus|flac|weba|amr|mka|aiff?)$/.test(u.split("?")[0].toLowerCase()); }
 function esVideoFile(u){ return u && /\.(mp4|webm|mov|m4v|mkv|avi|ogv)$/.test(u.split("?")[0].toLowerCase()); }
@@ -798,11 +870,25 @@ function render(){
   // Un palo (de todos los cursos): descripción + rejilla con etiqueta de curso
   const arr=DATOS.filter(it=>(it.palo||"")===vista.valor).sort((a,b)=>fechaClaseTs(b)-fechaClaseTs(a));
   const desc = PALO_DESC[vista.valor]||"";
-  const descHTML = `<div class="palo-desc">
-    ${desc?`<p class="palo-desc-txt">${escapar(desc)}</p>`:""}
-    <button class="btn btn-ghost btn-sm" onclick="editarDescPalo('${escapar(vista.valor).replace(/'/g,"\\'")}')">${desc?"Editar descripción":"＋ Añadir descripción del palo"}</button>
+  const paloArg = escapar(vista.valor).replace(/'/g,"\\'");
+  const descHTML = `<div class="palo-sec palo-desc">
+    <h2 class="palo-sec-tit">Descripción</h2>
+    ${desc?`<p class="palo-desc-txt">${escapar(desc)}</p>`:`<p class="palo-sec-vacio">Todavía no hay una descripción de este palo.</p>`}
+    <button class="btn btn-ghost btn-sm" onclick="editarDescPalo('${paloArg}')">${desc?"Editar descripción":"＋ Añadir descripción"}</button>
   </div>`;
-  board.innerHTML = descHTML + (arr.length
+  const recs = PALO_RECS[vista.valor]||[];
+  const recsItems = recs.map((r,i)=>`<div class="rec-item">
+      ${adminAuth?`<button class="rec-del" title="Eliminar (admin)" onclick="borrarRecPalo('${paloArg}',${i})">×</button>`:""}
+      <div class="rec-head"><b>${escapar(r.cantaor||"")}</b>${r.estilo?` · <span class="rec-estilo">${escapar(r.estilo)}</span>`:""}</div>
+      ${r.disco?`<div class="rec-disco">Disco: ${escapar(r.disco)}</div>`:""}
+      ${r.enlace?recEnlaceHTML(r.enlace):""}
+    </div>`).join("");
+  const recsHTML = `<div class="palo-sec palo-recs">
+    <h2 class="palo-sec-tit">Recomendaciones</h2>
+    ${recs.length?`<div class="rec-list">${recsItems}</div>`:`<p class="palo-sec-vacio">Todavía no hay recomendaciones para este palo.</p>`}
+    <button class="btn btn-ghost btn-sm" onclick="editarRecPalo('${paloArg}')">＋ Añadir recomendación</button>
+  </div>`;
+  board.innerHTML = descHTML + recsHTML + (arr.length
     ? `<div class="grid">${arr.map(it=>tarjeta(it,{mostrarPalo:false, mostrarCurso:true})).join("")}</div>`
     : `<div class="empty"><p>Todavía no hay ningún cante en este palo.</p></div>`);
 }
@@ -986,6 +1072,44 @@ $("#guardarDesc").onclick=async ()=>{
 };
 window.editarDescPalo=editarDescPalo;
 
+/* ---------- Recomendaciones del palo ---------- */
+let recPaloActual="";
+const recOverlay=$("#recOverlay");
+function editarRecPalo(nombre){
+  recPaloActual=nombre;
+  $("#recTit").textContent="Recomendación · "+nombre;
+  ["rec-cantaor","rec-estilo","rec-disco","rec-enlace"].forEach(i=>$("#"+i).value="");
+  recOverlay.classList.add("open");
+  setTimeout(()=>$("#rec-cantaor").focus(),50);
+}
+function cerrarRec(){ recOverlay.classList.remove("open"); }
+$("#cerrarRec").onclick=cerrarRec; $("#cancelarRec").onclick=cerrarRec;
+recOverlay.addEventListener("click",e=>{ if(e.target===recOverlay) cerrarRec(); });
+$("#guardarRec").onclick=async ()=>{
+  const cantaor=$("#rec-cantaor").value.trim(), estilo=$("#rec-estilo").value.trim();
+  const disco=$("#rec-disco").value.trim(), enlace=$("#rec-enlace").value.trim();
+  if(!cantaor || !estilo){ alert("El cantaor/cantaora y el estilo son obligatorios."); return; }
+  if(enlace && !/^https?:\/\//i.test(enlace)){ alert("El enlace debe empezar por http:// o https://"); return; }
+  const btn=$("#guardarRec"); btn.disabled=true; btn.textContent="Guardando…";
+  const arr=(PALO_RECS[recPaloActual]||[]).slice();
+  arr.push({cantaor, estilo, disco, enlace});
+  await guardarRecsPalo(recPaloActual, arr);
+  btn.disabled=false; btn.textContent="Guardar";
+  cerrarRec();
+  if(vista.tipo==="palo") render();
+};
+window.editarRecPalo=editarRecPalo;
+async function borrarRecPalo(nombre, idx){
+  if(!adminAuth){ alert("Solo el administrador puede eliminar recomendaciones."); return; }
+  const arr=(PALO_RECS[nombre]||[]).slice();
+  if(idx<0 || idx>=arr.length) return;
+  if(!confirm("¿Eliminar esta recomendación?")) return;
+  arr.splice(idx,1);
+  await guardarRecsPalo(nombre, arr);
+  if(vista.tipo==="palo") render();
+}
+window.borrarRecPalo=borrarRecPalo;
+
 /* ---------- Chips ---------- */
 function pintarMenu(){
   const usados={}; DATOS.forEach(d=>{ if(d.palo) usados[d.palo]=(usados[d.palo]||0)+1; });
@@ -1137,24 +1261,24 @@ function renderAyuda(){
   $("#ayudaView").innerHTML=`<div class="detalle ayuda">
     <button class="back" onclick="irInicio()">← Inicio</button>
     <h1 class="dtitulo">¿Cómo funciona?</h1>
-    <p class="intro">Esto es el cuaderno vivo del taller de cante flamenco de 'El Cuchillero': entre todxs, guardamos las letras, las grabaciones y las referencias de cada cante aprendidos en el taller, ordenados por palo y clase.</p>
+    <p class="intro">Esto es el cuaderno vivo del taller de cante flamenco impartido por 'El Cuchillero' en Espacio Loseta. Entre todxs, guardamos las letras, las grabaciones y las referencias de cada cante aprendidos en el taller, ordenados por palo, estilos y cronología de las clases.</p>
 
-    <h2>Moverte por la web</h2>
-    <p>Al entrar, podrás ver las <b>Últimas actualizaciones</b>: los cantes de las últimas clases (por su fecha de clase). En el botón <b>☰</b> (arriba a la derecha) abres el menú, que tiene dos formas de mirar lo mismo:</p>
+    <h2>¿Cómo moverte por la web?</h2>
+    <p>Al entrar, podrás ver las <b>últimas actualizaciones</b>: los cantes de las últimas clases ordenados cronológicamente. En el botón <b>☰</b> (arriba a la derecha) se despliega el menú, que ofrece dos formas de mirar lo mismo:</p>
     <ul>
-      <li><b>Cursos:</b> entras en un curso (por ejemplo, "Curso 2026-2027") y podrás ver los cantes de esa edición.</li>
-      <li><b>Palos:</b> entras en un palo (soleá, bulerías…) y podrás ver todos los cantes de dicho palo, independientemente de cuándo se hayan aprendido. Arriba puedes añadir o editar una descripción del palo.</li>
+      <li><b>Cursos:</b> al entrar en un 'curso' (por ejemplo, "Curso 2026-2027"), podrás ver los cantes de esa edición.</li>
+      <li><b>Palos:</b> al entrar en un palo (soleá, bulerías…), podrás ver todos los cantes de dicho palo, independientemente de cuándo se hayan aprendido. También se puede añadir o editar una descripción del palo, así como realizar recomendaciones de cantaores, discos o referentes de dicho palo.</li>
     </ul>
-    <p>El buscador encuentra por título, palo, cantaor o letra. Si pulsas cualquier ficha, se abre el cante con su letra completa, sus audios (con control de velocidad, para estudiar despacio) y el vídeo de referencia de YouTube si lo hubiera. Desde la página del cante, pulsando el nombre del palo (arriba) puedes ir directamente a su página.</p>
+    <p>El buscador encuentra por título, palo, cantaor o letra. Al pulsar en una ficha de cante, se abre el cante con su letra completa, sus audios (con control de velocidad, para estudiar despacio) y el vídeo de referencia de YouTube si lo hubiera. Desde la página del cante, pulsando el nombre del palo (arriba) es posible también ir directamente a su página.</p>
 
-    <h2>Añadir un cante</h2>
-    <p>Pulsa <b>＋ Añadir cante</b>. Son obligatorios: palo, curso, fecha de la clase, título, letra y quién lo sube. El estilo, el cantaor de referencia, los audios y el enlace de YouTube son opcionales.</p>
-    <p>Puedes subir varios audios (por ejemplo, si el cante va por partes: salida, tercios, estribillo…). En cada audio hay que indicar la cejilla y la tonalidad; el nombre del audio es opcional. No se permiten vídeos para evitar archivos muy pesados que llenen el espacio de almacenamiento. Los archivos están limitados a 5 MB. Si tu audio es muy largo, valora recortarlo en varias partes.</p>
+    <h2>¿Cómo añadir un nuevo cante?</h2>
+    <p>Desde la página de inicio o la página de un cante/curso, pulsa <b>＋ Añadir cante</b>. Es obligatorio indicar: palo, curso, fecha de la clase, título, letra y quién lo sube. El estilo, el cantaor de referencia, los audios y el enlace de YouTube son opcionales.</p>
+    <p>Es posible subir varios audios (por ejemplo, si el cante va por partes: salida, tercios, estribillo…). En cada audio hay que indicar dónde está la cejilla en la guitarra y la tonalidad, si se conoce; el nombre del audio es opcional. No se permiten vídeos para evitar archivos muy pesados que llenen el espacio de almacenamiento. Los archivos están limitados a 5 MB. Si tu audio es muy largo, valora recortarlo en varias partes.</p>
 
     <div class="callout">
       <h2 style="margin-top:0">Entre todxs:</h2>
-      <p>No hace falta que hayas subido tú el cante para mejorarlo. Si ves una errata o un fallo en la letra, o quieres añadir otra grabación (o un vídeo de referencia), entra en el cante y pulsa <b>Editar</b>. Puedes hacerlo aunque lo subiera otra persona.</p>
-      <p>Solo te pedirá tu nombre, y queda registrada la última edición (quién y cuándo). Los cantes no se pueden borrar desde la web, para evitar pérdidas por error. Si te has equivocado con algo y quieres que se elimine, indícalo en el <button type="button" class="link-buzon" onclick="abrirBuzon()">buzón de sugerencias</button> y se atenderá la incidencia cuanto antes.</p>
+      <p>No es necesario que hayas subido tú el cante para mejorarlo. Si observas una errata o un fallo en la letra, o quieres añadir otra grabación o un vídeo de referencia, entra en el cante y pulsa <b>Editar</b>. La edición está habilitada para todxs, aunque lo subiera otra persona.</p>
+      <p>Solo te pedirá tu nombre, y quedará registrada la última edición (quién y cuándo). Los cantes no se pueden borrar desde la web, para evitar pérdidas por error. Si te has equivocado con algo y quieres que se elimine, indícalo en el <button type="button" class="link-buzon" onclick="abrirBuzon()">buzón de sugerencias</button> y se atenderá la incidencia cuanto antes.</p>
     </div>
 
     <h2>Dudas o fallos: el buzón</h2>
