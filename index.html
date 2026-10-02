@@ -70,15 +70,18 @@
   .palo-sec{margin:0 0 22px}
   .palo-sec-tit{font-family:"Spectral",Georgia,serif;font-size:1.25rem;color:var(--vino);margin:0 0 8px;letter-spacing:.01em}
   .palo-sec-vacio{color:var(--tinta-2);font-style:italic;margin:0 0 10px}
-  .rec-list{display:flex;flex-direction:column;gap:10px;margin:0 0 12px}
-  .rec-item{position:relative;border-left:3px solid var(--palo,var(--oro));padding:8px 14px;background:var(--papel);border-radius:0 8px 8px 0;box-shadow:var(--sombra-sm)}
-  .rec-head{font-size:1.05rem;color:var(--tinta)}
+  .rec-list{display:flex;flex-direction:row;gap:10px;margin:0 0 12px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+  .rec-item{position:relative;flex:0 0 auto;min-width:220px;max-width:300px;border-left:3px solid var(--palo,var(--oro));padding:8px 14px;background:var(--papel);border-radius:0 8px 8px 0;box-shadow:var(--sombra-sm)}
+  .rec-head{font-size:1.05rem;color:var(--tinta);padding-right:46px}
   .rec-head b{color:var(--vino)}
   .rec-estilo{color:var(--tinta-2)}
   .rec-disco{font-size:.95rem;color:var(--tinta-2);margin-top:2px}
   .rec-enlace{display:inline-block;margin-top:4px;font-size:.92rem;color:var(--vino);text-decoration:underline;text-underline-offset:2px}
-  .rec-del{position:absolute;top:6px;right:8px;background:none;border:0;color:var(--vino);font-size:1.1rem;cursor:pointer;line-height:1;padding:2px 4px}
-  .rec-del:hover{color:var(--vino-claro)}
+  .rec-autor{font-size:.82rem;color:var(--tinta-2);margin-top:6px;font-style:italic}
+  .rec-acts{position:absolute;top:6px;right:8px;display:flex;gap:2px}
+  .rec-acts button{background:none;border:0;color:var(--vino);font-size:1rem;cursor:pointer;line-height:1;padding:2px 4px}
+  .rec-acts button:hover{color:var(--vino-claro)}
+  .rec-acts .rec-del{font-size:1.15rem}
   .palo-link{color:inherit;font-size:1.2rem;letter-spacing:.06em;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--linea-2);cursor:pointer}
   .palo-link:hover{color:var(--vino);text-decoration-color:var(--vino)}
   .curso-link{cursor:pointer;text-decoration:none;transition:background .15s}
@@ -385,6 +388,10 @@
       <label for="desc-txt">Descripción</label>
       <textarea id="desc-txt" placeholder="Ej. Compás, origen, características, cómo se acompaña…"></textarea>
     </div>
+    <div class="field">
+      <label for="desc-autor">Quién lo edita <span class="req">*</span></label>
+      <input id="desc-autor" type="text" placeholder="Tu nombre" />
+    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="cancelarDesc">Cancelar</button>
       <button class="btn btn-vino" id="guardarDesc">Guardar</button>
@@ -412,6 +419,10 @@
     <div class="field">
       <label for="rec-enlace">Enlace YouTube / Spotify (opcional)</label>
       <input id="rec-enlace" type="url" placeholder="https://…" />
+    </div>
+    <div class="field">
+      <label for="rec-autor">Quién la sube <span class="req">*</span></label>
+      <input id="rec-autor" type="text" placeholder="Tu nombre" />
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="cancelarRec">Cancelar</button>
@@ -623,32 +634,39 @@ async function borrarArchivo(path){ if(path && MODO==="nube"){ try{ await sb.sto
 function leerPalosLocal(){ try{ return JSON.parse(localStorage.getItem(LS_PALOS)||"[]"); }catch{ return []; } }
 function guardarPalosLocal(a){ try{ localStorage.setItem(LS_PALOS, JSON.stringify(a)); }catch{} }
 const LS_PALODESC = "cuchillo_palodesc_v1";
+const LS_PALODESCMETA = "cuchillo_palodescmeta_v1";
 const LS_PALORECS = "cuchillo_palorecs_v1";
 let PALO_DESC = {};
+let PALO_DESCMETA = {};   // { nombre: {autor, editado} }
 let PALO_RECS = {};
 function normRecs(v){ return Array.isArray(v) ? v : []; }
 async function listarPalos(){
   if(MODO==="nube"){
-    // intenta traer descripción y recomendaciones; si alguna columna no existe, degrada paso a paso
-    try{
-      const { data, error } = await sb.from("palos").select("nombre,descripcion,recomendaciones");
-      if(error) throw error;
-      PALO_DESC={}; PALO_RECS={};
-      (data||[]).forEach(r=>{ if(r.descripcion) PALO_DESC[r.nombre]=r.descripcion; if(r.recomendaciones) PALO_RECS[r.nombre]=normRecs(r.recomendaciones); });
-      return (data||[]).map(r=>r.nombre);
-    }catch(e){
+    // intenta traer todo; si alguna columna no existe, degrada por conjuntos de columnas
+    const intentos=[
+      "nombre,descripcion,desc_autor,desc_editado,recomendaciones",
+      "nombre,descripcion,recomendaciones",
+      "nombre,descripcion",
+      "nombre"
+    ];
+    for(const cols of intentos){
       try{
-        const { data, error } = await sb.from("palos").select("nombre,descripcion");
+        const { data, error } = await sb.from("palos").select(cols);
         if(error) throw error;
-        PALO_DESC={}; (data||[]).forEach(r=>{ if(r.descripcion) PALO_DESC[r.nombre]=r.descripcion; });
+        PALO_DESC={}; PALO_DESCMETA={}; PALO_RECS={};
+        (data||[]).forEach(r=>{
+          if(r.descripcion) PALO_DESC[r.nombre]=r.descripcion;
+          if(r.desc_autor||r.desc_editado) PALO_DESCMETA[r.nombre]={autor:r.desc_autor||"", editado:r.desc_editado||""};
+          if(r.recomendaciones) PALO_RECS[r.nombre]=normRecs(r.recomendaciones);
+        });
         return (data||[]).map(r=>r.nombre);
-      }catch(e2){
-        try{ const { data, error } = await sb.from("palos").select("nombre"); if(error) throw error; return (data||[]).map(r=>r.nombre); }
-        catch(e3){ console.warn("¿tabla 'palos' creada?", e3.message); return leerPalosLocal(); }
-      }
+      }catch(e){ /* prueba el siguiente conjunto de columnas */ }
     }
+    console.warn("¿tabla 'palos' creada?");
+    return leerPalosLocal();
   }
   try{ PALO_DESC = JSON.parse(localStorage.getItem(LS_PALODESC)||"{}"); }catch{ PALO_DESC={}; }
+  try{ PALO_DESCMETA = JSON.parse(localStorage.getItem(LS_PALODESCMETA)||"{}"); }catch{ PALO_DESCMETA={}; }
   try{ PALO_RECS = JSON.parse(localStorage.getItem(LS_PALORECS)||"{}"); }catch{ PALO_RECS={}; }
   return leerPalosLocal();
 }
@@ -656,15 +674,19 @@ async function guardarPaloDB(nombre){
   if(MODO==="nube"){ try{ const { error } = await sb.from("palos").insert({ nombre }); if(error) throw error; return; }catch(e){ console.warn(e.message); } }
   const a = leerPalosLocal(); if(!a.includes(nombre)){ a.push(nombre); guardarPalosLocal(a); }
 }
-async function guardarDescripcionPalo(nombre, texto){
+async function guardarDescripcionPalo(nombre, texto, autor){
+  const meta={autor:autor||"", editado:new Date().toISOString()};
   PALO_DESC[nombre]=texto;
+  PALO_DESCMETA[nombre]=meta;
   if(MODO==="nube"){
-    const { error } = await sb.from("palos").upsert({ nombre, descripcion:texto }, { onConflict:"nombre" });
+    const { error } = await sb.from("palos").upsert({ nombre, descripcion:texto, desc_autor:meta.autor, desc_editado:meta.editado }, { onConflict:"nombre" });
     if(error){ alert("No se pudo guardar la descripción: "+error.message); return false; }
     return true;
   }
   let map={}; try{ map=JSON.parse(localStorage.getItem(LS_PALODESC)||"{}"); }catch{}
   map[nombre]=texto; try{ localStorage.setItem(LS_PALODESC, JSON.stringify(map)); }catch{}
+  let mm={}; try{ mm=JSON.parse(localStorage.getItem(LS_PALODESCMETA)||"{}"); }catch{}
+  mm[nombre]=meta; try{ localStorage.setItem(LS_PALODESCMETA, JSON.stringify(mm)); }catch{}
   return true;
 }
 async function guardarRecsPalo(nombre, arr){
@@ -869,17 +891,25 @@ function render(){
   const arr=DATOS.filter(it=>(it.palo||"")===vista.valor).sort((a,b)=>fechaClaseTs(b)-fechaClaseTs(a));
   const desc = PALO_DESC[vista.valor]||"";
   const paloArg = escapar(vista.valor).replace(/'/g,"\\'");
+  const dmeta=PALO_DESCMETA[vista.valor]||null;
+  const dmetaHTML=(desc && dmeta && dmeta.autor)
+    ? `<p class="rec-autor">Editado por ${escapar(dmeta.autor)}${dmeta.editado?` · ${fecha(dmeta.editado)}`:""}</p>` : "";
   const descHTML = `<div class="palo-sec palo-desc">
     <h2 class="palo-sec-tit">Descripción</h2>
     ${desc?`<p class="palo-desc-txt">${escapar(desc)}</p>`:`<p class="palo-sec-vacio">Todavía no hay una descripción de este palo.</p>`}
+    ${dmetaHTML}
     <button class="btn btn-ghost btn-sm" onclick="editarDescPalo('${paloArg}')">${desc?"Editar descripción":"＋ Añadir descripción"}</button>
   </div>`;
   const recs = PALO_RECS[vista.valor]||[];
   const recsItems = recs.map((r,i)=>`<div class="rec-item">
-      ${adminAuth?`<button class="rec-del" title="Eliminar (admin)" onclick="borrarRecPalo('${paloArg}',${i})">×</button>`:""}
+      <div class="rec-acts">
+        <button class="rec-edit" title="Editar" onclick="editarRecPalo('${paloArg}',${i})">✎</button>
+        ${adminAuth?`<button class="rec-del" title="Eliminar (admin)" onclick="borrarRecPalo('${paloArg}',${i})">×</button>`:""}
+      </div>
       <div class="rec-head"><b>${escapar(r.cantaor||"")}</b>${r.estilo?` · <span class="rec-estilo">${escapar(r.estilo)}</span>`:""}</div>
       ${r.disco?`<div class="rec-disco">Disco: ${escapar(r.disco)}</div>`:""}
       ${r.enlace?recEnlaceHTML(r.enlace):""}
+      ${r.autor?`<div class="rec-autor">Añadido por ${escapar(r.autor)}</div>`:""}
     </div>`).join("");
   const recsHTML = `<div class="palo-sec palo-recs">
     <h2 class="palo-sec-tit">Recomendaciones</h2>
@@ -1058,6 +1088,7 @@ function editarDescPalo(nombre){
   descPaloActual=nombre;
   $("#descTit").textContent=nombre;
   $("#desc-txt").value=PALO_DESC[nombre]||"";
+  $("#desc-autor").value="";
   descOverlay.classList.add("open");
   setTimeout(()=>$("#desc-txt").focus(),50);
 }
@@ -1066,8 +1097,10 @@ $("#cerrarDesc").onclick=cerrarDesc; $("#cancelarDesc").onclick=cerrarDesc;
 descOverlay.addEventListener("click",e=>{ if(e.target===descOverlay) cerrarDesc(); });
 $("#guardarDesc").onclick=async ()=>{
   const txt=$("#desc-txt").value.trim();
+  const autor=$("#desc-autor").value.trim();
+  if(!autor){ alert("Indica quién edita la descripción."); return; }
   const btn=$("#guardarDesc"); btn.disabled=true; btn.textContent="Guardando…";
-  await guardarDescripcionPalo(descPaloActual, txt);
+  await guardarDescripcionPalo(descPaloActual, txt, autor);
   btn.disabled=false; btn.textContent="Guardar";
   cerrarDesc();
   if(vista.tipo==="palo") render();
@@ -1075,26 +1108,35 @@ $("#guardarDesc").onclick=async ()=>{
 window.editarDescPalo=editarDescPalo;
 
 /* ---------- Recomendaciones del palo ---------- */
-let recPaloActual="";
+let recPaloActual="", recEditIdx=-1;
 const recOverlay=$("#recOverlay");
-function editarRecPalo(nombre){
+function editarRecPalo(nombre, idx){
   recPaloActual=nombre;
-  $("#recTit").textContent="Recomendaciones por... "+nombre;
-  ["rec-cantaor","rec-estilo","rec-disco","rec-enlace"].forEach(i=>$("#"+i).value="");
+  recEditIdx=(typeof idx==="number") ? idx : -1;
+  const r = recEditIdx>=0 ? (PALO_RECS[nombre]||[])[recEditIdx]||{} : {};
+  $("#recTit").textContent=(recEditIdx>=0?"Editar recomendación · ":"Recomendaciones por... ")+nombre;
+  $("#rec-cantaor").value=r.cantaor||"";
+  $("#rec-estilo").value=r.estilo||"";
+  $("#rec-disco").value=r.disco||"";
+  $("#rec-enlace").value=r.enlace||"";
+  $("#rec-autor").value=r.autor||"";
   recOverlay.classList.add("open");
   setTimeout(()=>$("#rec-cantaor").focus(),50);
 }
-function cerrarRec(){ recOverlay.classList.remove("open"); }
+function cerrarRec(){ recOverlay.classList.remove("open"); recEditIdx=-1; }
 $("#cerrarRec").onclick=cerrarRec; $("#cancelarRec").onclick=cerrarRec;
 recOverlay.addEventListener("click",e=>{ if(e.target===recOverlay) cerrarRec(); });
 $("#guardarRec").onclick=async ()=>{
   const cantaor=$("#rec-cantaor").value.trim(), estilo=$("#rec-estilo").value.trim();
   const disco=$("#rec-disco").value.trim(), enlace=$("#rec-enlace").value.trim();
+  const autor=$("#rec-autor").value.trim();
   if(!cantaor || !estilo){ alert("El cantaor/cantaora y el estilo son obligatorios."); return; }
+  if(!autor){ alert("Indica quién sube la recomendación."); return; }
   if(enlace && !/^https?:\/\//i.test(enlace)){ alert("El enlace debe empezar por http:// o https://"); return; }
   const btn=$("#guardarRec"); btn.disabled=true; btn.textContent="Guardando…";
   const arr=(PALO_RECS[recPaloActual]||[]).slice();
-  arr.push({cantaor, estilo, disco, enlace});
+  const obj={cantaor, estilo, disco, enlace, autor};
+  if(recEditIdx>=0 && recEditIdx<arr.length) arr[recEditIdx]=obj; else arr.push(obj);
   await guardarRecsPalo(recPaloActual, arr);
   btn.disabled=false; btn.textContent="Guardar";
   cerrarRec();
