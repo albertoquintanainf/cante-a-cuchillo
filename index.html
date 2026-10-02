@@ -381,7 +381,6 @@
   <div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="descTit">
     <button class="close-x" id="cerrarDesc" aria-label="Cerrar">×</button>
     <h2 id="descTit">Descripción del palo</h2>
-    <p class="sub" id="descSub">Un texto breve sobre este palo, que verán todos antes de los cantes.</p>
     <div class="field">
       <label for="desc-txt">Descripción</label>
       <textarea id="desc-txt" placeholder="Ej. Compás, origen, características, cómo se acompaña…"></textarea>
@@ -398,7 +397,6 @@
   <div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="recTit">
     <button class="close-x" id="cerrarRec" aria-label="Cerrar">×</button>
     <h2 id="recTit">Añadir recomendación</h2>
-    <p class="sub" id="recSub">Un cantaor o cantaora de referencia para este palo.</p>
     <div class="field">
       <label for="rec-cantaor">Cantaor/cantaora <span class="req">*</span></label>
       <input id="rec-cantaor" type="text" placeholder="Ej. Antonio Mairena" />
@@ -888,9 +886,13 @@ function render(){
     ${recs.length?`<div class="rec-list">${recsItems}</div>`:`<p class="palo-sec-vacio">Todavía no hay recomendaciones para este palo.</p>`}
     <button class="btn btn-ghost btn-sm" onclick="editarRecPalo('${paloArg}')">＋ Añadir recomendación</button>
   </div>`;
-  board.innerHTML = descHTML + recsHTML + (arr.length
-    ? `<div class="grid">${arr.map(it=>tarjeta(it,{mostrarPalo:false, mostrarCurso:true})).join("")}</div>`
-    : `<div class="empty"><p>Todavía no hay ningún cante en este palo.</p></div>`);
+  const cantesHTML = `<div class="palo-sec palo-cantes">
+    <h2 class="palo-sec-tit">Los cantes de clase</h2>
+    ${arr.length
+      ? `<div class="grid">${arr.map(it=>tarjeta(it,{mostrarPalo:false, mostrarCurso:true})).join("")}</div>`
+      : `<p class="palo-sec-vacio">Todavía no hay ningún cante en este palo.</p>`}
+  </div>`;
+  board.innerHTML = descHTML + recsHTML + cantesHTML;
 }
 
 /* ---------- Página de detalle ---------- */
@@ -1077,7 +1079,7 @@ let recPaloActual="";
 const recOverlay=$("#recOverlay");
 function editarRecPalo(nombre){
   recPaloActual=nombre;
-  $("#recTit").textContent="Recomendación · "+nombre;
+  $("#recTit").textContent="Recomendaciones por... "+nombre;
   ["rec-cantaor","rec-estilo","rec-disco","rec-enlace"].forEach(i=>$("#"+i).value="");
   recOverlay.classList.add("open");
   setTimeout(()=>$("#rec-cantaor").focus(),50);
