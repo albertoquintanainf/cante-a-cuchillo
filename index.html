@@ -86,9 +86,7 @@
   .palo-link:hover{color:var(--vino);text-decoration-color:var(--vino)}
   .curso-link{cursor:pointer;text-decoration:none;transition:background .15s}
   .curso-link:hover{background:rgba(181,133,47,.3)}
-  .palo-desc-txt{position:relative;color:#3f362c;line-height:1.65;font-size:1.02rem;white-space:pre-wrap;margin:0 0 10px;border-left:3px solid var(--palo,var(--oro));padding:0 40px 0 14px}
-  .desc-lapiz{position:absolute;top:0;right:6px;background:none;border:0;color:var(--vino);font-size:1.05rem;cursor:pointer;line-height:1;padding:2px 4px}
-  .desc-lapiz:hover{color:var(--vino-claro)}
+  .palo-desc-txt{color:#3f362c;line-height:1.65;font-size:1.02rem;white-space:pre-wrap;margin:0 0 10px;border-left:3px solid var(--palo,var(--oro));padding-left:14px}
   .palo-sub .back{padding:0;margin:0}
   .page-count{font-size:.85rem;color:var(--tinta-2)}
   .page-kind{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--oro);border:1px solid var(--oro);border-radius:5px;padding:1px 7px}
@@ -898,11 +896,9 @@ function render(){
     ? `<p class="rec-autor">Editado por ${escapar(dmeta.autor)}${dmeta.editado?` · ${fecha(dmeta.editado)}`:""}</p>` : "";
   const descHTML = `<div class="palo-sec palo-desc">
     <h2 class="palo-sec-tit">Descripción</h2>
-    ${desc
-      ? `<div class="palo-desc-txt"><button class="desc-lapiz" title="Editar descripción" aria-label="Editar descripción" onclick="editarDescPalo('${paloArg}')">✎</button>${escapar(desc)}</div>
-    ${dmetaHTML}`
-      : `<p class="palo-sec-vacio">Todavía no hay una descripción de este palo.</p>
-    <button class="btn btn-ghost btn-sm" onclick="editarDescPalo('${paloArg}')">＋ Añadir descripción</button>`}
+    ${desc?`<p class="palo-desc-txt">${escapar(desc)}</p>`:`<p class="palo-sec-vacio">Todavía no hay una descripción de este palo.</p>`}
+    ${dmetaHTML}
+    <button class="btn btn-ghost btn-sm" onclick="editarDescPalo('${paloArg}')">${desc?"Editar":"＋ Añadir descripción"}</button>
   </div>`;
   const recs = PALO_RECS[vista.valor]||[];
   const recsItems = recs.map((r,i)=>`<div class="rec-item">
