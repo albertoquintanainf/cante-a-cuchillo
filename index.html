@@ -238,6 +238,13 @@
   .yt-link:hover{color:var(--vino-claro)}
   .spotify-embed{width:100%;border-radius:12px;overflow:hidden}
   .spotify-embed iframe{width:100%;border:0;display:block;border-radius:12px}
+  .act-list{display:flex;flex-direction:column;gap:8px;margin:0 0 8px}
+  .act-item{display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-left:3px solid var(--oro);padding:7px 12px;background:var(--papel);border-radius:0 8px 8px 0;box-shadow:var(--sombra-sm)}
+  .act-item.clic{cursor:pointer}
+  .act-item.clic:hover{background:#fbf7ef}
+  .act-txt{font-size:.95rem;color:var(--tinta);line-height:1.4}
+  .act-txt b{color:var(--vino)}
+  .act-when{flex:none;font-size:.78rem;color:var(--tinta-2);white-space:nowrap}
   .cap{display:block;font-size:.84rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-2);font-weight:600;margin-bottom:8px}
   .dfoot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-top:1px solid var(--linea);padding-top:18px;color:var(--tinta-2);font-size:.92rem}
   .dfoot b{color:var(--tinta)}
@@ -786,6 +793,21 @@ function recEnlaceHTML(url){
   return `<a class="rec-enlace" href="${escapar(u)}" target="_blank" rel="noopener">${txt}</a>`;
 }
 function fecha(iso){ if(!iso) return ""; const d=new Date(iso); return isNaN(d)?"":d.toLocaleDateString("es-ES",{day:"numeric",month:"short",year:"numeric"}); }
+function fechaHora(iso){ if(!iso) return ""; const d=new Date(iso); return isNaN(d)?"":d.toLocaleString("es-ES",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}); }
+function actividadReciente(limit){
+  const ev=[];
+  DATOS.forEach(it=>{
+    const tit=it.titulo||it.estilo||it.palo||"(sin título)";
+    if(it.creado)  ev.push({cuando:it.creado,  quien:it.autor||"",  accion:"añadió el cante",  obj:tit, id:it.id});
+    if(it.editado) ev.push({cuando:it.editado, quien:it.editor||"", accion:"editó el cante",   obj:tit, id:it.id});
+  });
+  Object.keys(PALO_DESCMETA||{}).forEach(nombre=>{
+    const m=PALO_DESCMETA[nombre];
+    if(m && m.editado) ev.push({cuando:m.editado, quien:m.autor||"", accion:"editó la descripción del palo", obj:nombre, palo:nombre});
+  });
+  ev.sort((a,b)=>(Date.parse(b.cuando)||0)-(Date.parse(a.cuando)||0));
+  return ev.slice(0, limit||25);
+}
 function esAudio(u){ return u && /\.(mp3|m4a|m4b|wav|ogg|oga|aac|opus|flac|weba|amr|mka|aiff?)$/.test(u.split("?")[0].toLowerCase()); }
 function esVideoFile(u){ return u && /\.(mp4|webm|mov|m4v|mkv|avi|ogv)$/.test(u.split("?")[0].toLowerCase()); }
 function youtubeId(u){
@@ -1312,7 +1334,24 @@ function pintarAdmin(){
       ${chip("todas","Todas",adminDatos.length)}
     </div>
     ${cards}
+    ${actividadHTML()}
   </div>`;
+}
+function actividadHTML(){
+  const ev=actividadReciente(25);
+  const filas = ev.length ? ev.map(e=>{
+    const clic = e.id!=null ? `class="act-item clic" onclick="verCante('${e.id}')"`
+               : e.palo    ? `class="act-item clic" onclick="location.hash='#palo='+encodeURIComponent('${escapar(e.palo).replace(/'/g,"\\'")}')"`
+               : `class="act-item"`;
+    const quien = e.quien ? `<b>${escapar(e.quien)}</b>` : "<b>Alguien</b>";
+    return `<div ${clic}>
+      <span class="act-txt">${quien} ${e.accion} «${escapar(e.obj)}»</span>
+      <span class="act-when">${fechaHora(e.cuando)}</span>
+    </div>`;
+  }).join("") : `<p class="palo-sec-vacio">Todavía no hay actividad registrada.</p>`;
+  return `<h2 class="palo-sec-tit" style="margin-top:30px">Actividad reciente</h2>
+    <p class="dmeta" style="margin-top:0">Últimas altas y ediciones registradas en los cantes y en las descripciones de palo.</p>
+    <div class="act-list">${filas}</div>`;
 }
 function adminSetFiltro(k){ adminFiltro=k; pintarAdmin(); }
 async function toggleSug(id, estado){
