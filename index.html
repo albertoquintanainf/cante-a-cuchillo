@@ -40,6 +40,7 @@
 
   header.hero{padding:clamp(30px,6vw,48px) 0 18px}
   .eyebrow{font-size:.76rem;letter-spacing:.2em;text-transform:uppercase;color:var(--vino);font-weight:600;margin:0 0 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  #eyebrow{font-size:.95rem;letter-spacing:.14em}
   .eyebrow::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--linea-2),transparent)}
   h1.title{font-family:"Bodoni Moda",serif;font-weight:900;font-size:clamp(2.5rem,9vw,5.6rem);line-height:.95;margin:0;letter-spacing:-.01em;color:var(--tinta)}
   h1.title em{font-style:italic;font-weight:700;color:var(--vino)}
@@ -185,7 +186,7 @@
   #detail{display:none}
   #adminView{display:none}
   #ayudaView{display:none}
-  .ayuda .intro{font-size:1.1rem;color:var(--tinta-2);margin:22px 0 26px}
+  .ayuda .intro{color:#3f362c;line-height:1.7;margin:0 0 12px;text-align:justify}
   .ayuda h2{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.4rem;color:var(--tinta);margin:28px 0 8px}
   .ayuda p{color:#3f362c;line-height:1.7;margin:0 0 12px;text-align:justify}
   .ayuda ul{color:#3f362c;line-height:1.7;margin:0 0 12px;padding-left:20px}
@@ -323,6 +324,7 @@
   @media (max-width:600px){.row2{grid-template-columns:1fr}.toolbar .btn{flex:1 1 auto;text-align:center}.footer-inner{flex-direction:column;align-items:flex-start;gap:12px}}
   @media (max-width:600px){
     .topbar.con-titulo .btn-sm{padding:9px 12px}
+    .ayuda{padding-left:10px;padding-right:10px}
   }
   @media (prefers-reduced-motion:reduce){.beat{transition:none}}
 </style>
@@ -1132,7 +1134,7 @@ function renderDetalle(id){
   const ultEd = hist.length ? hist[hist.length-1] : null;
   const edits = ultEd ? `<span class="edit-line">Última edición por <b>${escapar(ultEd.por||"—")}</b> · ${fecha(ultEd.cuando)}</span>` : "";
   cont.innerHTML=`<div class="detalle" style="--palo:${col}">
-    <button class="back" onclick="volver()">← Volver al tablón</button>
+    <button class="back" onclick="volver()">${volverLabel()}</button>
     <p class="eyebrow">${eyebrow}</p>
     <h1 class="dtitulo">${escapar(it.titulo||it.estilo||"Sin título")}</h1>
     ${dmeta}
@@ -1186,8 +1188,20 @@ function renderRoute(){
   render(); window.scrollTo(0,0);
 }
 window.addEventListener("hashchange", renderRoute);
-function verCante(id){ location.hash="cante="+encodeURIComponent(id); }
-function volver(){ location.hash=""; }
+let volverHash="";
+function verCante(id){
+  const h=location.hash||"";
+  if(!/^#cante=/.test(h)) volverHash=h;   // recuerda la página de origen (palo, curso, todos, inicio)
+  location.hash="cante="+encodeURIComponent(id);
+}
+function volver(){ location.hash = volverHash || ""; }
+function volverLabel(){
+  const h=volverHash||"";
+  if(/^#palo=/.test(h)) return "← Volver al palo";
+  if(/^#curso=/.test(h)) return "← Volver al curso";
+  if(h==="#todos") return "← Volver a todos los cantes";
+  return "← Volver al tablón";
+}
 function irInicio(){ q=""; const b=$("#buscar"); if(b) b.value=""; location.hash=""; }
 function irPalo(p){ q=""; const b=$("#buscar"); if(b) b.value=""; location.hash="palo="+encodeURIComponent(p); }
 window.verCante=verCante; window.volver=volver; window.irInicio=irInicio; window.irPalo=irPalo;
