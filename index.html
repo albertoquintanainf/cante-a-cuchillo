@@ -129,7 +129,7 @@
   .menu-item.curso-actual{background:rgba(181,133,47,.14);border-left-color:var(--oro);font-weight:600}
   .badge-actual{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:#fff;background:var(--oro);border-radius:5px;padding:2px 7px;margin-left:6px;vertical-align:middle}
   .menu-sep{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--vino);font-weight:700;margin:16px 12px 4px}
-  .ptag{display:inline-block;font-size:.88rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--palo,var(--oro));margin-bottom:2px}
+  .ptag{display:block;font-size:.88rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--palo,var(--oro));margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
   .estado{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;color:var(--tinta-2);margin:6px 0 8px;padding:7px 13px;border-radius:999px;background:var(--papel);border:1px solid var(--linea)}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--oro)}
@@ -147,10 +147,12 @@
   .card{background:var(--papel);border:1px solid var(--linea);border-radius:var(--r);padding:18px 18px 14px;position:relative;overflow:hidden;box-shadow:var(--sombra-sm);display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:box-shadow .15s,transform .15s}
   .card:hover,.card:focus-visible{box-shadow:var(--sombra);transform:translateY(-2px);outline:none}
   .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--palo,var(--oro))}
-  .card h3{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.3rem;margin:0;line-height:1.15;color:var(--tinta);word-break:break-word}
+  .card h3{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.3rem;margin:0;line-height:1.15;color:var(--tinta);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:calc(1.15em * 2);word-break:break-word}
   .card .metaline{font-size:.86rem;color:var(--tinta-2)}
+  .card .metaline.estilo-line{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .card .metaline.editado{font-size:.78rem;color:#9a8b75;font-style:italic}
-  .card .metaline.info{font-size:.8rem;color:var(--tinta-2);display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:3px}
+  .card .metaline.info{font-size:.8rem;color:var(--tinta-2);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+  .card .metaline.info .curso-tag{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
   .dclase{font-size:1.02rem;color:var(--tinta-2);margin:-14px 0 24px}
   .card .foot{margin-top:auto;display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--linea)}
   .who{font-size:.8rem;color:var(--tinta-2);flex:1;min-width:0}
@@ -160,6 +162,16 @@
   .mk-ic{display:inline-flex;align-items:center}
   .mk-ic svg{height:16px;width:auto;display:block}
   .mk-ic.yt svg{height:14px}
+  @media(max-width:600px){
+    .card h3{font-size:1.5rem}
+    .ptag{font-size:1rem}
+    .card .metaline,.card .metaline.estilo-line{font-size:1rem}
+    .card .metaline.info{font-size:.95rem}
+    .who,.ver{font-size:.95rem}
+    .mk{font-size:.95rem}
+    .mk-ic svg{height:19px}
+    .mk-ic.yt svg{height:16px}
+  }
 
   .empty{text-align:center;padding:clamp(48px,10vw,72px) 20px;border:1px dashed var(--linea-2);border-radius:var(--r);color:var(--tinta-2);background:var(--papel-2)}
   .empty h3{font-family:"Bodoni Moda",serif;color:var(--tinta);font-size:1.6rem;margin:0 0 8px}
@@ -903,10 +915,13 @@ function tarjeta(it, opts){
   opts=opts||{};
   const col=colorPalo(it.palo);
   const titulo=it.titulo||it.estilo||it.palo||"Sin título";
-  const ptag = opts.mostrarPalo ? `<div class="ptag" style="--palo:${col}">${escapar(it.palo||"")}</div>` : "";
-  const estilo=(it.estilo && it.estilo!==titulo)?`<div class="metaline">${escapar(it.estilo)}</div>`:"";
-  const cursoLinea = it.curso ? `<div class="metaline info"><span class="curso-tag ${it.curso===cursoActual()?'curso-tag-actual':''}">${escapar(it.curso)}</span></div>` : "";
-  const fechaLinea = it.fecha_clase ? `<div class="metaline info clase-fecha">Clase ${fecha(it.fecha_clase)}</div>` : "";
+  const paloTxt = escapar(it.palo||"");
+  const ptag = opts.mostrarPalo ? `<div class="ptag" style="--palo:${col}" title="${paloTxt}">${paloTxt}</div>` : "";
+  const estiloTxt = (it.estilo && it.estilo!==titulo) ? escapar(it.estilo) : "";
+  const estilo = `<div class="metaline estilo-line" title="${estiloTxt}">${estiloTxt||"&nbsp;"}</div>`;
+  const cursoTxt = escapar(it.curso||"");
+  const cursoLinea = `<div class="metaline info curso-line">${cursoTxt?`<span class="curso-tag ${it.curso===cursoActual()?'curso-tag-actual':''}" title="${cursoTxt}">${cursoTxt}</span>`:"&nbsp;"}</div>`;
+  const fechaLinea = `<div class="metaline info clase-fecha">${it.fecha_clase?`Clase ${fecha(it.fecha_clase)}`:"&nbsp;"}</div>`;
   const infoLine = cursoLinea + fechaLinea;
   const marcas=[];
   const nAud = Array.isArray(it.audios)? it.audios.length : (it.audio_url?1:0);
