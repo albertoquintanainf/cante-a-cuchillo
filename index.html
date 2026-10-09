@@ -60,12 +60,14 @@
   .topbar{position:sticky;top:0;z-index:5;margin:6px 0;padding:10px 0;background:linear-gradient(180deg,var(--cal) 78%,rgba(246,241,230,0));display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .topbar .search{flex:1 1 180px;padding:8px 14px}
   .topbar .search input{font-size:.95rem}
-  .topbar-title{flex:1 1 auto;min-width:0;overflow-wrap:anywhere;font-family:"Bodoni Moda",serif;font-weight:700;font-size:clamp(1.9rem,6.5vw,2.8rem);margin:0;color:var(--tinta);line-height:1.05;border-left:4px solid var(--palo,var(--oro));padding-left:12px}
+  .topbar-title{flex:1 1 auto;min-width:0;overflow-wrap:anywhere;font-family:"Bodoni Moda",serif;font-weight:700;font-size:clamp(1.9rem,6.5vw,2.8rem);margin:0;color:var(--tinta);line-height:1.05}
   /* En páginas de palo: el buscador se hace pequeño y va a la derecha */
-  .topbar.con-titulo .search{flex:0 1 200px;order:3}
-  .topbar.con-titulo .btn-sm{order:4}
-  .topbar.con-titulo .btn-icon{order:5}
-  .palo-sub{display:flex;gap:14px;align-items:center;margin:4px 0 16px}
+  .topbar.con-titulo{flex-wrap:wrap;margin-top:20px;row-gap:12px}
+  .topbar.con-titulo .topbar-title{flex:1 1 100%;order:0;padding:2px 0 14px;border-bottom:3px solid var(--palo,var(--oro))}
+  .topbar.con-titulo .search{flex:1 1 0;min-width:0;order:1}
+  .topbar.con-titulo .btn-sm{flex:0 0 auto;order:2}
+  .topbar.con-titulo .btn-icon{flex:0 0 auto;order:3}
+  .palo-sub{display:flex;gap:14px;align-items:center;margin:10px 0 20px}
   .palo-desc{margin:0 0 22px}
   .palo-sec{margin:0 0 22px}
   .palo-sec-tit{font-family:"Spectral",Georgia,serif;font-size:1.25rem;color:var(--vino);margin:0 0 8px;letter-spacing:.01em}
@@ -119,7 +121,7 @@
   /* Drawer menú de palos */
   .drawer-overlay{position:fixed;inset:0;z-index:60;display:none;background:rgba(42,33,26,.45);backdrop-filter:blur(2px)}
   .drawer-overlay.open{display:block}
-  .drawer{position:absolute;left:0;top:0;bottom:0;width:min(82vw,300px);background:var(--cal);border-right:1px solid var(--linea);box-shadow:0 0 50px -10px rgba(40,26,12,.5);padding:18px 16px;overflow-y:auto;transform:translateX(-6px);display:flex;flex-direction:column;gap:4px}
+  .drawer{position:absolute;right:0;top:0;bottom:0;width:min(82vw,300px);background:var(--cal);border-left:1px solid var(--linea);box-shadow:0 0 50px -10px rgba(40,26,12,.5);padding:18px 16px;overflow-y:auto;transform:translateX(6px);display:flex;flex-direction:column;gap:4px}
   .drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
   .drawer-head span{font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.4rem;color:var(--tinta)}
   .menu-item{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;border:0;background:none;font-family:"Spectral",serif;font-size:1.02rem;color:var(--tinta);padding:11px 12px;border-radius:10px;cursor:pointer;border-left:3px solid transparent;transition:background .15s}
@@ -320,11 +322,7 @@
   :focus-visible{outline:2px solid var(--oro);outline-offset:2px}
   @media (max-width:600px){.row2{grid-template-columns:1fr}.toolbar .btn{flex:1 1 auto;text-align:center}.footer-inner{flex-direction:column;align-items:flex-start;gap:12px}}
   @media (max-width:600px){
-    .topbar.con-titulo{flex-wrap:wrap}
-    .topbar.con-titulo .topbar-title{flex:1 1 100%;order:0}
-    .topbar.con-titulo .search{flex:1 1 0;min-width:0;order:1}
-    .topbar.con-titulo .btn-sm{flex:0 0 auto;order:2;padding:9px 12px}
-    .topbar.con-titulo .btn-icon{flex:0 0 auto;order:3}
+    .topbar.con-titulo .btn-sm{padding:9px 12px}
   }
   @media (prefers-reduced-motion:reduce){.beat{transition:none}}
 </style>
@@ -964,7 +962,7 @@ function setTopHeader(){
   }
   let titulo, col, n;
   if(vista.tipo==="todo"){ titulo="Todos los cantes"; col="var(--vino)"; n=DATOS.length; }
-  else if(vista.tipo==="curso"){ titulo=vista.valor; col="var(--oro)"; n=DATOS.filter(it=>it.curso===vista.valor).length; }
+  else if(vista.tipo==="curso"){ titulo=vista.valor; col="var(--vino)"; n=DATOS.filter(it=>it.curso===vista.valor).length; }
   else { titulo=vista.valor; col=colorPalo(vista.valor); n=DATOS.filter(it=>(it.palo||"")===vista.valor).length; }
   tt.textContent=titulo; tt.style.display="";
   tb.style.setProperty("--palo", col);
