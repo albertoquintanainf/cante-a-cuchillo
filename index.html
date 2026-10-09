@@ -139,6 +139,8 @@
   .palo-sec{margin:28px 0 6px}
   .palo-head{display:flex;align-items:baseline;gap:14px;margin:0 0 16px}
   .palo-head h2{font-family:"Bodoni Moda",serif;font-weight:700;font-size:clamp(1.45rem,4.5vw,2.1rem);margin:0;color:var(--tinta)}
+  .palo-head-link{color:inherit;text-decoration:none}
+  .palo-head-link:hover{color:var(--palo,var(--oro));text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--palo,var(--oro))}
   .palo-head .n{font-size:.8rem;color:var(--tinta-2);letter-spacing:.05em;white-space:nowrap}
   .palo-head .rule{flex:1;height:0;border-top:1px solid var(--linea);position:relative;top:-4px;min-width:24px}
   .palo-head .rule::after{content:"";position:absolute;left:0;top:0;width:46px;border-top:2px solid var(--palo,var(--oro))}
@@ -153,7 +155,7 @@
   .card .metaline.editado{font-size:.78rem;color:#9a8b75;font-style:italic}
   .card .metaline.info{font-size:.8rem;color:var(--tinta-2);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
   .card .metaline.info .curso-tag{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
-  .dclase{font-size:1.02rem;color:var(--tinta-2);margin:-14px 0 24px}
+  .dclase{font-size:1.02rem;color:var(--tinta-2);margin:0 0 24px}
   .card .foot{margin-top:auto;display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--linea)}
   .who{font-size:.8rem;color:var(--tinta-2);flex:1;min-width:0}
   .who b{color:var(--tinta);font-weight:600}
@@ -211,8 +213,8 @@
   .back{background:none;border:0;color:var(--tinta-2);font-family:"Spectral",serif;font-size:.96rem;cursor:pointer;padding:8px 0;margin-bottom:14px}
   .back:hover{color:var(--vino)}
   .detalle .eyebrow{color:var(--palo,var(--vino))}
-  .dtitulo{font-family:"Bodoni Moda",serif;font-weight:900;font-size:clamp(2rem,6.5vw,3.4rem);line-height:1.03;margin:4px 0 8px;color:var(--tinta);overflow-wrap:anywhere}
-  .dmeta{margin-bottom:26px}
+  .dtitulo{font-family:"Bodoni Moda",serif;font-weight:900;font-size:clamp(2rem,6.5vw,3.4rem);line-height:1.03;margin:4px 0 16px;color:var(--tinta);overflow-wrap:anywhere}
+  .dmeta{margin-bottom:12px}
   .dmeta-line{font-size:1.18rem;color:var(--tinta);margin-bottom:5px;line-height:1.5}
   .dmeta-lbl{color:var(--tinta-2);font-weight:600}
   .dmeta b{color:var(--vino);font-weight:600}
@@ -940,9 +942,12 @@ function tarjeta(it, opts){
     </div>
   </article>`;
 }
-function seccion(titulo, col, arr, opts){
+function seccion(titulo, col, arr, opts, linkPalo){
+  const head = linkPalo
+    ? `<a class="palo-head-link" href="#palo=${encodeURIComponent(linkPalo)}">${escapar(titulo)}</a>`
+    : escapar(titulo);
   return `<section class="palo-sec">
-    <div class="palo-head" style="--palo:${col}"><h2>${escapar(titulo)}</h2><span class="n">${arr.length} ${arr.length===1?"cante":"cantes"}</span><span class="rule"></span></div>
+    <div class="palo-head" style="--palo:${col}"><h2>${head}</h2><span class="n">${arr.length} ${arr.length===1?"cante":"cantes"}</span><span class="rule"></span></div>
     <div class="grid">${arr.map(it=>tarjeta(it, opts)).join("")}</div>
   </section>`;
 }
@@ -973,7 +978,7 @@ function render(){
   const agrupadoPorPalo = (items, mostrarCurso)=>{
     const grupos={}; items.forEach(it=>{ const k=it.palo||"Sin clasificar"; (grupos[k]=grupos[k]||[]).push(it); });
     return Object.keys(grupos).sort((a,b)=>a.localeCompare(b,"es"))
-      .map(p=>seccion(p, colorPalo(p), grupos[p].sort((a,b)=>fechaClaseTs(a)-fechaClaseTs(b)), {mostrarPalo:false, mostrarCurso})).join("");
+      .map(p=>seccion(p, colorPalo(p), grupos[p].sort((a,b)=>fechaClaseTs(a)-fechaClaseTs(b)), {mostrarPalo:false, mostrarCurso}, (p&&p!=="Sin clasificar")?p:"")).join("");
   };
   // Búsqueda: todo lo que coincide, agrupado por palo (con etiqueta de curso)
   if(ql){
