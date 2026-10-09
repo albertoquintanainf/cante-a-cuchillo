@@ -70,18 +70,29 @@
   .palo-sec{margin:0 0 22px}
   .palo-sec-tit{font-family:"Spectral",Georgia,serif;font-size:1.25rem;color:var(--vino);margin:0 0 8px;letter-spacing:.01em}
   .palo-sec-vacio{color:var(--tinta-2);font-style:italic;margin:0 0 10px}
-  .rec-list{display:flex;flex-direction:row;gap:10px;margin:0 0 12px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
-  .rec-item{position:relative;flex:0 0 auto;min-width:220px;max-width:300px;border-left:3px solid var(--palo,var(--oro));padding:8px 14px;background:var(--papel);border-radius:0 8px 8px 0;box-shadow:var(--sombra-sm)}
-  .rec-head{font-size:1.05rem;color:var(--tinta);padding-right:46px}
+  .rec-list{display:flex;flex-direction:column;gap:8px;margin:0 0 12px}
+  .rec-item{display:flex;align-items:center;gap:12px;border-left:3px solid var(--palo,var(--oro));padding:8px 12px;background:var(--papel);border-radius:0 8px 8px 0;box-shadow:var(--sombra-sm)}
+  .rec-cover{flex:0 0 auto;width:52px;height:52px;border-radius:6px;overflow:hidden;background:#e9e0d2 radial-gradient(circle at 50% 50%, #c9bca6 0 18%, #e9e0d2 19% 100%);display:flex;align-items:center;justify-content:center;position:relative}
+  .rec-cover::after{content:"";position:absolute;width:12px;height:12px;border-radius:50%;background:#efe7d8;box-shadow:0 0 0 2px #c9bca6}
+  .rec-cover-img{width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1}
+  .rec-main{flex:1 1 auto;min-width:0}
+  .rec-head{font-size:1.02rem;color:var(--tinta);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .rec-head b{color:var(--vino)}
   .rec-estilo{color:var(--tinta-2)}
-  .rec-disco{font-size:.95rem;color:var(--tinta-2);margin-top:2px}
-  .rec-enlace{display:inline-block;margin-top:4px;font-size:.92rem;color:var(--vino);text-decoration:underline;text-underline-offset:2px}
-  .rec-autor{font-size:.82rem;color:var(--tinta-2);margin-top:6px;font-style:italic}
-  .rec-acts{position:absolute;top:6px;right:8px;display:flex;gap:2px}
+  .rec-sub{font-size:.84rem;color:var(--tinta-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rec-links{flex:0 0 auto;display:flex;gap:6px}
+  .rec-plat{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;text-decoration:none;font-size:.62rem;font-weight:700;letter-spacing:.02em;color:#fff}
+  .rec-plat.yt{background:#c4302b}
+  .rec-plat.sp{background:#1DB954}
+  .rec-plat:hover{filter:brightness(1.08)}
+  .rec-acts{flex:0 0 auto;display:flex;gap:2px}
   .rec-acts button{background:none;border:0;color:var(--vino);font-size:1rem;cursor:pointer;line-height:1;padding:2px 4px}
   .rec-acts button:hover{color:var(--vino-claro)}
   .rec-acts .rec-del{font-size:1.15rem}
+  @media(max-width:560px){
+    .rec-head{white-space:normal}
+    .rec-sub{white-space:normal}
+  }
   .palo-link{color:inherit;font-size:1.2rem;letter-spacing:.06em;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--linea-2);cursor:pointer}
   .palo-link:hover{color:var(--vino);text-decoration-color:var(--vino)}
   .curso-link{cursor:pointer;text-decoration:none;transition:background .15s}
@@ -426,8 +437,12 @@
       <input id="rec-disco" type="text" placeholder="Ej. La fragua de los Mairena" />
     </div>
     <div class="field">
-      <label for="rec-enlace">Enlace YouTube / Spotify (opcional)</label>
-      <input id="rec-enlace" type="url" placeholder="https://…" />
+      <label for="rec-youtube">Enlace de YouTube (opcional)</label>
+      <input id="rec-youtube" type="url" placeholder="https://youtube.com/…" />
+    </div>
+    <div class="field">
+      <label for="rec-spotify">Enlace de Spotify (opcional)</label>
+      <input id="rec-spotify" type="url" placeholder="https://open.spotify.com/…" />
     </div>
     <div class="field">
       <label for="rec-autor">Quién la sube <span class="req">*</span></label>
@@ -784,14 +799,64 @@ function cursoActual(){ const l=cursosConocidos(); return l.length?l[0].nombre:"
 /* ---------- Helpers ---------- */
 const $ = s => document.querySelector(s);
 function escapar(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-function recEnlaceHTML(url){
-  const u=(url||"").trim();
-  if(!/^https?:\/\//i.test(u)) return "";
-  let txt="Abrir enlace ↗";
-  if(/youtube\.com|youtu\.be/i.test(u)) txt="Ver en YouTube ↗";
-  else if(/spotify\.com/i.test(u)) txt="Escuchar en Spotify ↗";
-  return `<a class="rec-enlace" href="${escapar(u)}" target="_blank" rel="noopener">${txt}</a>`;
+// Enlaces de una recomendación, con compatibilidad hacia atrás (campo antiguo 'enlace')
+function recYoutube(r){
+  const u=(r.youtube||"").trim();
+  if(u) return u;
+  const old=(r.enlace||"").trim();
+  return /youtube\.com|youtu\.be/i.test(old) ? old : "";
 }
+function recSpotify(r){
+  const u=(r.spotify||"").trim();
+  if(u) return u;
+  const old=(r.enlace||"").trim();
+  return /spotify\.com/i.test(old) ? old : "";
+}
+function recItemHTML(r,i,paloArg){
+  const yt=recYoutube(r), sp=recSpotify(r);
+  const ytId=youtubeId(yt);
+  // Miniatura: portada de Spotify (vía oEmbed, se carga después) o, si no, la de YouTube
+  let coverImg="";
+  if(sp){
+    const fallback = ytId?`https://img.youtube.com/vi/${ytId}/mqdefault.jpg`:"";
+    coverImg=`<img class="rec-cover-img" loading="lazy" alt="" data-sp="${escapar(sp)}"${fallback?` data-fallback="${fallback}"`:""} style="display:none" onerror="this.style.display='none'">`;
+  } else if(ytId){
+    coverImg=`<img class="rec-cover-img" loading="lazy" alt="" src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" onerror="this.style.display='none'">`;
+  }
+  const sub=[];
+  if(r.disco) sub.push(escapar(r.disco));
+  if(r.autor) sub.push("por "+escapar(r.autor));
+  const links=[];
+  if(yt) links.push(`<a class="rec-plat yt" href="${escapar(yt)}" target="_blank" rel="noopener" title="Ver en YouTube">YT</a>`);
+  if(sp) links.push(`<a class="rec-plat sp" href="${escapar(sp)}" target="_blank" rel="noopener" title="Escuchar en Spotify">SP</a>`);
+  return `<div class="rec-item">
+    <div class="rec-cover">${coverImg}</div>
+    <div class="rec-main">
+      <div class="rec-head"><b>${escapar(r.cantaor||"")}</b>${r.estilo?` · <span class="rec-estilo">${escapar(r.estilo)}</span>`:""}</div>
+      ${sub.length?`<div class="rec-sub">${sub.join(" · ")}</div>`:""}
+    </div>
+    <div class="rec-links">${links.join("")}</div>
+    <div class="rec-acts">
+      <button class="rec-edit" title="Editar" onclick="editarRecPalo('${paloArg}',${i})">✎</button>
+      ${adminAuth?`<button class="rec-del" title="Eliminar (admin)" onclick="borrarRecPalo('${paloArg}',${i})">×</button>`:""}
+    </div>
+  </div>`;
+}
+async function cargarCaratulasSpotify(){
+  const imgs=[...document.querySelectorAll('.rec-cover-img[data-sp]')];
+  for(const img of imgs){
+    const sp=img.getAttribute('data-sp'); img.removeAttribute('data-sp');
+    const fb=img.getAttribute('data-fallback')||"";
+    try{
+      const r=await fetch('https://open.spotify.com/oembed?url='+encodeURIComponent(sp));
+      if(r.ok){ const j=await r.json(); if(j && j.thumbnail_url){ img.src=j.thumbnail_url; img.style.display=''; continue; } }
+      throw new Error("sin portada");
+    }catch(e){
+      if(fb){ img.src=fb; img.style.display=''; }   // si Spotify no deja, usa la miniatura de YouTube
+    }
+  }
+}
+window.cargarCaratulasSpotify=cargarCaratulasSpotify;
 function fecha(iso){ if(!iso) return ""; const d=new Date(iso); return isNaN(d)?"":d.toLocaleDateString("es-ES",{day:"numeric",month:"short",year:"numeric"}); }
 function fechaHora(iso){ if(!iso) return ""; const d=new Date(iso); return isNaN(d)?"":d.toLocaleString("es-ES",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}); }
 function actividadReciente(limit){
@@ -939,16 +1004,7 @@ function render(){
     <button class="btn btn-ghost btn-sm" onclick="editarDescPalo('${paloArg}')">${desc?"Editar":"＋ Añadir descripción"}</button>
   </div>`;
   const recs = PALO_RECS[vista.valor]||[];
-  const recsItems = recs.map((r,i)=>`<div class="rec-item">
-      <div class="rec-acts">
-        <button class="rec-edit" title="Editar" onclick="editarRecPalo('${paloArg}',${i})">✎</button>
-        ${adminAuth?`<button class="rec-del" title="Eliminar (admin)" onclick="borrarRecPalo('${paloArg}',${i})">×</button>`:""}
-      </div>
-      <div class="rec-head"><b>${escapar(r.cantaor||"")}</b>${r.estilo?` · <span class="rec-estilo">${escapar(r.estilo)}</span>`:""}</div>
-      ${r.disco?`<div class="rec-disco">Disco: ${escapar(r.disco)}</div>`:""}
-      ${r.enlace?recEnlaceHTML(r.enlace):""}
-      ${r.autor?`<div class="rec-autor">Añadido por ${escapar(r.autor)}</div>`:""}
-    </div>`).join("");
+  const recsItems = recs.map((r,i)=>recItemHTML(r,i,paloArg)).join("");
   const recsHTML = `<div class="palo-sec palo-recs">
     <h2 class="palo-sec-tit">Recomendaciones</h2>
     ${recs.length?`<div class="rec-list">${recsItems}</div>`:`<p class="palo-sec-vacio">Todavía no hay recomendaciones para este palo.</p>`}
@@ -961,6 +1017,7 @@ function render(){
       : `<p class="palo-sec-vacio">Todavía no hay ningún cante en este palo.</p>`}
   </div>`;
   board.innerHTML = descHTML + recsHTML + cantesHTML;
+  cargarCaratulasSpotify();
 }
 
 /* ---------- Página de detalle ---------- */
@@ -1163,7 +1220,8 @@ function editarRecPalo(nombre, idx){
   $("#rec-cantaor").value=r.cantaor||"";
   $("#rec-estilo").value=r.estilo||"";
   $("#rec-disco").value=r.disco||"";
-  $("#rec-enlace").value=r.enlace||"";
+  $("#rec-youtube").value=recYoutube(r);
+  $("#rec-spotify").value=recSpotify(r);
   $("#rec-autor").value=r.autor||"";
   recOverlay.classList.add("open");
   setTimeout(()=>$("#rec-cantaor").focus(),50);
@@ -1173,14 +1231,16 @@ $("#cerrarRec").onclick=cerrarRec; $("#cancelarRec").onclick=cerrarRec;
 recOverlay.addEventListener("click",e=>{ if(e.target===recOverlay) cerrarRec(); });
 $("#guardarRec").onclick=async ()=>{
   const cantaor=$("#rec-cantaor").value.trim(), estilo=$("#rec-estilo").value.trim();
-  const disco=$("#rec-disco").value.trim(), enlace=$("#rec-enlace").value.trim();
+  const disco=$("#rec-disco").value.trim();
+  const youtube=$("#rec-youtube").value.trim(), spotify=$("#rec-spotify").value.trim();
   const autor=$("#rec-autor").value.trim();
   if(!cantaor || !estilo){ alert("El cantaor/cantaora y el estilo son obligatorios."); return; }
   if(!autor){ alert("Indica quién sube la recomendación."); return; }
-  if(enlace && !/^https?:\/\//i.test(enlace)){ alert("El enlace debe empezar por http:// o https://"); return; }
+  if(youtube && !/youtube\.com|youtu\.be/i.test(youtube)){ alert("El enlace de YouTube no parece válido."); return; }
+  if(spotify && !/spotify\.com/i.test(spotify)){ alert("El enlace de Spotify no parece válido (open.spotify.com)."); return; }
   const btn=$("#guardarRec"); btn.disabled=true; btn.textContent="Guardando…";
   const arr=(PALO_RECS[recPaloActual]||[]).slice();
-  const obj={cantaor, estilo, disco, enlace, autor};
+  const obj={cantaor, estilo, disco, youtube, spotify, autor};
   if(recEditIdx>=0 && recEditIdx<arr.length) arr[recEditIdx]=obj; else arr.push(obj);
   await guardarRecsPalo(recPaloActual, arr);
   btn.disabled=false; btn.textContent="Guardar";
