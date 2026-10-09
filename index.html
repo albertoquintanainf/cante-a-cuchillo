@@ -76,10 +76,11 @@
   .rec-cover::after{content:"";position:absolute;width:12px;height:12px;border-radius:50%;background:#efe7d8;box-shadow:0 0 0 2px #c9bca6}
   .rec-cover-img{width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1}
   .rec-main{flex:1 1 auto;min-width:0}
-  .rec-head{font-size:1.02rem;color:var(--tinta);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .rec-head b{color:var(--vino)}
-  .rec-estilo{color:var(--tinta-2)}
-  .rec-sub{font-size:.84rem;color:var(--tinta-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rec-main>div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+  .rec-l1{font-size:1rem}
+  .rec-l1 b{color:var(--vino)}
+  .rec-l2{font-size:.9rem;color:var(--tinta)}
+  .rec-l3{font-size:.82rem;color:var(--tinta-2)}
   .rec-links{flex:0 0 auto;display:flex;gap:8px;align-items:center}
   .rec-plat{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;line-height:0}
   .rec-plat svg{width:26px;height:26px;display:block}
@@ -89,10 +90,6 @@
   .rec-acts button{background:none;border:0;color:var(--vino);font-size:1rem;cursor:pointer;line-height:1;padding:2px 4px}
   .rec-acts button:hover{color:var(--vino-claro)}
   .rec-acts .rec-del{font-size:1.15rem}
-  @media(max-width:560px){
-    .rec-head{white-space:normal}
-    .rec-sub{white-space:normal}
-  }
   .palo-link{color:inherit;font-size:1.2rem;letter-spacing:.06em;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--linea-2);cursor:pointer}
   .palo-link:hover{color:var(--vino);text-decoration-color:var(--vino)}
   .curso-link{cursor:pointer;text-decoration:none;transition:background .15s}
@@ -160,6 +157,9 @@
   .who b{color:var(--tinta);font-weight:600}
   .ver{font-size:.8rem;color:var(--palo,var(--oro));font-weight:600;white-space:nowrap}
   .mk{font-size:.78rem;color:var(--palo,var(--oro));font-weight:700;line-height:1}
+  .mk-ic{display:inline-flex;align-items:center}
+  .mk-ic svg{height:16px;width:auto;display:block}
+  .mk-ic.yt svg{height:14px}
 
   .empty{text-align:center;padding:clamp(48px,10vw,72px) 20px;border:1px dashed var(--linea-2);border-radius:var(--r);color:var(--tinta-2);background:var(--papel-2)}
   .empty h3{font-family:"Bodoni Moda",serif;color:var(--tinta);font-size:1.6rem;margin:0 0 8px}
@@ -823,16 +823,16 @@ function recItemHTML(r,i,paloArg){
   } else if(ytId){
     coverImg=`<img class="rec-cover-img" loading="lazy" alt="" src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" onerror="this.style.display='none'">`;
   }
-  const sub=[];
-  if(r.disco) sub.push(escapar(r.disco));
   const links=[];
   if(yt) links.push(`<a class="rec-plat yt" href="${escapar(yt)}" target="_blank" rel="noopener" title="Ver en YouTube" aria-label="Ver en YouTube">${YT_LOGO}</a>`);
   if(sp) links.push(`<a class="rec-plat sp" href="${escapar(sp)}" target="_blank" rel="noopener" title="Escuchar en Spotify" aria-label="Escuchar en Spotify">${SP_LOGO}</a>`);
+  const cantaor=escapar(r.cantaor||""), estilo=escapar(r.estilo||""), disco=escapar(r.disco||"");
   return `<div class="rec-item">
     <div class="rec-cover">${coverImg}</div>
     <div class="rec-main">
-      <div class="rec-head"><b>${escapar(r.cantaor||"")}</b>${r.estilo?` · <span class="rec-estilo">${escapar(r.estilo)}</span>`:""}</div>
-      ${sub.length?`<div class="rec-sub">${sub.join(" · ")}</div>`:""}
+      <div class="rec-l1" title="${cantaor}"><b>${cantaor}</b></div>
+      <div class="rec-l2" title="${estilo}">${estilo||"&nbsp;"}</div>
+      <div class="rec-l3" title="${disco}">${disco?`Disco: ${disco}`:"&nbsp;"}</div>
     </div>
     <div class="rec-links">${links.join("")}</div>
     <div class="rec-acts">
@@ -911,8 +911,8 @@ function tarjeta(it, opts){
   const marcas=[];
   const nAud = Array.isArray(it.audios)? it.audios.length : (it.audio_url?1:0);
   if(nAud) marcas.push(`<span class="mk" title="Audios">♪${nAud>1?nAud:""}</span>`);
-  if(youtubeId(it.video_url)) marcas.push('<span class="mk" title="Tiene YouTube">YT</span>');
-  if(it.spotify_url) marcas.push('<span class="mk" title="Tiene Spotify">Spotify</span>');
+  if(youtubeId(it.video_url)) marcas.push(`<span class="mk mk-ic yt" title="Tiene YouTube" aria-label="Tiene YouTube">${YT_LOGO}</span>`);
+  if(it.spotify_url) marcas.push(`<span class="mk mk-ic sp" title="Tiene Spotify" aria-label="Tiene Spotify">${SP_LOGO}</span>`);
   return `<article class="card" style="--palo:${col}" tabindex="0" role="button" onclick="verCante('${it.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();verCante('${it.id}')}">
     ${ptag}
     <h3>${escapar(titulo)}</h3>
