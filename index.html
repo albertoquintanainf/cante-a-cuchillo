@@ -72,6 +72,7 @@
   .palo-desc{margin:0 0 22px}
   .palo-sec{margin:0 0 22px}
   .palo-sec-tit{font-family:"Spectral",Georgia,serif;font-size:1.25rem;color:var(--vino);margin:0 0 8px;letter-spacing:.01em}
+  .palo-sec-tit .sec-count{font-size:.8rem;color:var(--tinta-2);font-weight:400;letter-spacing:.05em;margin-left:6px}
   .palo-sec-vacio{color:var(--tinta-2);font-style:italic;margin:0 0 10px}
   .rec-list{display:flex;flex-direction:column;gap:8px;margin:0 0 12px}
   .rec-item{display:flex;align-items:center;gap:12px;border-left:3px solid var(--palo,var(--oro));padding:8px 12px;background:var(--papel);border-radius:0 8px 8px 0;box-shadow:var(--sombra-sm)}
@@ -942,12 +943,13 @@ function tarjeta(it, opts){
     </div>
   </article>`;
 }
-function seccion(titulo, col, arr, opts, linkPalo){
+function seccion(titulo, col, arr, opts, linkPalo, sinConteo){
   const head = linkPalo
     ? `<a class="palo-head-link" href="#palo=${encodeURIComponent(linkPalo)}">${escapar(titulo)}</a>`
     : escapar(titulo);
+  const conteo = sinConteo ? "" : `<span class="n">${arr.length} ${arr.length===1?"cante":"cantes"}</span>`;
   return `<section class="palo-sec">
-    <div class="palo-head" style="--palo:${col}"><h2>${head}</h2><span class="n">${arr.length} ${arr.length===1?"cante":"cantes"}</span><span class="rule"></span></div>
+    <div class="palo-head" style="--palo:${col}"><h2>${head}</h2>${conteo}<span class="rule"></span></div>
     <div class="grid">${arr.map(it=>tarjeta(it, opts)).join("")}</div>
   </section>`;
 }
@@ -969,7 +971,8 @@ function setTopHeader(){
   tt.textContent=titulo; tt.style.display="";
   tb.style.setProperty("--palo", col);
   tb.classList.add("con-titulo");
-  ps.innerHTML=`<button class="back" onclick="irInicio()">← Inicio</button><span class="page-count">${n} ${n===1?"cante":"cantes"}</span>`;
+  const contHeader = vista.tipo==="palo" ? "" : `<span class="page-count">${n} ${n===1?"cante":"cantes"}</span>`;
+  ps.innerHTML=`<button class="back" onclick="irInicio()">← Inicio</button>${contHeader}`;
   ps.style.display="";
 }
 function render(){
@@ -992,7 +995,7 @@ function render(){
     const MAX_CANTES = 8;
     const recientes = [...DATOS].sort((a,b)=>fechaClaseTs(b)-fechaClaseTs(a)).slice(0, MAX_CANTES);
     if(!recientes.length) return vacio();
-    board.innerHTML=seccion("Últimas actualizaciones", "var(--vino)", recientes, {mostrarPalo:true, mostrarCurso:true});
+    board.innerHTML=seccion("Últimas actualizaciones", "var(--vino)", recientes, {mostrarPalo:true, mostrarCurso:true}, "", true);
     return;
   }
   // Todos los palos
@@ -1031,7 +1034,7 @@ function render(){
     <button class="btn btn-ghost btn-sm" onclick="editarRecPalo('${paloArg}')">＋ Añadir recomendación</button>
   </div>`;
   const cantesHTML = `<div class="palo-sec palo-cantes">
-    <h2 class="palo-sec-tit">Los cantes de clase</h2>
+    <h2 class="palo-sec-tit">Los cantes de clase <span class="sec-count">${arr.length} ${arr.length===1?"cante":"cantes"}</span></h2>
     ${arr.length
       ? `<div class="grid">${arr.map(it=>tarjeta(it,{mostrarPalo:false, mostrarCurso:true})).join("")}</div>`
       : `<p class="palo-sec-vacio">Todavía no hay ningún cante en este palo.</p>`}
