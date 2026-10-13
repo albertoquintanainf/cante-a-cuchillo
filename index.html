@@ -55,6 +55,12 @@
 
   .toolbar{position:sticky;top:0;z-index:5;margin:14px 0 8px;padding:12px 0;background:linear-gradient(180deg,var(--cal) 72%,rgba(246,241,230,0));display:flex;gap:12px;align-items:center;flex-wrap:wrap}
   .cta-home{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:20px 0 8px}
+  .inicio-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:10px 0}
+  .inicio-card{display:block;background:var(--papel);border:1px solid var(--linea);border-left:3px solid var(--vino);border-radius:12px;padding:18px 20px;text-decoration:none;color:var(--tinta);box-shadow:var(--sombra-sm);transition:transform .15s,box-shadow .15s}
+  .inicio-card:hover{transform:translateY(-2px);box-shadow:var(--sombra)}
+  .inicio-card b{display:block;font-family:"Bodoni Moda",serif;font-weight:700;font-size:1.3rem;color:var(--vino);margin-bottom:4px}
+  .inicio-card span{font-size:.9rem;color:var(--tinta-2)}
+  .cta-todos{display:flex;justify-content:center;margin:24px 0 8px}
   .btn-lg{font-size:1.12rem;padding:15px 40px;border-radius:999px;letter-spacing:.01em;box-shadow:0 12px 26px -12px rgba(142,30,44,.6)}
   .btn-lg:hover{transform:translateY(-1px)}
   .btn-sm{font-size:.86rem;padding:9px 15px;white-space:nowrap}
@@ -912,7 +918,7 @@ async function marcarSugerencia(id, estado, quien){
 }
 
 /* ---------- Estado ---------- */
-let DATOS = [], CUSTOM_PALOS = [], CURSOS = [], vista = {tipo:"recientes", valor:null}, q = "", EDITING = null, audiosEstado = [], audiosBorrar = [];
+let DATOS = [], CUSTOM_PALOS = [], CURSOS = [], vista = {tipo:"inicio", valor:null}, q = "", EDITING = null, audiosEstado = [], audiosBorrar = [];
 
 function palosConocidos(){ const usados=DATOS.map(d=>d.palo).filter(Boolean); return [...new Set([...BASE_PALOS, ...CUSTOM_PALOS, ...usados])]; }
 function ordenPalo(n){ const i=BASE_PALOS.indexOf(n); return i>=0?i:1000+(n||"").toLowerCase().charCodeAt(0); }
@@ -1089,14 +1095,15 @@ function vacio(){
 }
 function setTopHeader(){
   const tt=$("#topbarTitle"), ps=$("#paloSub"), tb=$("#topbar");
-  if(vista.tipo==="recientes"){
+  if(vista.tipo==="inicio"){
     tt.style.display="none"; tt.textContent="";
     ps.innerHTML=""; ps.style.display="none";
     tb.classList.remove("con-titulo");
     return;
   }
   let titulo, col, n;
-  if(vista.tipo==="todo"){ titulo="Todos los cantes"; col="var(--vino)"; n=DATOS.length; }
+  if(vista.tipo==="recientes"){ titulo="Últimas actualizaciones"; col="var(--vino)"; n=Math.min(8,DATOS.length); }
+  else if(vista.tipo==="todo"){ titulo="Todos los cantes"; col="var(--vino)"; n=DATOS.length; }
   else if(vista.tipo==="curso"){ titulo=vista.valor; col="var(--vino)"; n=DATOS.filter(it=>it.curso===vista.valor).length; }
   else { titulo=vista.valor; col=colorPalo(vista.valor); n=DATOS.filter(it=>(it.palo||"")===vista.valor).length; }
   tt.textContent=titulo; tt.style.display="";
@@ -1121,12 +1128,21 @@ function render(){
     board.innerHTML=agrupadoPorPalo(items, true);
     return;
   }
-  // Principal: los cantes más recientes (por fecha de la clase)
+  // Inicio: portada con accesos directos
+  if(vista.tipo==="inicio"){
+    board.innerHTML = `<div class="inicio-links">
+      <a class="inicio-card" href="#recientes"><b>Últimas actualizaciones →</b><span>Los cantes de las últimas clases</span></a>
+      <a class="inicio-card" href="#todos"><b>Todos los cantes →</b><span>${DATOS.length} ${DATOS.length===1?"cante":"cantes"} en total</span></a>
+    </div>`;
+    return;
+  }
+  // Últimas actualizaciones: los cantes más recientes (por fecha de la clase)
   if(vista.tipo==="recientes"){
     const MAX_CANTES = 8;
     const recientes = [...DATOS].sort((a,b)=>fechaClaseTs(b)-fechaClaseTs(a)).slice(0, MAX_CANTES);
-    if(!recientes.length) return vacio();
-    board.innerHTML=seccion("Últimas actualizaciones", "var(--vino)", recientes, {mostrarPalo:true, mostrarCurso:true}, "", true);
+    const btnTodos = `<div class="cta-todos"><a class="btn btn-vino" href="#todos">Ver todos los cantes →</a></div>`;
+    if(!recientes.length){ board.innerHTML=`<div class="empty"><p>Todavía no hay cantes que mostrar.</p></div>`+btnTodos; return; }
+    board.innerHTML = `<div class="grid">${recientes.map(it=>tarjeta(it,{mostrarPalo:true, mostrarCurso:true})).join("")}</div>`+btnTodos;
     return;
   }
   // Todos los palos
@@ -1501,8 +1517,9 @@ function renderRoute(){
   if((m=h.match(/^#palo=(.+)$/))) vista={tipo:"palo", valor:decodeURIComponent(m[1])};
   else if((m=h.match(/^#curso=(.+)$/))) vista={tipo:"curso", valor:decodeURIComponent(m[1])};
   else if(h==="#todos") vista={tipo:"todo", valor:null};
-  else vista={tipo:"recientes", valor:null};
-  const home = (vista.tipo==="recientes");
+  else if(h==="#recientes") vista={tipo:"recientes", valor:null};
+  else vista={tipo:"inicio", valor:null};
+  const home = (vista.tipo==="inicio");
   $("#hero").style.display = home?"":"none";
   $("#estado").style.display = home?"":"none";
   $("#ctaHome").style.display = home?"":"none";
@@ -1745,7 +1762,8 @@ function pintarMenu(){
   const cUsados={}; DATOS.forEach(d=>{ if(d.curso) cUsados[d.curso]=(cUsados[d.curso]||0)+1; });
   const cursos=cursosConocidos().map(c=>c.nombre);
   const act = (tipo,val)=> (vista.tipo===tipo && (val===undefined || vista.valor===val)) ? "on" : "";
-  let html =`<button class="menu-item ${act('recientes')}" data-t="recientes">Últimas actualizaciones</button>`;
+  let html =`<button class="menu-item ${act('inicio')}" data-t="inicio">Inicio</button>`;
+  html+=`<button class="menu-item ${act('recientes')}" data-t="recientes">Últimas actualizaciones</button>`;
   html+=`<button class="menu-item ${act('todo')}" data-t="todo">Todos los cantes <span class="cnt">${DATOS.length}</span></button>`;
   if(cursos.length){
     const cActual = cursoActual();
@@ -1768,7 +1786,8 @@ function pintarMenu(){
       if(t==="buzon"){ abrirBuzon(); return; }
       if(t==="ayuda"){ location.hash="ayuda"; return; }
       q=""; const buscar=$("#buscar"); if(buscar) buscar.value="";
-      if(t==="recientes") location.hash="";
+      if(t==="inicio") location.hash="";
+      else if(t==="recientes") location.hash="recientes";
       else if(t==="todo") location.hash="todos";
       else if(t==="curso") location.hash="curso="+encodeURIComponent(v);
       else location.hash="palo="+encodeURIComponent(v);
