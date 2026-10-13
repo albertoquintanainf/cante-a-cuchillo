@@ -118,6 +118,14 @@
   .cp-dot.pie{background:var(--palo,var(--vino))}
   .cp-dot.palma{background:#e6cf9b}
   .cp-audios{display:flex;flex-direction:column;gap:10px;margin:0 0 14px}
+  .cp-variante{padding:0 0 4px;margin:0 0 20px;border-bottom:1px dashed var(--linea)}
+  .cp-variante:last-of-type{border-bottom:0;margin-bottom:10px}
+  .cp-var-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px}
+  .cp-var-tit{font-family:"Spectral",Georgia,serif;font-size:1.05rem;color:var(--tinta);margin:0;font-weight:600}
+  .cp-var-acts{flex:0 0 auto;display:flex;gap:2px}
+  .cp-var-acts button{background:none;border:0;color:var(--vino);font-size:1rem;cursor:pointer;line-height:1;padding:2px 4px}
+  .cp-var-acts button:hover{color:var(--vino-claro)}
+  .cp-var-acts .rec-del{font-size:1.15rem}
   .cp-edit-grid{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 6px}
   .cp-edit-grid .cp-cell{cursor:pointer}
   .cp-edit-hint{font-size:.8rem;color:var(--tinta-2);margin:0 0 12px}
@@ -501,6 +509,10 @@
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cpTit">
     <button class="close-x" id="cerrarCompas" aria-label="Cerrar">×</button>
     <h2 id="cpTit">Compás</h2>
+    <div class="field">
+      <label for="cp-titulo">Título / variante <span class="opt">— opcional</span></label>
+      <input id="cp-titulo" type="text" placeholder="Ej. Fandango de Alosno" />
+    </div>
     <div class="cp-row">
       <label for="cp-pulsos">Nº de pulsos</label>
       <input id="cp-pulsos" type="number" min="2" max="16" value="12" style="width:72px" />
@@ -514,18 +526,14 @@
       <button type="button" id="cp-edit-play" class="cp-play" onclick="compasPreview()"><span>Reproducir</span></button>
     </div>
     <div class="media-box">
-      <label>Muestras propias <span class="opt">— opcional</span></label>
-      <div class="cp-row"><label style="width:54px">Pie:</label><input id="cp-pie-file" type="file" accept="audio/*" /></div>
-      <div class="cp-sample" id="cp-pie-info"></div>
-      <div class="cp-row"><label style="width:54px">Palma:</label><input id="cp-palma-file" type="file" accept="audio/*" /></div>
-      <div class="cp-sample" id="cp-palma-info"></div>
-      <p class="hint">Si no subes nada, se usan sonidos sintetizados. Máximo 5 MB por archivo.</p>
-    </div>
-    <div class="media-box">
       <label>Audios de ejemplo <span class="opt">— opcional</span></label>
       <input id="cp-audio-file" type="file" accept="audio/*" multiple />
       <div id="cp-audios-list"></div>
       <p class="hint">Grabaciones del compás. Máximo 5 MB por archivo.</p>
+    </div>
+    <div class="field">
+      <label for="cp-autor">Quién lo añade/edita <span class="req">*</span></label>
+      <input id="cp-autor" type="text" placeholder="Tu nombre" />
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="cancelarCompas">Cancelar</button>
@@ -1123,7 +1131,7 @@ function render(){
       : `<p class="palo-sec-vacio">Todavía no hay ningún cante en este palo.</p>`}
   </div>`;
   const compasHTML = compasSeccionHTML(vista.valor, paloArg, paloCol);
-  board.innerHTML = descHTML + recsHTML + compasHTML + cantesHTML;
+  board.innerHTML = descHTML + compasHTML + recsHTML + cantesHTML;
   cargarCaratulasSpotify();
   ajustarVerMas();
   wirePlayer(board); wireSpeed(board);
@@ -1222,31 +1230,27 @@ function wireSpeed(scope){
 }
 
 /* ---------- Compás: motor de audio ---------- */
-function normCompas(c){
+function normCompas(c){   // una variante
   if(!c || typeof c!=="object") return null;
   const pulsos = Math.max(2, Math.min(16, parseInt(c.pulsos,10)||12));
   let patron = Array.isArray(c.patron) ? c.patron.slice(0,pulsos) : [];
   while(patron.length<pulsos) patron.push("off");
   patron = patron.map(p=> (p==="pie"||p==="palma") ? p : "off");
   const bpm = Math.max(30, Math.min(240, parseInt(c.bpm,10)||90));
-  const muestras = (c.muestras&&typeof c.muestras==="object") ? c.muestras : {};
-  const audios = Array.isArray(c.audios) ? c.audios : [];
-  return { pulsos, patron, bpm, muestras, audios };
+  const audios = Array.isArray(c.audios) ? c.audios.map(a=>({url:a.url, path:a.path||null, nombre:a.nombre||""})) : [];
+  return { titulo:(c.titulo||"").toString(), pulsos, patron, bpm, audios, autor:(c.autor||"").toString() };
+}
+function normCompasList(v){   // admite formato antiguo (objeto único) o lista
+  if(!v) return [];
+  const arr = Array.isArray(v) ? v : [v];
+  return arr.map(normCompas).filter(Boolean);
 }
 const CompasAudio = {
-  ctx:null, pieBuf:null, palmaBuf:null, pieUrl:null, palmaUrl:null,
+  ctx:null,
   async ensure(){
     if(!this.ctx){ const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false; this.ctx=new AC(); }
     if(this.ctx.state==="suspended"){ try{ await this.ctx.resume(); }catch(e){} }
     return true;
-  },
-  async loadBuf(url){ try{ const r=await fetch(url); const ab=await r.arrayBuffer(); return await this.ctx.decodeAudioData(ab); }catch(e){ return null; } },
-  async prepare(muestras){
-    if(!await this.ensure()) return;
-    const pu=(muestras&&muestras.pie&&muestras.pie.url)||null;
-    const au=(muestras&&muestras.palma&&muestras.palma.url)||null;
-    if(pu!==this.pieUrl){ this.pieUrl=pu; this.pieBuf = pu? await this.loadBuf(pu) : null; }
-    if(au!==this.palmaUrl){ this.palmaUrl=au; this.palmaBuf = au? await this.loadBuf(au) : null; }
   },
   synthPie(t){ const c=this.ctx, o=c.createOscillator(), g=c.createGain();
     o.type="sine"; o.frequency.setValueAtTime(115,t); o.frequency.exponentialRampToValueAtTime(52,t+0.15);
@@ -1257,8 +1261,7 @@ const CompasAudio = {
     n.buffer=buf; const bp=c.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=1900; bp.Q.value=0.8;
     const g=c.createGain(); g.gain.setValueAtTime(0.85,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
     n.connect(bp).connect(g).connect(c.destination); n.start(t); n.stop(t+dur); },
-  playBuf(buf,t){ const c=this.ctx, s=c.createBufferSource(); s.buffer=buf; s.connect(c.destination); s.start(t); },
-  hit(type,t){ if(type==="pie"){ this.pieBuf?this.playBuf(this.pieBuf,t):this.synthPie(t); } else if(type==="palma"){ this.palmaBuf?this.playBuf(this.palmaBuf,t):this.synthPalma(t); } }
+  hit(type,t){ if(type==="pie") this.synthPie(t); else if(type==="palma") this.synthPalma(t); }
 };
 let compasState={ playing:false, timer:null, rafId:null, beat:0, nextTime:0, pattern:[], bpm:90, curBeat:-1, cola:[], scope:"" };
 function compasHighlight(idx, scope){
@@ -1276,7 +1279,6 @@ async function compasReproducir(compasObj, scope){
   const c=normCompas(compasObj); if(!c) return;
   compasParar();
   if(!await CompasAudio.ensure()){ alert("Tu navegador no permite reproducir el compás."); return; }
-  await CompasAudio.prepare(c.muestras);
   const st=compasState;
   st.playing=true; st.pattern=c.patron; st.bpm=c.bpm; st.beat=0; st.curBeat=-1; st.cola=[]; st.scope=scope||".cp-grid";
   st.nextTime=CompasAudio.ctx.currentTime+0.12;
@@ -1302,13 +1304,14 @@ function compasParar(){
   compasBtnEstado(false, st.scope);
 }
 function compasBtnEstado(reproduciendo, scope){
-  const prefix = (scope==="#cp-edit-grid") ? "#cp-edit-play" : "#cp-play";
-  const btn=document.querySelector(prefix);
+  const sel = (scope==="#cp-edit-grid") ? "#cp-edit-play" : (scope||"").replace("cp-grid","cp-play");
+  const btn = sel ? document.querySelector(sel) : null;
   if(btn){ btn.classList.toggle("on", reproduciendo); btn.innerHTML = (reproduciendo?PAUSE_SVG:PLAY_SVG)+`<span>${reproduciendo?"Parar":"Reproducir"}</span>`; }
 }
-function compasTogglePagina(){
-  if(compasState.playing && compasState.scope===".cp-grid") compasParar();
-  else compasReproducir(PALO_COMPAS[vista.valor], ".cp-grid");
+function compasTogglePagina(idx){
+  const scope="#cp-grid-"+idx;
+  if(compasState.playing && compasState.scope===scope) compasParar();
+  else compasReproducir(normCompasList(PALO_COMPAS[vista.valor])[idx], scope);
 }
 window.compasTogglePagina=compasTogglePagina;
 function cpCell(tipo,i){ return `<div class="cp-cell ${tipo}" data-i="${i}"><span class="cp-num">${i+1}</span></div>`; }
@@ -1324,23 +1327,48 @@ function audioPlayerHTML(url,nombre){
     ${SPEED_BTNS}
   </div>`;
 }
+function compasVarianteHTML(c, idx, paloArg){
+  const titulo = c.titulo ? escapar(c.titulo) : ("Compás "+(idx+1));
+  return `<div class="cp-variante">
+    <div class="cp-var-head">
+      <h3 class="cp-var-tit">${titulo}</h3>
+      <div class="cp-var-acts">
+        <button class="rec-edit" title="Editar" onclick="editarCompasPalo('${paloArg}',${idx})">✎</button>
+        ${adminAuth?`<button class="rec-del" title="Eliminar (admin)" onclick="borrarCompasPalo('${paloArg}',${idx})">×</button>`:""}
+      </div>
+    </div>
+    <div class="cp-controls">
+      <button id="cp-play-${idx}" class="cp-play" onclick="compasTogglePagina(${idx})">${PLAY_SVG}<span>Reproducir</span></button>
+      <span class="cp-bpm">${c.bpm} ppm</span>
+    </div>
+    <div class="cp-grid" id="cp-grid-${idx}">${c.patron.map((p,i)=>cpCell(p,i)).join("")}</div>
+    <div class="cp-leyenda"><span class="cp-dot pie"></span> Pie (fuerte) &nbsp;·&nbsp; <span class="cp-dot palma"></span> Palma (flojo)</div>
+    ${c.audios.length?`<div class="cp-audios">${c.audios.map(a=>audioPlayerHTML(a.url,a.nombre)).join("")}</div>`:""}
+    ${c.autor?`<p class="rec-autor">Añadido por ${escapar(c.autor)}</p>`:""}
+  </div>`;
+}
 function compasSeccionHTML(nombrePalo, paloArg, paloCol){
-  const compas = normCompas(PALO_COMPAS[nombrePalo]);
-  const cuerpo = compas
-    ? `<div class="cp-controls">
-         <button id="cp-play" class="cp-play" onclick="compasTogglePagina()">${PLAY_SVG}<span>Reproducir</span></button>
-         <span class="cp-bpm">${compas.bpm} ppm</span>
-       </div>
-       <div class="cp-grid">${compas.patron.map((p,i)=>cpCell(p,i)).join("")}</div>
-       <div class="cp-leyenda"><span class="cp-dot pie"></span> Pie (fuerte) &nbsp;·&nbsp; <span class="cp-dot palma"></span> Palma (flojo)</div>
-       ${compas.audios.length?`<div class="cp-audios">${compas.audios.map(a=>audioPlayerHTML(a.url,a.nombre)).join("")}</div>`:""}`
+  const lista = normCompasList(PALO_COMPAS[nombrePalo]);
+  const cuerpo = lista.length
+    ? lista.map((c,i)=>compasVarianteHTML(c,i,paloArg)).join("")
     : `<p class="palo-sec-vacio">Todavía no hay compás para este palo.</p>`;
   return `<div class="palo-sec palo-compas" style="--palo:${paloCol}">
     <h2 class="palo-sec-tit">Compás</h2>
     ${cuerpo}
-    <button class="btn btn-ghost btn-sm" onclick="editarCompasPalo('${paloArg}')">${compas?"Editar compás":"＋ Añadir compás"}</button>
+    <button class="btn btn-ghost btn-sm" onclick="editarCompasPalo('${paloArg}')">＋ Añadir compás</button>
   </div>`;
 }
+async function borrarCompasPalo(nombre, idx){
+  if(!adminAuth){ alert("Solo el administrador puede eliminar compases."); return; }
+  const arr=normCompasList(PALO_COMPAS[nombre]);
+  if(idx<0||idx>=arr.length) return;
+  if(!confirm("¿Eliminar este compás?")) return;
+  const quitado=arr.splice(idx,1)[0];
+  await guardarCompasPalo(nombre, arr);
+  if(quitado&&quitado.audios) for(const a of quitado.audios) if(a.path) await borrarArchivo(a.path);
+  if(vista.tipo==="palo") render();
+}
+window.borrarCompasPalo=borrarCompasPalo;
 function renderDetalle(id){
   const cont=$("#detail"); const it=byId(id);
   if(!it){ cont.innerHTML=`<div class="detalle"><button class="back" onclick="volver()">← Volver al tablón</button><p>Ese cante ya no está disponible.</p></div>`; return; }
@@ -1519,23 +1547,27 @@ window.borrarRecPalo=borrarRecPalo;
 /* ---------- Editor de compás ---------- */
 let compasEdit=null;
 const compasOverlay=$("#compasOverlay");
-function editarCompasPalo(nombre){
-  const base=normCompas(PALO_COMPAS[nombre]) || {pulsos:12, bpm:90, patron:Array(12).fill("off"), muestras:{}, audios:[]};
+function editarCompasPalo(nombre, idx){
+  const lista=normCompasList(PALO_COMPAS[nombre]);
+  const esNuevo=(typeof idx!=="number");
+  const base = esNuevo ? {titulo:"", pulsos:12, bpm:90, patron:Array(12).fill("off"), audios:[], autor:""} : (lista[idx]||{titulo:"", pulsos:12, bpm:90, patron:Array(12).fill("off"), audios:[], autor:""});
   compasEdit={
-    nombre,
-    pulsos:base.pulsos,
-    bpm:base.bpm,
-    patron:base.patron.slice(),
-    muestras:{ pie: base.muestras.pie||null, palma: base.muestras.palma||null },
-    pieFile:null, palmaFile:null,
-    audios: base.audios.map(a=>({url:a.url, path:a.path||null, nombre:a.nombre||""})),
+    nombre, idx: esNuevo ? -1 : idx,
+    titulo: base.titulo||"",
+    pulsos: base.pulsos,
+    bpm: base.bpm,
+    patron: base.patron.slice(),
+    audios: (base.audios||[]).map(a=>({url:a.url, path:a.path||null, nombre:a.nombre||""})),
+    autor: base.autor||"",
     borrar:[]
   };
-  $("#cpTit").textContent="Compás · "+nombre;
+  $("#cpTit").textContent=(esNuevo?"Nuevo compás · ":"Editar compás · ")+nombre;
+  $("#cp-titulo").value=compasEdit.titulo;
   $("#cp-pulsos").value=compasEdit.pulsos;
   $("#cp-bpm").value=compasEdit.bpm; $("#cp-bpm-val").textContent=compasEdit.bpm+" ppm";
-  $("#cp-pie-file").value=""; $("#cp-palma-file").value=""; $("#cp-audio-file").value="";
-  cpRenderGrid(); cpRenderMuestras(); cpRenderAudios();
+  $("#cp-autor").value=compasEdit.autor;
+  $("#cp-audio-file").value="";
+  cpRenderGrid(); cpRenderAudios();
   compasBtnEstado(false,"#cp-edit-grid");
   compasOverlay.classList.add("open");
 }
@@ -1550,22 +1582,10 @@ function cpCicla(i){
   cpRenderGrid();
 }
 window.cpCicla=cpCicla;
-function cpRenderMuestras(){
-  const pie=compasEdit.pieFile?compasEdit.pieFile.name:(compasEdit.muestras.pie?"Muestra guardada":"");
-  const palma=compasEdit.palmaFile?compasEdit.palmaFile.name:(compasEdit.muestras.palma?"Muestra guardada":"");
-  $("#cp-pie-info").innerHTML = pie?`${escapar(pie)} <span class="quitar" onclick="cpQuitarMuestra('pie')">quitar</span>`:"";
-  $("#cp-palma-info").innerHTML = palma?`${escapar(palma)} <span class="quitar" onclick="cpQuitarMuestra('palma')">quitar</span>`:"";
-}
-function cpQuitarMuestra(tipo){
-  if(tipo==="pie"){ if(compasEdit.muestras.pie&&compasEdit.muestras.pie.path) compasEdit.borrar.push(compasEdit.muestras.pie.path); compasEdit.muestras.pie=null; compasEdit.pieFile=null; $("#cp-pie-file").value=""; }
-  else { if(compasEdit.muestras.palma&&compasEdit.muestras.palma.path) compasEdit.borrar.push(compasEdit.muestras.palma.path); compasEdit.muestras.palma=null; compasEdit.palmaFile=null; $("#cp-palma-file").value=""; }
-  cpRenderMuestras();
-}
-window.cpQuitarMuestra=cpQuitarMuestra;
 function cpRenderAudios(){
   const cont=$("#cp-audios-list");
   cont.innerHTML=compasEdit.audios.map((a,i)=>`<div class="cp-row" style="margin:6px 0">
-    <input class="cp-aud-nombre" data-i="${i}" type="text" placeholder="Nombre (opcional)" value="${escapar(a.nombre||"")}" style="flex:1 1 140px" />
+    <input class="cp-aud-nombre" data-i="${i}" type="text" placeholder="Título (opcional)" value="${escapar(a.nombre||"")}" style="flex:1 1 140px" />
     <span class="cp-sample">${a.file?escapar(a.file.name):"guardado"} <span class="quitar" onclick="cpQuitarAudio(${i})">quitar</span></span>
   </div>`).join("");
   cont.querySelectorAll(".cp-aud-nombre").forEach(inp=>{ inp.oninput=()=>{ compasEdit.audios[+inp.dataset.i].nombre=inp.value; }; });
@@ -1575,6 +1595,8 @@ function cpQuitarAudio(i){
   compasEdit.audios.splice(i,1); cpRenderAudios();
 }
 window.cpQuitarAudio=cpQuitarAudio;
+$("#cp-titulo").oninput=()=>{ compasEdit.titulo=$("#cp-titulo").value; };
+$("#cp-autor").oninput=()=>{ compasEdit.autor=$("#cp-autor").value; };
 $("#cp-pulsos").oninput=()=>{
   let n=Math.max(2,Math.min(16, parseInt($("#cp-pulsos").value,10)||12));
   const p=compasEdit.patron;
@@ -1586,8 +1608,6 @@ $("#cp-bpm").oninput=()=>{
   $("#cp-bpm-val").textContent=compasEdit.bpm+" ppm";
   if(compasState.playing && compasState.scope==="#cp-edit-grid") compasState.bpm=compasEdit.bpm;
 };
-$("#cp-pie-file").onchange=()=>{ const f=$("#cp-pie-file").files[0]; if(f&&f.size>5*1024*1024){ alert("El archivo supera 5 MB."); $("#cp-pie-file").value=""; return; } compasEdit.pieFile=f||null; cpRenderMuestras(); };
-$("#cp-palma-file").onchange=()=>{ const f=$("#cp-palma-file").files[0]; if(f&&f.size>5*1024*1024){ alert("El archivo supera 5 MB."); $("#cp-palma-file").value=""; return; } compasEdit.palmaFile=f||null; cpRenderMuestras(); };
 $("#cp-audio-file").onchange=()=>{
   for(const f of [...$("#cp-audio-file").files]){
     if(f.size>5*1024*1024){ alert(`"${f.name}" supera 5 MB y no se añade.`); continue; }
@@ -1595,18 +1615,9 @@ $("#cp-audio-file").onchange=()=>{
   }
   $("#cp-audio-file").value=""; cpRenderAudios();
 };
-function editorCompasObj(preview){
-  const e=compasEdit; let muestras={};
-  if(preview){
-    const pu = e.pieFile ? URL.createObjectURL(e.pieFile) : (e.muestras.pie&&e.muestras.pie.url);
-    const au = e.palmaFile ? URL.createObjectURL(e.palmaFile) : (e.muestras.palma&&e.muestras.palma.url);
-    if(pu) muestras.pie={url:pu}; if(au) muestras.palma={url:au};
-  } else { muestras={ pie:e.muestras.pie||null, palma:e.muestras.palma||null }; }
-  return {pulsos:e.pulsos, bpm:e.bpm, patron:e.patron, muestras, audios:e.audios};
-}
 function compasPreview(){
   if(compasState.playing && compasState.scope==="#cp-edit-grid") compasParar();
-  else compasReproducir(editorCompasObj(true), "#cp-edit-grid");
+  else compasReproducir({pulsos:compasEdit.pulsos, bpm:compasEdit.bpm, patron:compasEdit.patron}, "#cp-edit-grid");
 }
 window.compasPreview=compasPreview;
 function cerrarCompas(){ compasParar(); compasOverlay.classList.remove("open"); }
@@ -1614,21 +1625,22 @@ $("#cerrarCompas").onclick=cerrarCompas; $("#cancelarCompas").onclick=cerrarComp
 compasOverlay.addEventListener("click",e=>{ if(e.target===compasOverlay) cerrarCompas(); });
 $("#guardarCompas").onclick=async ()=>{
   const e=compasEdit; if(!e) return;
-  const hayArchivos = e.pieFile||e.palmaFile||e.audios.some(a=>a.file);
-  if(hayArchivos && MODO!=="nube"){ alert("Para subir archivos necesitas conectar Supabase (ver README)."); return; }
+  const autor=(e.autor||"").trim();
+  if(!autor){ alert("Indica quién añade o edita el compás."); return; }
+  const hayArchivos = e.audios.some(a=>a.file);
+  if(hayArchivos && MODO!=="nube"){ alert("Para subir audios necesitas conectar Supabase (ver README)."); return; }
   compasParar();
   const btn=$("#guardarCompas"); btn.disabled=true; btn.textContent="Guardando…";
   try{
-    const muestras={ pie:e.muestras.pie||null, palma:e.muestras.palma||null };
-    if(e.pieFile){ const up=await subir(e.pieFile); muestras.pie={url:up.url, path:up.path}; }
-    if(e.palmaFile){ const up=await subir(e.palmaFile); muestras.palma={url:up.url, path:up.path}; }
     const audios=[];
     for(const a of e.audios){
       if(a.file){ const up=await subir(a.file); audios.push({url:up.url, path:up.path, nombre:(a.nombre||"").trim()}); }
       else if(a.url){ audios.push({url:a.url, path:a.path||null, nombre:(a.nombre||"").trim()}); }
     }
-    const obj=normCompas({pulsos:e.pulsos, bpm:e.bpm, patron:e.patron, muestras, audios});
-    const ok=await guardarCompasPalo(e.nombre, obj);
+    const variante=normCompas({titulo:(e.titulo||"").trim(), pulsos:e.pulsos, bpm:e.bpm, patron:e.patron, audios, autor});
+    const lista=normCompasList(PALO_COMPAS[e.nombre]);
+    if(e.idx>=0 && e.idx<lista.length) lista[e.idx]=variante; else lista.push(variante);
+    const ok=await guardarCompasPalo(e.nombre, lista);
     if(ok){ for(const p of e.borrar) await borrarArchivo(p); }
   }catch(err){ alert("No se pudo guardar el compás: "+(err&&err.message||err)); }
   btn.disabled=false; btn.textContent="Guardar";
