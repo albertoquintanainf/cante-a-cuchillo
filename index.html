@@ -99,6 +99,9 @@
   .curso-link{cursor:pointer;text-decoration:none;transition:background .15s}
   .curso-link:hover{background:rgba(181,133,47,.3)}
   .palo-desc-txt{color:#3f362c;line-height:1.65;font-size:1.02rem;white-space:pre-wrap;margin:0 0 10px;border-left:3px solid var(--palo,var(--oro));padding-left:14px}
+  .palo-desc-txt.clamp{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+  .ver-mas{background:none;border:0;color:var(--vino);font-family:"Spectral",serif;font-size:.9rem;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px;margin:0 0 10px}
+  .ver-mas:hover{color:var(--vino-claro)}
   .palo-sub .back{padding:0;margin:0}
   .page-count{font-size:.85rem;color:var(--tinta-2)}
   .page-kind{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--oro);border:1px solid var(--oro);border-radius:5px;padding:1px 7px}
@@ -1020,7 +1023,10 @@ function render(){
     ? `<p class="rec-autor">Editado por ${escapar(dmeta.autor)}${dmeta.editado?` · ${fecha(dmeta.editado)}`:""}</p>` : "";
   const descHTML = `<div class="palo-sec palo-desc">
     <h2 class="palo-sec-tit">Descripción</h2>
-    ${desc?`<p class="palo-desc-txt">${escapar(desc)}</p>`:`<p class="palo-sec-vacio">Todavía no hay una descripción de este palo.</p>`}
+    ${desc
+      ? `<div class="palo-desc-txt clamp" id="paloDescBox">${escapar(desc)}</div>
+    <button class="ver-mas" id="paloVerMas" style="display:none" onclick="togglePaloDesc()">Ver más</button>`
+      : `<p class="palo-sec-vacio">Todavía no hay una descripción de este palo.</p>`}
     ${dmetaHTML}
     <button class="btn btn-ghost btn-sm" onclick="editarDescPalo('${paloArg}')">${desc?"Editar":"＋ Añadir descripción"}</button>
   </div>`;
@@ -1041,6 +1047,20 @@ function render(){
   </div>`;
   board.innerHTML = descHTML + recsHTML + cantesHTML;
   cargarCaratulasSpotify();
+  ajustarVerMas();
+}
+function togglePaloDesc(){
+  const box=$("#paloDescBox"), btn=$("#paloVerMas");
+  if(!box||!btn) return;
+  const recortado=box.classList.toggle("clamp");
+  btn.textContent=recortado?"Ver más":"Ver menos";
+}
+window.togglePaloDesc=togglePaloDesc;
+function ajustarVerMas(){
+  const box=$("#paloDescBox"), btn=$("#paloVerMas");
+  if(!box||!btn) return;
+  if(box.scrollHeight > box.clientHeight + 4){ btn.style.display=""; btn.textContent="Ver más"; }
+  else { btn.style.display="none"; box.classList.remove("clamp"); }
 }
 
 /* ---------- Página de detalle ---------- */
