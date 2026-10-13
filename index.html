@@ -102,6 +102,11 @@
   .palo-desc-txt.clamp{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
   .ver-mas{background:none;border:0;color:var(--vino);font-family:"Spectral",serif;font-size:.9rem;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px;margin:0 0 10px}
   .ver-mas:hover{color:var(--vino-claro)}
+  .cp-sec-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px}
+  .cp-mute{display:inline-flex;align-items:center;gap:6px;background:var(--papel);border:1px solid var(--linea);color:var(--tinta-2);border-radius:999px;padding:5px 12px;font-family:"Spectral",serif;font-size:.82rem;cursor:pointer}
+  .cp-mute:hover{border-color:var(--oro);color:var(--vino)}
+  .cp-mute.on{background:var(--vino);border-color:var(--vino);color:#fff}
+  .cp-mute svg{display:block}
   .cp-variante{background:var(--papel);border-left:3px solid var(--palo,var(--vino));border-radius:0 8px 8px 0;box-shadow:var(--sombra-sm);padding:8px 12px;margin:0 0 8px}
   .cp-var-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 4px}
   .cp-var-tit{font-family:"Spectral",Georgia,serif;font-size:.95rem;color:var(--tinta);margin:0;font-weight:600}
@@ -1197,6 +1202,8 @@ function audiosDe(it){
 const SPEED_BTNS = `<div class="speed"><span>Velocidad</span><button data-r="0.5">0.5×</button><button data-r="0.75">0.75×</button><button data-r="1" class="on">1×</button><button data-r="1.25">1.25×</button><button data-r="1.5">1.5×</button></div>`;
 const PLAY_SVG='<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
 const PAUSE_SVG='<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4.5" height="14" rx="1"/><rect x="13.5" y="5" width="4.5" height="14" rx="1"/></svg>';
+const SPK_ON='<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M4 9v6h4l5 4V5L8 9H4z"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M16.5 8.5a5 5 0 0 1 0 7M18.9 6.1a8 8 0 0 1 0 11.8"/></svg>';
+const SPK_OFF='<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M4 9v6h4l5 4V5L8 9H4z"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M17 9.5l5 5M22 9.5l-5 5"/></svg>';
 const YT_LOGO='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.376.505A3.016 3.016 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.376-.505a3.016 3.016 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/><path fill="#fff" d="M9.545 15.568V8.432L15.818 12z"/></svg>';
 const SP_LOGO='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#1DB954" d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.503 17.304a.747.747 0 0 1-1.028.248c-2.814-1.72-6.357-2.108-10.529-1.156a.748.748 0 1 1-.333-1.458c4.566-1.043 8.483-.595 11.642 1.338a.747.747 0 0 1 .248 1.028zm1.47-3.267a.936.936 0 0 1-1.287.308c-3.222-1.98-8.133-2.554-11.943-1.397a.936.936 0 1 1-.543-1.79c4.352-1.321 9.764-.682 13.465 1.593a.936.936 0 0 1 .308 1.286zm.126-3.403C15.24 8.34 8.82 8.13 5.136 9.249a1.123 1.123 0 1 1-.651-2.15c4.229-1.284 11.32-1.036 15.785 1.617a1.122 1.122 0 1 1-1.146 1.93z"/></svg>';
 function mediaHTML(it){
@@ -1311,9 +1318,20 @@ const CompasAudio = {
     n.connect(hp).connect(pk).connect(g).connect(c.destination); n.start(t); n.stop(t+dur); },
   synthPalma(t){ // aplauso seco: doble transiente breve
     this.palmada(t, 2.7); this.palmada(t+0.008, 1.3); },
-  hit(type,t){ if(type==="pie") this.synthPie(t); else if(type==="palma") this.synthPalma(t); }
+  hit(type,t){ if(compasMute) return; if(type==="pie") this.synthPie(t); else if(type==="palma") this.synthPalma(t); }
 };
+let compasMute=false; try{ compasMute=localStorage.getItem("cuchillo_compas_mute")==="1"; }catch{}
 let compasState={ playing:false, timer:null, rafId:null, beat:0, nextTime:0, pattern:[], bpm:90, curBeat:-1, cola:[], scope:"" };
+function compasToggleMute(){
+  compasMute=!compasMute;
+  try{ localStorage.setItem("cuchillo_compas_mute", compasMute?"1":"0"); }catch{}
+  document.querySelectorAll(".cp-mute").forEach(b=>{
+    b.classList.toggle("on", compasMute);
+    b.title = compasMute?"Activar sonido":"Silenciar";
+    b.innerHTML = (compasMute?SPK_OFF:SPK_ON)+`<span>${compasMute?"Silenciado":"Sonido"}</span>`;
+  });
+}
+window.compasToggleMute=compasToggleMute;
 function compasHighlight(idx, scope){
   const base=scope||".cp-grid";
   document.querySelectorAll(base+" .cp-beat, "+base+" .cp-cell").forEach(el=>el.classList.toggle("activo", +el.dataset.i===idx));
@@ -1402,8 +1420,11 @@ function compasSeccionHTML(nombrePalo, paloArg, paloCol){
   const cuerpo = lista.length
     ? lista.map((c,i)=>compasVarianteHTML(c,i,paloArg)).join("")
     : `<p class="palo-sec-vacio">Todavía no hay compás para este palo.</p>`;
+  const muteBtn = lista.length
+    ? `<button class="cp-mute ${compasMute?'on':''}" title="${compasMute?'Activar sonido':'Silenciar'}" onclick="compasToggleMute()">${(compasMute?SPK_OFF:SPK_ON)}<span>${compasMute?'Silenciado':'Sonido'}</span></button>`
+    : "";
   return `<div class="palo-sec palo-compas" style="--palo:${paloCol}">
-    <h2 class="palo-sec-tit">Compás</h2>
+    <div class="cp-sec-head"><h2 class="palo-sec-tit" style="margin:0">Compás</h2>${muteBtn}</div>
     ${cuerpo}
     <button class="btn btn-ghost btn-sm" onclick="editarCompasPalo('${paloArg}')">＋ Añadir compás</button>
   </div>`;
