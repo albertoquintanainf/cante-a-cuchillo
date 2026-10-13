@@ -1128,12 +1128,12 @@ function render(){
     board.innerHTML=agrupadoPorPalo(items, true);
     return;
   }
-  // Inicio: portada con accesos directos
+  // Inicio: portada con las últimas actualizaciones (como antes)
   if(vista.tipo==="inicio"){
-    board.innerHTML = `<div class="inicio-links">
-      <a class="inicio-card" href="#recientes"><b>Últimas actualizaciones →</b><span>Los cantes de las últimas clases</span></a>
-      <a class="inicio-card" href="#todos"><b>Todos los cantes →</b><span>${DATOS.length} ${DATOS.length===1?"cante":"cantes"} en total</span></a>
-    </div>`;
+    const MAX_CANTES = 8;
+    const recientes = [...DATOS].sort((a,b)=>fechaClaseTs(b)-fechaClaseTs(a)).slice(0, MAX_CANTES);
+    if(!recientes.length) return vacio();
+    board.innerHTML=seccion("Últimas actualizaciones", "var(--vino)", recientes, {mostrarPalo:true, mostrarCurso:true}, "", true);
     return;
   }
   // Últimas actualizaciones: los cantes más recientes (por fecha de la clase)
