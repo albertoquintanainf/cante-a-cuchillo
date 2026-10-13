@@ -116,7 +116,7 @@
   .cp-play svg{width:15px;height:15px;fill:currentColor}
   .cp-play span{display:none}
   .cp-bpm{font-size:.8rem;color:var(--tinta-2);letter-spacing:.04em;flex:0 0 auto}
-  .cp-grid{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;overflow-x:auto;overflow-y:visible;min-width:0;flex:1 1 auto;padding:9px 2px;margin:0;-webkit-overflow-scrolling:touch}
+  .cp-grid{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;overflow-x:auto;overflow-y:visible;min-width:0;flex:1 1 auto;padding:9px 4px 9px 14px;margin:0;-webkit-overflow-scrolling:touch}
   .cp-beat{flex:0 0 auto;width:11px;height:11px;border-radius:50%;background:#E7DCC6;border:1px solid var(--linea-2);transition:transform .15s,box-shadow .15s}
   .cp-beat.palma{background:var(--oro);border-color:var(--oro)}
   .cp-beat.pie{width:15px;height:15px;background:var(--vino);border-color:var(--vino)}
@@ -1291,15 +1291,25 @@ const CompasAudio = {
     if(this.ctx.state==="suspended"){ try{ await this.ctx.resume(); }catch(e){} }
     return true;
   },
-  synthPie(t){ const c=this.ctx, o=c.createOscillator(), g=c.createGain();
-    o.type="sine"; o.frequency.setValueAtTime(115,t); o.frequency.exponentialRampToValueAtTime(52,t+0.15);
-    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.95,t+0.006); g.gain.exponentialRampToValueAtTime(0.0001,t+0.22);
-    o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.25); },
-  synthPalma(t){ const c=this.ctx, dur=0.09, n=c.createBufferSource(), buf=c.createBuffer(1,Math.floor(c.sampleRate*dur),c.sampleRate), d=buf.getChannelData(0);
-    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
-    n.buffer=buf; const bp=c.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=1900; bp.Q.value=0.8;
-    const g=c.createGain(); g.gain.setValueAtTime(0.85,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-    n.connect(bp).connect(g).connect(c.destination); n.start(t); n.stop(t+dur); },
+  synthPie(t){ const c=this.ctx;
+    // cuerpo grave (golpe de pie)
+    const o=c.createOscillator(), g=c.createGain();
+    o.type="sine"; o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(55,t+0.14);
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(1.0,t+0.005); g.gain.exponentialRampToValueAtTime(0.0001,t+0.26);
+    o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.3);
+    // click de ataque para que se marque bien
+    const dur=0.025, n=c.createBufferSource(), buf=c.createBuffer(1,Math.floor(c.sampleRate*dur),c.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
+    n.buffer=buf; const lp=c.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=2600;
+    const g2=c.createGain(); g2.gain.setValueAtTime(0.5,t); g2.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    n.connect(lp).connect(g2).connect(c.destination); n.start(t); n.stop(t+dur); },
+  synthPalma(t){ const c=this.ctx, dur=0.14, n=c.createBufferSource(), buf=c.createBuffer(1,Math.floor(c.sampleRate*dur),c.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++){ const env=Math.pow(1-i/d.length,1.5); d[i]=(Math.random()*2-1)*env; }
+    n.buffer=buf;
+    const hp=c.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=700;
+    const bp=c.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=1500; bp.Q.value=0.7;
+    const g=c.createGain(); g.gain.setValueAtTime(1.0,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    n.connect(hp).connect(bp).connect(g).connect(c.destination); n.start(t); n.stop(t+dur); },
   hit(type,t){ if(type==="pie") this.synthPie(t); else if(type==="palma") this.synthPalma(t); }
 };
 let compasState={ playing:false, timer:null, rafId:null, beat:0, nextTime:0, pattern:[], bpm:90, curBeat:-1, cola:[], scope:"" };
