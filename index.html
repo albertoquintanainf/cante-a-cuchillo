@@ -136,9 +136,9 @@
   .cp-audios .ptime{font-size:.76rem}
   @media (max-width:600px){ .cp-audios .pbtn{width:36px;height:36px;font-size:1rem} .cp-audios .pbar{height:8px} }
   .cp-cell{position:relative;width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;border:1px solid var(--linea);background:var(--papel);color:var(--tinta-2);font-size:.85rem;transition:transform .06s,box-shadow .06s;user-select:none}
-  .cp-cell.palma{background:#efe2c4;border-color:#d8c08a;color:#7a5a1e}
+  .cp-cell.palma{background:var(--oro);border-color:var(--oro);color:#fff;font-weight:700}
   .cp-cell.pie{background:var(--vino);border-color:var(--vino);color:#fff;font-weight:700}
-  .cp-cell.silencio{background:repeating-linear-gradient(45deg,#f0ebe0,#f0ebe0 4px,#e2dac9 4px,#e2dac9 8px);border-color:var(--tinta-2);border-style:dashed;color:var(--tinta-2)}
+  .cp-cell.silencio{background:transparent;border-color:var(--tinta-2);border-style:dashed;color:var(--tinta-2)}
   .cp-cell.activo{transform:scale(1.15);box-shadow:0 0 0 3px rgba(142,30,44,.4);z-index:1}
   .cp-edit-grid{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 6px}
   .cp-edit-grid .cp-cell{cursor:pointer}
@@ -542,6 +542,7 @@
     </div>
     <p class="cp-edit-hint">Pulsa cada casilla para cambiarla: vacío → <b>pie</b> (fuerte) → <b>palma</b> (flojo) → <b>silencio</b> (no suena).</p>
     <div class="cp-edit-grid" id="cp-edit-grid"></div>
+    <div class="cp-leyenda" style="margin:2px 0 12px"><span class="cp-dot pie"></span> Pie (fuerte) &nbsp;·&nbsp; <span class="cp-dot palma"></span> Palma (flojo) &nbsp;·&nbsp; <span class="cp-dot silencio"></span> Silencio</div>
     <div class="cp-row">
       <label for="cp-bpm">Velocidad</label>
       <input id="cp-bpm" type="range" min="40" max="200" value="90" style="flex:1 1 140px;min-width:120px" />
@@ -1291,28 +1292,25 @@ const CompasAudio = {
     if(this.ctx.state==="suspended"){ try{ await this.ctx.resume(); }catch(e){} }
     return true;
   },
+  ruido(t, dur, forma){ const c=this.ctx, n=c.createBufferSource(), buf=c.createBuffer(1,Math.max(1,Math.floor(c.sampleRate*dur)),c.sampleRate), d=buf.getChannelData(0);
+    const f=forma||1.6; for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,f);
+    n.buffer=buf; return n; },
   synthPie(t){ const c=this.ctx;
-    // cuerpo grave (golpe de pie)
+    // golpe de zapato contra el suelo: cuerpo grave + pisada (ruido)
     const o=c.createOscillator(), g=c.createGain();
-    o.type="sine"; o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(55,t+0.14);
-    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(1.0,t+0.005); g.gain.exponentialRampToValueAtTime(0.0001,t+0.26);
-    o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.3);
-    // click de ataque para que se marque bien
-    const dur=0.025, n=c.createBufferSource(), buf=c.createBuffer(1,Math.floor(c.sampleRate*dur),c.sampleRate), d=buf.getChannelData(0);
-    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
-    n.buffer=buf; const lp=c.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=2600;
-    const g2=c.createGain(); g2.gain.setValueAtTime(0.5,t); g2.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.type="sine"; o.frequency.setValueAtTime(120,t); o.frequency.exponentialRampToValueAtTime(42,t+0.13);
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(1.3,t+0.004); g.gain.exponentialRampToValueAtTime(0.0001,t+0.2);
+    o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.24);
+    const dur=0.05, n=this.ruido(t,dur,2.4), lp=c.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=3200;
+    const g2=c.createGain(); g2.gain.setValueAtTime(1.0,t); g2.gain.exponentialRampToValueAtTime(0.0001,t+dur);
     n.connect(lp).connect(g2).connect(c.destination); n.start(t); n.stop(t+dur); },
-  synthPalma(t){ const c=this.ctx;
-    // "clac" tonal agudo (misma vía que el pie, que sí suena)
-    const o=c.createOscillator(), g=c.createGain();
-    o.type="triangle"; o.frequency.setValueAtTime(1500,t); o.frequency.exponentialRampToValueAtTime(850,t+0.05);
-    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.9,t+0.004); g.gain.exponentialRampToValueAtTime(0.0001,t+0.13);
-    o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.15);
-    const o2=c.createOscillator(), g3=c.createGain();
-    o2.type="square"; o2.frequency.setValueAtTime(2300,t);
-    g3.gain.setValueAtTime(0.0001,t); g3.gain.exponentialRampToValueAtTime(0.25,t+0.003); g3.gain.exponentialRampToValueAtTime(0.0001,t+0.05);
-    o2.connect(g3).connect(c.destination); o2.start(t); o2.stop(t+0.06); },
+  palmada(t, amp){ const c=this.ctx, dur=0.11, n=this.ruido(t,dur,1.4);
+    const hp=c.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=550;
+    const pk=c.createBiquadFilter(); pk.type="peaking"; pk.frequency.value=1200; pk.Q.value=1.1; pk.gain.value=9;
+    const g=c.createGain(); g.gain.setValueAtTime(amp,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    n.connect(hp).connect(pk).connect(g).connect(c.destination); n.start(t); n.stop(t+dur); },
+  synthPalma(t){ // aplauso: doble transiente de ruido
+    this.palmada(t, 2.6); this.palmada(t+0.012, 1.5); },
   hit(type,t){ if(type==="pie") this.synthPie(t); else if(type==="palma") this.synthPalma(t); }
 };
 let compasState={ playing:false, timer:null, rafId:null, beat:0, nextTime:0, pattern:[], bpm:90, curBeat:-1, cola:[], scope:"" };
