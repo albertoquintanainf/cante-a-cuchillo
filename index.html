@@ -120,11 +120,13 @@
   .cp-beat{flex:0 0 auto;width:11px;height:11px;border-radius:50%;background:#E7DCC6;border:1px solid var(--linea-2);transition:transform .15s,box-shadow .15s}
   .cp-beat.palma{background:var(--oro);border-color:var(--oro)}
   .cp-beat.pie{width:15px;height:15px;background:var(--vino);border-color:var(--vino)}
+  .cp-beat.silencio{background:transparent;border:1.5px solid var(--tinta-2)}
   .cp-beat.activo{transform:scale(1.25);box-shadow:0 0 0 3px rgba(142,30,44,.2),0 0 7px rgba(142,30,44,.4)}
   .cp-leyenda{font-size:.72rem;color:var(--tinta-2);display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:5px 0 0}
   .cp-dot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:middle}
   .cp-dot.pie{background:var(--vino)}
   .cp-dot.palma{background:var(--oro)}
+  .cp-dot.silencio{background:transparent;border:1.5px solid var(--tinta-2)}
   .cp-audios{display:flex;flex-direction:column;gap:8px;margin:10px 0 0}
   .cp-audios .audio-item{margin-bottom:0}
   .cp-audios .cap{font-size:.78rem}
@@ -136,6 +138,7 @@
   .cp-cell{position:relative;width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;border:1px solid var(--linea);background:var(--papel);color:var(--tinta-2);font-size:.85rem;transition:transform .06s,box-shadow .06s;user-select:none}
   .cp-cell.palma{background:#efe2c4;border-color:#d8c08a;color:#7a5a1e}
   .cp-cell.pie{background:var(--vino);border-color:var(--vino);color:#fff;font-weight:700}
+  .cp-cell.silencio{background:repeating-linear-gradient(45deg,#f0ebe0,#f0ebe0 4px,#e2dac9 4px,#e2dac9 8px);border-color:var(--tinta-2);border-style:dashed;color:var(--tinta-2)}
   .cp-cell.activo{transform:scale(1.15);box-shadow:0 0 0 3px rgba(142,30,44,.4);z-index:1}
   .cp-edit-grid{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 6px}
   .cp-edit-grid .cp-cell{cursor:pointer}
@@ -537,7 +540,7 @@
       <label for="cp-pulsos">Nº de pulsos</label>
       <input id="cp-pulsos" type="number" min="2" max="16" value="12" style="width:72px" />
     </div>
-    <p class="cp-edit-hint">Pulsa cada casilla para cambiarla: vacío → <b>pie</b> (golpe fuerte) → <b>palma</b> (golpe flojo).</p>
+    <p class="cp-edit-hint">Pulsa cada casilla para cambiarla: vacío → <b>pie</b> (fuerte) → <b>palma</b> (flojo) → <b>silencio</b> (no suena).</p>
     <div class="cp-edit-grid" id="cp-edit-grid"></div>
     <div class="cp-row">
       <label for="cp-bpm">Velocidad</label>
@@ -1269,7 +1272,7 @@ function normCompas(c){   // una variante
   const pulsos = Math.max(2, Math.min(16, parseInt(c.pulsos,10)||12));
   let patron = Array.isArray(c.patron) ? c.patron.slice(0,pulsos) : [];
   while(patron.length<pulsos) patron.push("off");
-  patron = patron.map(p=> (p==="pie"||p==="palma") ? p : "off");
+  patron = patron.map(p=> (p==="pie"||p==="palma"||p==="silencio") ? p : "off");
   const bpm = Math.max(30, Math.min(240, parseInt(c.bpm,10)||90));
   const audios = Array.isArray(c.audios) ? c.audios.map(a=>({url:a.url, path:a.path||null, nombre:a.nombre||""})) : [];
   const out = { titulo:(c.titulo||"").toString(), pulsos, patron, bpm, audios, autor:(c.autor||"").toString() };
@@ -1300,12 +1303,16 @@ const CompasAudio = {
     n.buffer=buf; const lp=c.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=2600;
     const g2=c.createGain(); g2.gain.setValueAtTime(0.5,t); g2.gain.exponentialRampToValueAtTime(0.0001,t+dur);
     n.connect(lp).connect(g2).connect(c.destination); n.start(t); n.stop(t+dur); },
-  synthPalma(t){ const c=this.ctx, dur=0.13, n=c.createBufferSource(), buf=c.createBuffer(1,Math.floor(c.sampleRate*dur),c.sampleRate), d=buf.getChannelData(0);
-    for(let i=0;i<d.length;i++){ const env=Math.pow(1-i/d.length,1.3); d[i]=(Math.random()*2-1)*env; }
-    n.buffer=buf;
-    const hp=c.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=1000;
-    const g=c.createGain(); g.gain.setValueAtTime(2.6,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-    n.connect(hp).connect(g).connect(c.destination); n.start(t); n.stop(t+dur); },
+  synthPalma(t){ const c=this.ctx;
+    // "clac" tonal agudo (misma vía que el pie, que sí suena)
+    const o=c.createOscillator(), g=c.createGain();
+    o.type="triangle"; o.frequency.setValueAtTime(1500,t); o.frequency.exponentialRampToValueAtTime(850,t+0.05);
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.9,t+0.004); g.gain.exponentialRampToValueAtTime(0.0001,t+0.13);
+    o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.15);
+    const o2=c.createOscillator(), g3=c.createGain();
+    o2.type="square"; o2.frequency.setValueAtTime(2300,t);
+    g3.gain.setValueAtTime(0.0001,t); g3.gain.exponentialRampToValueAtTime(0.25,t+0.003); g3.gain.exponentialRampToValueAtTime(0.0001,t+0.05);
+    o2.connect(g3).connect(c.destination); o2.start(t); o2.stop(t+0.06); },
   hit(type,t){ if(type==="pie") this.synthPie(t); else if(type==="palma") this.synthPalma(t); }
 };
 let compasState={ playing:false, timer:null, rafId:null, beat:0, nextTime:0, pattern:[], bpm:90, curBeat:-1, cola:[], scope:"" };
@@ -1333,7 +1340,7 @@ async function compasReproducir(compasObj, scope){
     if(!st.playing) return;
     while(st.nextTime < CompasAudio.ctx.currentTime + 0.12){
       const idx=st.beat % st.pattern.length, type=st.pattern[idx];
-      if(type!=="off") CompasAudio.hit(type, st.nextTime);
+      if(type==="pie"||type==="palma") CompasAudio.hit(type, st.nextTime);
       st.cola.push({i:idx, t:st.nextTime});
       st.nextTime += spb(); st.beat++;
     }
@@ -1388,7 +1395,7 @@ function compasVarianteHTML(c, idx, paloArg){
       <div class="cp-grid" id="cp-grid-${idx}">${dots}</div>
       <span class="cp-bpm">${c.bpm} ppm</span>
     </div>
-    <div class="cp-leyenda"><span class="cp-dot pie"></span> Pie (fuerte) &nbsp;·&nbsp; <span class="cp-dot palma"></span> Palma (flojo)</div>
+    <div class="cp-leyenda"><span class="cp-dot pie"></span> Pie (fuerte) &nbsp;·&nbsp; <span class="cp-dot palma"></span> Palma (flojo) &nbsp;·&nbsp; <span class="cp-dot silencio"></span> Silencio</div>
     ${c.audios.length?`<div class="cp-audios">${c.audios.map(a=>audioPlayerHTML(a.url,a.nombre)).join("")}</div>`:""}
   </div>`;
 }
@@ -1639,7 +1646,7 @@ function cpRenderGrid(){
   g.innerHTML=compasEdit.patron.map((p,i)=>`<div class="cp-cell ${p}" data-i="${i}" onclick="cpCicla(${i})"><span class="cp-num">${i+1}</span></div>`).join("");
 }
 function cpCicla(i){
-  const orden={off:"pie",pie:"palma",palma:"off"};
+  const orden={off:"pie",pie:"palma",palma:"silencio",silencio:"off"};
   compasEdit.patron[i]=orden[compasEdit.patron[i]]||"off";
   cpRenderGrid();
 }
