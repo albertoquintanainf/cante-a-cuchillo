@@ -116,16 +116,26 @@
   .cp-play svg{width:15px;height:15px;fill:currentColor}
   .cp-play span{display:none}
   .cp-bpm{font-size:.8rem;color:var(--tinta-2);letter-spacing:.04em;flex:0 0 auto}
-  .cp-grid{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;overflow-x:auto;min-width:0;flex:1 1 auto;padding:2px 0;margin:0;-webkit-overflow-scrolling:touch}
+  .cp-grid{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;overflow-x:auto;overflow-y:visible;min-width:0;flex:1 1 auto;padding:9px 2px;margin:0;-webkit-overflow-scrolling:touch}
   .cp-beat{flex:0 0 auto;width:11px;height:11px;border-radius:50%;background:#E7DCC6;border:1px solid var(--linea-2);transition:transform .15s,box-shadow .15s}
   .cp-beat.palma{background:var(--oro);border-color:var(--oro)}
   .cp-beat.pie{width:15px;height:15px;background:var(--vino);border-color:var(--vino)}
-  .cp-beat.activo{transform:scale(1.4);box-shadow:0 0 0 4px rgba(142,30,44,.22),0 0 12px rgba(142,30,44,.45)}
+  .cp-beat.activo{transform:scale(1.25);box-shadow:0 0 0 3px rgba(142,30,44,.2),0 0 7px rgba(142,30,44,.4)}
   .cp-leyenda{font-size:.72rem;color:var(--tinta-2);display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:5px 0 0}
   .cp-dot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:middle}
   .cp-dot.pie{background:var(--vino)}
   .cp-dot.palma{background:var(--oro)}
-  .cp-audios{display:flex;flex-direction:column;gap:10px;margin:12px 0 0}
+  .cp-audios{display:flex;flex-direction:column;gap:8px;margin:10px 0 0}
+  .cp-audios .audio-item{margin-bottom:0}
+  .cp-audios .cap{font-size:.78rem}
+  .cp-audios .player{padding:6px 10px;gap:9px;border-radius:10px}
+  .cp-audios .pbtn{width:32px;height:32px;font-size:.9rem}
+  .cp-audios .pbar{height:7px}
+  .cp-audios .ptime{font-size:.76rem}
+  .cp-audios .speed{margin-top:6px;gap:5px}
+  .cp-audios .speed span{font-size:.74rem}
+  .cp-audios .speed button{font-size:.72rem;padding:3px 9px}
+  @media (max-width:600px){ .cp-audios .pbtn{width:36px;height:36px;font-size:1rem} .cp-audios .pbar{height:8px} }
   .cp-cell{position:relative;width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;border:1px solid var(--linea);background:var(--papel);color:var(--tinta-2);font-size:.85rem;transition:transform .06s,box-shadow .06s;user-select:none}
   .cp-cell.palma{background:#efe2c4;border-color:#d8c08a;color:#7a5a1e}
   .cp-cell.pie{background:var(--vino);border-color:var(--vino);color:#fff;font-weight:700}
