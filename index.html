@@ -54,7 +54,7 @@
   .beat.on-acc{background:var(--vino);border-color:var(--vino);transform:scale(1.55);box-shadow:0 0 18px rgba(142,30,44,.55)}
 
   .toolbar{position:sticky;top:0;z-index:5;margin:14px 0 8px;padding:12px 0;background:linear-gradient(180deg,var(--cal) 72%,rgba(246,241,230,0));display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-  .cta-home{display:flex;justify-content:center;margin:20px 0 8px}
+  .cta-home{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:20px 0 8px}
   .btn-lg{font-size:1.12rem;padding:15px 40px;border-radius:999px;letter-spacing:.01em;box-shadow:0 12px 26px -12px rgba(142,30,44,.6)}
   .btn-lg:hover{transform:translateY(-1px)}
   .btn-sm{font-size:.86rem;padding:9px 15px;white-space:nowrap}
@@ -102,30 +102,34 @@
   .palo-desc-txt.clamp{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
   .ver-mas{background:none;border:0;color:var(--vino);font-family:"Spectral",serif;font-size:.9rem;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px;margin:0 0 10px}
   .ver-mas:hover{color:var(--vino-claro)}
-  .cp-controls{display:flex;align-items:center;gap:14px;margin:0 0 14px;flex-wrap:wrap}
-  .cp-play{display:inline-flex;align-items:center;gap:8px;background:var(--vino);color:#fff;border:0;border-radius:999px;padding:9px 18px;font-family:"Spectral",serif;font-size:.95rem;cursor:pointer}
-  .cp-play:hover{background:var(--vino-claro)}
-  .cp-play.on{background:var(--tinta)}
-  .cp-play svg{width:18px;height:18px;fill:currentColor}
-  .cp-bpm{font-size:.85rem;color:var(--tinta-2);letter-spacing:.04em}
-  .cp-grid{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 10px}
-  .cp-cell{position:relative;width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;border:1px solid var(--linea);background:var(--papel);color:var(--tinta-2);font-size:.85rem;transition:transform .06s,box-shadow .06s;user-select:none}
-  .cp-cell.palma{background:#efe2c4;border-color:#d8c08a;color:#7a5a1e}
-  .cp-cell.pie{background:var(--palo,var(--vino));border-color:var(--palo,var(--vino));color:#fff;font-weight:700}
-  .cp-cell.activo{transform:scale(1.15);box-shadow:0 0 0 3px rgba(142,30,44,.4);z-index:1}
-  .cp-leyenda{font-size:.8rem;color:var(--tinta-2);display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:0 0 14px}
-  .cp-dot{display:inline-block;width:13px;height:13px;border-radius:4px;vertical-align:middle}
-  .cp-dot.pie{background:var(--palo,var(--vino))}
-  .cp-dot.palma{background:#e6cf9b}
-  .cp-audios{display:flex;flex-direction:column;gap:10px;margin:0 0 14px}
-  .cp-variante{padding:0 0 4px;margin:0 0 20px;border-bottom:1px dashed var(--linea)}
-  .cp-variante:last-of-type{border-bottom:0;margin-bottom:10px}
-  .cp-var-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px}
-  .cp-var-tit{font-family:"Spectral",Georgia,serif;font-size:1.05rem;color:var(--tinta);margin:0;font-weight:600}
+  .cp-variante{background:var(--papel);border-left:3px solid var(--palo,var(--vino));border-radius:0 8px 8px 0;box-shadow:var(--sombra-sm);padding:12px 14px;margin:0 0 10px}
+  .cp-var-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px}
+  .cp-var-tit{font-family:"Spectral",Georgia,serif;font-size:1rem;color:var(--tinta);margin:0;font-weight:600}
   .cp-var-acts{flex:0 0 auto;display:flex;gap:2px}
   .cp-var-acts button{background:none;border:0;color:var(--vino);font-size:1rem;cursor:pointer;line-height:1;padding:2px 4px}
   .cp-var-acts button:hover{color:var(--vino-claro)}
   .cp-var-acts .rec-del{font-size:1.15rem}
+  .cp-controls{display:flex;align-items:center;gap:12px;margin:0;flex-wrap:wrap}
+  .cp-play{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:var(--vino);color:#fff;border:0;cursor:pointer;flex:0 0 auto;padding:0}
+  .cp-play:hover{background:var(--vino-claro)}
+  .cp-play.on{background:var(--tinta)}
+  .cp-play svg{width:18px;height:18px;fill:currentColor}
+  .cp-play span{display:none}
+  .cp-bpm{font-size:.82rem;color:var(--tinta-2);letter-spacing:.04em;flex:0 0 auto}
+  .cp-grid{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;overflow-x:auto;min-width:0;flex:1 1 auto;padding:6px 2px;margin:0;-webkit-overflow-scrolling:touch}
+  .cp-beat{flex:0 0 auto;width:13px;height:13px;border-radius:50%;background:#E7DCC6;border:1px solid var(--linea-2);transition:transform .15s,box-shadow .15s}
+  .cp-beat.palma{background:var(--oro);border-color:var(--oro)}
+  .cp-beat.pie{width:17px;height:17px;background:var(--vino);border-color:var(--vino)}
+  .cp-beat.activo{transform:scale(1.4);box-shadow:0 0 0 4px rgba(142,30,44,.22),0 0 12px rgba(142,30,44,.45)}
+  .cp-leyenda{font-size:.78rem;color:var(--tinta-2);display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:8px 0 0}
+  .cp-dot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:middle}
+  .cp-dot.pie{background:var(--vino)}
+  .cp-dot.palma{background:var(--oro)}
+  .cp-audios{display:flex;flex-direction:column;gap:10px;margin:12px 0 0}
+  .cp-cell{position:relative;width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;border:1px solid var(--linea);background:var(--papel);color:var(--tinta-2);font-size:.85rem;transition:transform .06s,box-shadow .06s;user-select:none}
+  .cp-cell.palma{background:#efe2c4;border-color:#d8c08a;color:#7a5a1e}
+  .cp-cell.pie{background:var(--vino);border-color:var(--vino);color:#fff;font-weight:700}
+  .cp-cell.activo{transform:scale(1.15);box-shadow:0 0 0 3px rgba(142,30,44,.4);z-index:1}
   .cp-edit-grid{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 6px}
   .cp-edit-grid .cp-cell{cursor:pointer}
   .cp-edit-hint{font-size:.8rem;color:var(--tinta-2);margin:0 0 12px}
@@ -308,6 +312,9 @@
   .act-txt{font-size:.95rem;color:var(--tinta);line-height:1.4}
   .act-txt b{color:var(--vino)}
   .act-when{flex:none;font-size:.78rem;color:var(--tinta-2);white-space:nowrap}
+  .act-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 0;flex-wrap:wrap}
+  .act-pag{font-size:.82rem;color:var(--tinta-2)}
+  .act-nav button[disabled]{opacity:.45;cursor:default}
   .cap{display:block;font-size:.84rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-2);font-weight:600;margin-bottom:8px}
   .dfoot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-top:1px solid var(--linea);padding-top:18px;color:var(--tinta-2);font-size:.92rem}
   .dfoot b{color:var(--tinta)}
@@ -384,6 +391,7 @@
 
     <div class="cta-home" id="ctaHome">
       <button class="btn btn-vino btn-lg" id="abrirAdd">＋ Añadir cante</button>
+      <button class="btn btn-ghost btn-lg" id="abrirRecInicio">＋ Añadir recomendación</button>
     </div>
 
     <div class="topbar" id="topbar">
@@ -473,6 +481,10 @@
   <div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="recTit">
     <button class="close-x" id="cerrarRec" aria-label="Cerrar">×</button>
     <h2 id="recTit">Añadir recomendación</h2>
+    <div class="field" id="rec-palo-field" style="display:none">
+      <label for="rec-palo">Palo <span class="req">*</span></label>
+      <select id="rec-palo"></select>
+    </div>
     <div class="field">
       <label for="rec-cantaor">Cantaor/cantaora <span class="req">*</span></label>
       <input id="rec-cantaor" type="text" placeholder="Ej. Antonio Mairena" />
@@ -961,7 +973,7 @@ async function cargarCaratulasSpotify(){
 window.cargarCaratulasSpotify=cargarCaratulasSpotify;
 function fecha(iso){ if(!iso) return ""; const d=new Date(iso); return isNaN(d)?"":d.toLocaleDateString("es-ES",{day:"numeric",month:"short",year:"numeric"}); }
 function fechaHora(iso){ if(!iso) return ""; const d=new Date(iso); return isNaN(d)?"":d.toLocaleString("es-ES",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}); }
-function actividadReciente(limit){
+function actividadReciente(){
   const ev=[];
   DATOS.forEach(it=>{
     const tit=it.titulo||it.estilo||it.palo||"(sin título)";
@@ -970,10 +982,24 @@ function actividadReciente(limit){
   });
   Object.keys(PALO_DESCMETA||{}).forEach(nombre=>{
     const m=PALO_DESCMETA[nombre];
-    if(m && m.editado) ev.push({cuando:m.editado, quien:m.autor||"", accion:"editó la descripción del palo", obj:nombre, palo:nombre});
+    if(m && m.editado) ev.push({cuando:m.editado, quien:m.autor||"", accion:"editó la descripción de", obj:nombre, palo:nombre});
+  });
+  Object.keys(PALO_RECS||{}).forEach(palo=>{
+    (PALO_RECS[palo]||[]).forEach(r=>{
+      if(!r || !r.ts) return;
+      const editada = r.creado && r.ts && r.ts!==r.creado;
+      ev.push({cuando:r.ts, quien:r.autor||"", accion:(editada?"editó":"añadió")+" una recomendación en "+palo+":", obj:r.cantaor||"recomendación", palo});
+    });
+  });
+  Object.keys(PALO_COMPAS||{}).forEach(palo=>{
+    normCompasList(PALO_COMPAS[palo]).forEach(c=>{
+      if(!c.ts) return;
+      const editado = c.creado && c.ts && c.ts!==c.creado;
+      ev.push({cuando:c.ts, quien:c.autor||"", accion:(editado?"editó":"añadió")+" un compás en "+palo+":", obj:c.titulo||"compás", palo});
+    });
   });
   ev.sort((a,b)=>(Date.parse(b.cuando)||0)-(Date.parse(a.cuando)||0));
-  return ev.slice(0, limit||25);
+  return ev;
 }
 function esAudio(u){ return u && /\.(mp3|m4a|m4b|wav|ogg|oga|aac|opus|flac|weba|amr|mka|aiff?)$/.test(u.split("?")[0].toLowerCase()); }
 function esVideoFile(u){ return u && /\.(mp4|webm|mov|m4v|mkv|avi|ogv)$/.test(u.split("?")[0].toLowerCase()); }
@@ -1238,7 +1264,9 @@ function normCompas(c){   // una variante
   patron = patron.map(p=> (p==="pie"||p==="palma") ? p : "off");
   const bpm = Math.max(30, Math.min(240, parseInt(c.bpm,10)||90));
   const audios = Array.isArray(c.audios) ? c.audios.map(a=>({url:a.url, path:a.path||null, nombre:a.nombre||""})) : [];
-  return { titulo:(c.titulo||"").toString(), pulsos, patron, bpm, audios, autor:(c.autor||"").toString() };
+  const out = { titulo:(c.titulo||"").toString(), pulsos, patron, bpm, audios, autor:(c.autor||"").toString() };
+  if(c.ts) out.ts=c.ts; if(c.creado) out.creado=c.creado;
+  return out;
 }
 function normCompasList(v){   // admite formato antiguo (objeto único) o lista
   if(!v) return [];
@@ -1265,7 +1293,8 @@ const CompasAudio = {
 };
 let compasState={ playing:false, timer:null, rafId:null, beat:0, nextTime:0, pattern:[], bpm:90, curBeat:-1, cola:[], scope:"" };
 function compasHighlight(idx, scope){
-  document.querySelectorAll((scope||".cp-grid")+" .cp-cell").forEach(el=>el.classList.toggle("activo", +el.dataset.i===idx));
+  const base=scope||".cp-grid";
+  document.querySelectorAll(base+" .cp-beat, "+base+" .cp-cell").forEach(el=>el.classList.toggle("activo", +el.dataset.i===idx));
 }
 function compasDraw(){
   if(!compasState.playing) return;
@@ -1300,7 +1329,7 @@ function compasParar(){
   if(st.timer){ clearTimeout(st.timer); st.timer=null; }
   if(st.rafId){ cancelAnimationFrame(st.rafId); st.rafId=null; }
   st.cola=[]; st.curBeat=-1;
-  document.querySelectorAll(".cp-cell.activo").forEach(el=>el.classList.remove("activo"));
+  document.querySelectorAll(".cp-cell.activo, .cp-beat.activo").forEach(el=>el.classList.remove("activo"));
   compasBtnEstado(false, st.scope);
 }
 function compasBtnEstado(reproduciendo, scope){
@@ -1329,6 +1358,7 @@ function audioPlayerHTML(url,nombre){
 }
 function compasVarianteHTML(c, idx, paloArg){
   const titulo = c.titulo ? escapar(c.titulo) : ("Compás "+(idx+1));
+  const dots = c.patron.map((p,i)=>`<div class="cp-beat ${p}" data-i="${i}"></div>`).join("");
   return `<div class="cp-variante">
     <div class="cp-var-head">
       <h3 class="cp-var-tit">${titulo}</h3>
@@ -1338,10 +1368,10 @@ function compasVarianteHTML(c, idx, paloArg){
       </div>
     </div>
     <div class="cp-controls">
-      <button id="cp-play-${idx}" class="cp-play" onclick="compasTogglePagina(${idx})">${PLAY_SVG}<span>Reproducir</span></button>
+      <button id="cp-play-${idx}" class="cp-play" title="Reproducir" aria-label="Reproducir" onclick="compasTogglePagina(${idx})">${PLAY_SVG}<span>Reproducir</span></button>
+      <div class="cp-grid" id="cp-grid-${idx}">${dots}</div>
       <span class="cp-bpm">${c.bpm} ppm</span>
     </div>
-    <div class="cp-grid" id="cp-grid-${idx}">${c.patron.map((p,i)=>cpCell(p,i)).join("")}</div>
     <div class="cp-leyenda"><span class="cp-dot pie"></span> Pie (fuerte) &nbsp;·&nbsp; <span class="cp-dot palma"></span> Palma (flojo)</div>
     ${c.audios.length?`<div class="cp-audios">${c.audios.map(a=>audioPlayerHTML(a.url,a.nombre)).join("")}</div>`:""}
     ${c.autor?`<p class="rec-autor">Añadido por ${escapar(c.autor)}</p>`:""}
@@ -1498,10 +1528,19 @@ window.editarDescPalo=editarDescPalo;
 let recPaloActual="", recEditIdx=-1;
 const recOverlay=$("#recOverlay");
 function editarRecPalo(nombre, idx){
-  recPaloActual=nombre;
+  recPaloActual=nombre||"";
   recEditIdx=(typeof idx==="number") ? idx : -1;
-  const r = recEditIdx>=0 ? (PALO_RECS[nombre]||[])[recEditIdx]||{} : {};
-  $("#recTit").textContent=(recEditIdx>=0?"Editar recomendación · ":"Recomendaciones por... ")+nombre;
+  const desdeInicio = !nombre;
+  const r = (recEditIdx>=0 && nombre) ? (PALO_RECS[nombre]||[])[recEditIdx]||{} : {};
+  const pf=$("#rec-palo-field");
+  if(desdeInicio){
+    pf.style.display="";
+    $("#rec-palo").innerHTML=palosConocidos().sort((a,b)=>ordenPalo(a)-ordenPalo(b)).map(p=>`<option>${escapar(p)}</option>`).join("");
+    $("#recTit").textContent="Añadir recomendación";
+  } else {
+    pf.style.display="none";
+    $("#recTit").textContent=(recEditIdx>=0?"Editar recomendación · ":"Recomendaciones por... ")+nombre;
+  }
   $("#rec-cantaor").value=r.cantaor||"";
   $("#rec-estilo").value=r.estilo||"";
   $("#rec-disco").value=r.disco||"";
@@ -1519,14 +1558,21 @@ $("#guardarRec").onclick=async ()=>{
   const disco=$("#rec-disco").value.trim();
   const youtube=$("#rec-youtube").value.trim(), spotify=$("#rec-spotify").value.trim();
   const autor=$("#rec-autor").value.trim();
+  if($("#rec-palo-field").style.display!=="none"){
+    const pal=$("#rec-palo").value;
+    if(!pal){ alert("Selecciona el palo de la recomendación."); return; }
+    recPaloActual=pal;
+  }
   if(!cantaor || !estilo){ alert("El cantaor/cantaora y el estilo son obligatorios."); return; }
   if(!autor){ alert("Indica quién sube la recomendación."); return; }
   if(youtube && !/youtube\.com|youtu\.be/i.test(youtube)){ alert("El enlace de YouTube no parece válido."); return; }
   if(spotify && !/spotify\.com/i.test(spotify)){ alert("El enlace de Spotify no parece válido (open.spotify.com)."); return; }
   const btn=$("#guardarRec"); btn.disabled=true; btn.textContent="Guardando…";
   const arr=(PALO_RECS[recPaloActual]||[]).slice();
-  const obj={cantaor, estilo, disco, youtube, spotify, autor};
-  if(recEditIdx>=0 && recEditIdx<arr.length) arr[recEditIdx]=obj; else arr.push(obj);
+  const ahora=new Date().toISOString();
+  const obj={cantaor, estilo, disco, youtube, spotify, autor, ts:ahora};
+  if(recEditIdx>=0 && recEditIdx<arr.length){ obj.creado=(arr[recEditIdx]&&arr[recEditIdx].creado)||ahora; arr[recEditIdx]=obj; }
+  else { obj.creado=ahora; arr.push(obj); }
   await guardarRecsPalo(recPaloActual, arr);
   btn.disabled=false; btn.textContent="Guardar";
   cerrarRec();
@@ -1637,8 +1683,10 @@ $("#guardarCompas").onclick=async ()=>{
       if(a.file){ const up=await subir(a.file); audios.push({url:up.url, path:up.path, nombre:(a.nombre||"").trim()}); }
       else if(a.url){ audios.push({url:a.url, path:a.path||null, nombre:(a.nombre||"").trim()}); }
     }
-    const variante=normCompas({titulo:(e.titulo||"").trim(), pulsos:e.pulsos, bpm:e.bpm, patron:e.patron, audios, autor});
+    const ahora=new Date().toISOString();
     const lista=normCompasList(PALO_COMPAS[e.nombre]);
+    const creado = (e.idx>=0 && lista[e.idx] && lista[e.idx].creado) || ahora;
+    const variante=normCompas({titulo:(e.titulo||"").trim(), pulsos:e.pulsos, bpm:e.bpm, patron:e.patron, audios, autor, ts:ahora, creado});
     if(e.idx>=0 && e.idx<lista.length) lista[e.idx]=variante; else lista.push(variante);
     const ok=await guardarCompasPalo(e.nombre, lista);
     if(ok){ for(const p of e.borrar) await borrarArchivo(p); }
@@ -1715,7 +1763,7 @@ $("#enviarBuzon").onclick=async ()=>{
 };
 
 /* ---------- Administración del buzón ---------- */
-let adminAuth=false, adminFiltro="pendientes", adminDatos=[];
+let adminAuth=false, adminFiltro="pendientes", adminDatos=[], actPagina=0;
 try{ adminAuth = sessionStorage.getItem("cuchillo_admin")==="1"; }catch{}
 $("#irAdmin").onclick=()=>{ location.hash="admin"; };
 function renderAdmin(){
@@ -1753,6 +1801,7 @@ function salirAdmin(){
 window.salirAdmin=salirAdmin;
 const _sa=$("#salirAdmin"); if(_sa) _sa.onclick=salirAdmin;
 async function cargarAdmin(){
+  actPagina=0;
   adminDatos = await listarSugerencias();
   pintarAdmin();
 }
@@ -1787,21 +1836,35 @@ function pintarAdmin(){
   </div>`;
 }
 function actividadHTML(){
-  const ev=actividadReciente(25);
-  const filas = ev.length ? ev.map(e=>{
+  const POR_PAGINA=10;
+  const ev=actividadReciente();
+  const total=ev.length;
+  const paginas=Math.max(1, Math.ceil(total/POR_PAGINA));
+  if(actPagina>=paginas) actPagina=paginas-1;
+  if(actPagina<0) actPagina=0;
+  const slice=ev.slice(actPagina*POR_PAGINA, actPagina*POR_PAGINA+POR_PAGINA);
+  const filas = total ? slice.map(e=>{
     const clic = e.id!=null ? `class="act-item clic" onclick="verCante('${e.id}')"`
                : e.palo    ? `class="act-item clic" onclick="location.hash='#palo='+encodeURIComponent('${escapar(e.palo).replace(/'/g,"\\'")}')"`
                : `class="act-item"`;
     const quien = e.quien ? `<b>${escapar(e.quien)}</b>` : "<b>Alguien</b>";
     return `<div ${clic}>
-      <span class="act-txt">${quien} ${e.accion} «${escapar(e.obj)}»</span>
+      <span class="act-txt">${quien} ${escapar(e.accion)} «${escapar(e.obj)}»</span>
       <span class="act-when">${fechaHora(e.cuando)}</span>
     </div>`;
   }).join("") : `<p class="palo-sec-vacio">Todavía no hay actividad registrada.</p>`;
+  const nav = total>POR_PAGINA ? `<div class="act-nav">
+      <button class="btn btn-ghost btn-sm" ${actPagina<=0?"disabled":""} onclick="actIrPagina(${actPagina-1})">← Anteriores</button>
+      <span class="act-pag">Página ${actPagina+1} de ${paginas} · ${total} en total</span>
+      <button class="btn btn-ghost btn-sm" ${actPagina>=paginas-1?"disabled":""} onclick="actIrPagina(${actPagina+1})">Siguientes →</button>
+    </div>` : "";
   return `<h2 class="palo-sec-tit" style="margin-top:30px">Actividad reciente</h2>
-    <p class="dmeta" style="margin-top:0">Últimas altas y ediciones registradas en los cantes y en las descripciones de palo.</p>
-    <div class="act-list">${filas}</div>`;
+    <p class="dmeta" style="margin-top:0">Altas y ediciones registradas en cantes, descripciones, recomendaciones y compases.</p>
+    <div class="act-list">${filas}</div>
+    ${nav}`;
 }
+function actIrPagina(n){ actPagina=n; pintarAdmin(); const el=document.querySelector("#adminView .act-list"); if(el) el.scrollIntoView({block:"start"}); }
+window.actIrPagina=actIrPagina;
 function adminSetFiltro(k){ adminFiltro=k; pintarAdmin(); }
 async function toggleSug(id, estado){
   const nuevo = estado==="solucionado" ? "pendiente" : "solucionado";
@@ -1966,6 +2029,7 @@ function abrir(id){
 function cerrar(){ overlay.classList.remove("open"); }
 $("#abrirAdd").onclick=()=>abrir();
 $("#abrirAddSm").onclick=()=>abrir();
+$("#abrirRecInicio").onclick=()=>editarRecPalo("");
 $("#cerrar").onclick=cerrar; $("#cancelar").onclick=cerrar;
 overlay.addEventListener("click",e=>{ if(e.target===overlay) cerrar(); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ cerrar(); cerrarMenu(); cerrarBuzon(); cerrarDesc(); } });
