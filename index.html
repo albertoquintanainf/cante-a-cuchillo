@@ -102,27 +102,27 @@
   .palo-desc-txt.clamp{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
   .ver-mas{background:none;border:0;color:var(--vino);font-family:"Spectral",serif;font-size:.9rem;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px;margin:0 0 10px}
   .ver-mas:hover{color:var(--vino-claro)}
-  .cp-variante{background:var(--papel);border-left:3px solid var(--palo,var(--vino));border-radius:0 8px 8px 0;box-shadow:var(--sombra-sm);padding:12px 14px;margin:0 0 10px}
-  .cp-var-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px}
-  .cp-var-tit{font-family:"Spectral",Georgia,serif;font-size:1rem;color:var(--tinta);margin:0;font-weight:600}
+  .cp-variante{background:var(--papel);border-left:3px solid var(--palo,var(--vino));border-radius:0 8px 8px 0;box-shadow:var(--sombra-sm);padding:8px 12px;margin:0 0 8px}
+  .cp-var-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 4px}
+  .cp-var-tit{font-family:"Spectral",Georgia,serif;font-size:.95rem;color:var(--tinta);margin:0;font-weight:600}
   .cp-var-acts{flex:0 0 auto;display:flex;gap:2px}
   .cp-var-acts button{background:none;border:0;color:var(--vino);font-size:1rem;cursor:pointer;line-height:1;padding:2px 4px}
   .cp-var-acts button:hover{color:var(--vino-claro)}
   .cp-var-acts .rec-del{font-size:1.15rem}
-  .cp-controls{display:flex;align-items:center;gap:12px;margin:0;flex-wrap:wrap}
-  .cp-play{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:var(--vino);color:#fff;border:0;cursor:pointer;flex:0 0 auto;padding:0}
+  .cp-controls{display:flex;align-items:center;gap:10px;margin:0;flex-wrap:wrap}
+  .cp-play{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:var(--vino);color:#fff;border:0;cursor:pointer;flex:0 0 auto;padding:0}
   .cp-play:hover{background:var(--vino-claro)}
   .cp-play.on{background:var(--tinta)}
-  .cp-play svg{width:18px;height:18px;fill:currentColor}
+  .cp-play svg{width:15px;height:15px;fill:currentColor}
   .cp-play span{display:none}
-  .cp-bpm{font-size:.82rem;color:var(--tinta-2);letter-spacing:.04em;flex:0 0 auto}
-  .cp-grid{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;overflow-x:auto;min-width:0;flex:1 1 auto;padding:6px 2px;margin:0;-webkit-overflow-scrolling:touch}
-  .cp-beat{flex:0 0 auto;width:13px;height:13px;border-radius:50%;background:#E7DCC6;border:1px solid var(--linea-2);transition:transform .15s,box-shadow .15s}
+  .cp-bpm{font-size:.8rem;color:var(--tinta-2);letter-spacing:.04em;flex:0 0 auto}
+  .cp-grid{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;overflow-x:auto;min-width:0;flex:1 1 auto;padding:2px 0;margin:0;-webkit-overflow-scrolling:touch}
+  .cp-beat{flex:0 0 auto;width:11px;height:11px;border-radius:50%;background:#E7DCC6;border:1px solid var(--linea-2);transition:transform .15s,box-shadow .15s}
   .cp-beat.palma{background:var(--oro);border-color:var(--oro)}
-  .cp-beat.pie{width:17px;height:17px;background:var(--vino);border-color:var(--vino)}
+  .cp-beat.pie{width:15px;height:15px;background:var(--vino);border-color:var(--vino)}
   .cp-beat.activo{transform:scale(1.4);box-shadow:0 0 0 4px rgba(142,30,44,.22),0 0 12px rgba(142,30,44,.45)}
-  .cp-leyenda{font-size:.78rem;color:var(--tinta-2);display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:8px 0 0}
-  .cp-dot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:middle}
+  .cp-leyenda{font-size:.72rem;color:var(--tinta-2);display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:5px 0 0}
+  .cp-dot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:middle}
   .cp-dot.pie{background:var(--vino)}
   .cp-dot.palma{background:var(--oro)}
   .cp-audios{display:flex;flex-direction:column;gap:10px;margin:12px 0 0}
@@ -152,6 +152,7 @@
   .btn-vino{background:var(--vino);color:#fff;box-shadow:var(--sombra-sm)}
   .btn-vino:hover{background:var(--vino-claro)}
   .btn-ghost{background:var(--papel);color:var(--tinta-2);border:1px solid var(--linea)}
+  #abrirRecInicio{box-shadow:none}
   .btn-ghost:hover{color:var(--tinta);border-color:var(--linea-2)}
   .btn.danger{background:var(--papel);color:var(--vino);border:1px solid #e7c9cd}
   .btn.danger:hover{background:#fbeef0;border-color:var(--vino)}
@@ -1357,7 +1358,7 @@ function audioPlayerHTML(url,nombre){
   </div>`;
 }
 function compasVarianteHTML(c, idx, paloArg){
-  const titulo = c.titulo ? escapar(c.titulo) : ("Compás "+(idx+1));
+  const titulo = c.titulo ? escapar(c.titulo) : ("Variante "+(idx+1));
   const dots = c.patron.map((p,i)=>`<div class="cp-beat ${p}" data-i="${i}"></div>`).join("");
   return `<div class="cp-variante">
     <div class="cp-var-head">
@@ -1374,7 +1375,6 @@ function compasVarianteHTML(c, idx, paloArg){
     </div>
     <div class="cp-leyenda"><span class="cp-dot pie"></span> Pie (fuerte) &nbsp;·&nbsp; <span class="cp-dot palma"></span> Palma (flojo)</div>
     ${c.audios.length?`<div class="cp-audios">${c.audios.map(a=>audioPlayerHTML(a.url,a.nombre)).join("")}</div>`:""}
-    ${c.autor?`<p class="rec-autor">Añadido por ${escapar(c.autor)}</p>`:""}
   </div>`;
 }
 function compasSeccionHTML(nombrePalo, paloArg, paloCol){
@@ -1597,9 +1597,10 @@ function editarCompasPalo(nombre, idx){
   const lista=normCompasList(PALO_COMPAS[nombre]);
   const esNuevo=(typeof idx!=="number");
   const base = esNuevo ? {titulo:"", pulsos:12, bpm:90, patron:Array(12).fill("off"), audios:[], autor:""} : (lista[idx]||{titulo:"", pulsos:12, bpm:90, patron:Array(12).fill("off"), audios:[], autor:""});
+  const tituloDefecto = esNuevo ? ("Variante "+(lista.length+1)) : (base.titulo||("Variante "+(idx+1)));
   compasEdit={
     nombre, idx: esNuevo ? -1 : idx,
-    titulo: base.titulo||"",
+    titulo: tituloDefecto,
     pulsos: base.pulsos,
     bpm: base.bpm,
     patron: base.patron.slice(),
