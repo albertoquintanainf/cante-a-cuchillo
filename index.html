@@ -1304,13 +1304,13 @@ const CompasAudio = {
     const dur=0.05, n=this.ruido(t,dur,2.4), lp=c.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=3200;
     const g2=c.createGain(); g2.gain.setValueAtTime(1.0,t); g2.gain.exponentialRampToValueAtTime(0.0001,t+dur);
     n.connect(lp).connect(g2).connect(c.destination); n.start(t); n.stop(t+dur); },
-  palmada(t, amp){ const c=this.ctx, dur=0.11, n=this.ruido(t,dur,1.4);
-    const hp=c.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=550;
-    const pk=c.createBiquadFilter(); pk.type="peaking"; pk.frequency.value=1200; pk.Q.value=1.1; pk.gain.value=9;
+  palmada(t, amp){ const c=this.ctx, dur=0.05, n=this.ruido(t,dur,2.6);
+    const hp=c.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=650;
+    const pk=c.createBiquadFilter(); pk.type="peaking"; pk.frequency.value=1300; pk.Q.value=0.8; pk.gain.value=4;
     const g=c.createGain(); g.gain.setValueAtTime(amp,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
     n.connect(hp).connect(pk).connect(g).connect(c.destination); n.start(t); n.stop(t+dur); },
-  synthPalma(t){ // aplauso: doble transiente de ruido
-    this.palmada(t, 2.6); this.palmada(t+0.012, 1.5); },
+  synthPalma(t){ // aplauso seco: doble transiente breve
+    this.palmada(t, 2.7); this.palmada(t+0.008, 1.3); },
   hit(type,t){ if(type==="pie") this.synthPie(t); else if(type==="palma") this.synthPalma(t); }
 };
 let compasState={ playing:false, timer:null, rafId:null, beat:0, nextTime:0, pattern:[], bpm:90, curBeat:-1, cola:[], scope:"" };
