@@ -102,6 +102,29 @@
   .palo-desc-txt.clamp{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
   .ver-mas{background:none;border:0;color:var(--vino);font-family:"Spectral",serif;font-size:.9rem;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px;margin:0 0 10px}
   .ver-mas:hover{color:var(--vino-claro)}
+  .cp-controls{display:flex;align-items:center;gap:14px;margin:0 0 14px;flex-wrap:wrap}
+  .cp-play{display:inline-flex;align-items:center;gap:8px;background:var(--vino);color:#fff;border:0;border-radius:999px;padding:9px 18px;font-family:"Spectral",serif;font-size:.95rem;cursor:pointer}
+  .cp-play:hover{background:var(--vino-claro)}
+  .cp-play.on{background:var(--tinta)}
+  .cp-play svg{width:18px;height:18px;fill:currentColor}
+  .cp-bpm{font-size:.85rem;color:var(--tinta-2);letter-spacing:.04em}
+  .cp-grid{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 10px}
+  .cp-cell{position:relative;width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;border:1px solid var(--linea);background:var(--papel);color:var(--tinta-2);font-size:.85rem;transition:transform .06s,box-shadow .06s;user-select:none}
+  .cp-cell.palma{background:#efe2c4;border-color:#d8c08a;color:#7a5a1e}
+  .cp-cell.pie{background:var(--palo,var(--vino));border-color:var(--palo,var(--vino));color:#fff;font-weight:700}
+  .cp-cell.activo{transform:scale(1.15);box-shadow:0 0 0 3px rgba(142,30,44,.4);z-index:1}
+  .cp-leyenda{font-size:.8rem;color:var(--tinta-2);display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:0 0 14px}
+  .cp-dot{display:inline-block;width:13px;height:13px;border-radius:4px;vertical-align:middle}
+  .cp-dot.pie{background:var(--palo,var(--vino))}
+  .cp-dot.palma{background:#e6cf9b}
+  .cp-audios{display:flex;flex-direction:column;gap:10px;margin:0 0 14px}
+  .cp-edit-grid{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 6px}
+  .cp-edit-grid .cp-cell{cursor:pointer}
+  .cp-edit-hint{font-size:.8rem;color:var(--tinta-2);margin:0 0 12px}
+  .cp-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 12px}
+  .cp-row label{font-size:.85rem;color:var(--tinta)}
+  .cp-sample{font-size:.82rem;color:var(--tinta-2);margin-top:4px}
+  .cp-sample .quitar{color:var(--vino);cursor:pointer;text-decoration:underline;margin-left:6px}
   .palo-sub .back{padding:0;margin:0}
   .page-count{font-size:.85rem;color:var(--tinta-2)}
   .page-kind{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--oro);border:1px solid var(--oro);border-radius:5px;padding:1px 7px}
@@ -473,6 +496,44 @@
   </div>
 </div>
 
+<!-- Compás del palo -->
+<div class="overlay" id="compasOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cpTit">
+    <button class="close-x" id="cerrarCompas" aria-label="Cerrar">×</button>
+    <h2 id="cpTit">Compás</h2>
+    <div class="cp-row">
+      <label for="cp-pulsos">Nº de pulsos</label>
+      <input id="cp-pulsos" type="number" min="2" max="16" value="12" style="width:72px" />
+    </div>
+    <p class="cp-edit-hint">Pulsa cada casilla para cambiarla: vacío → <b>pie</b> (golpe fuerte) → <b>palma</b> (golpe flojo).</p>
+    <div class="cp-edit-grid" id="cp-edit-grid"></div>
+    <div class="cp-row">
+      <label for="cp-bpm">Velocidad</label>
+      <input id="cp-bpm" type="range" min="40" max="200" value="90" style="flex:1 1 140px;min-width:120px" />
+      <span id="cp-bpm-val" class="cp-bpm">90 ppm</span>
+      <button type="button" id="cp-edit-play" class="cp-play" onclick="compasPreview()"><span>Reproducir</span></button>
+    </div>
+    <div class="media-box">
+      <label>Muestras propias <span class="opt">— opcional</span></label>
+      <div class="cp-row"><label style="width:54px">Pie:</label><input id="cp-pie-file" type="file" accept="audio/*" /></div>
+      <div class="cp-sample" id="cp-pie-info"></div>
+      <div class="cp-row"><label style="width:54px">Palma:</label><input id="cp-palma-file" type="file" accept="audio/*" /></div>
+      <div class="cp-sample" id="cp-palma-info"></div>
+      <p class="hint">Si no subes nada, se usan sonidos sintetizados. Máximo 5 MB por archivo.</p>
+    </div>
+    <div class="media-box">
+      <label>Audios de ejemplo <span class="opt">— opcional</span></label>
+      <input id="cp-audio-file" type="file" accept="audio/*" multiple />
+      <div id="cp-audios-list"></div>
+      <p class="hint">Grabaciones del compás. Máximo 5 MB por archivo.</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="cancelarCompas">Cancelar</button>
+      <button class="btn btn-vino" id="guardarCompas">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Menú lateral de palos -->
 <div class="drawer-overlay" id="menuDrawer">
   <nav class="drawer">
@@ -685,14 +746,17 @@ function guardarPalosLocal(a){ try{ localStorage.setItem(LS_PALOS, JSON.stringif
 const LS_PALODESC = "cuchillo_palodesc_v1";
 const LS_PALODESCMETA = "cuchillo_palodescmeta_v1";
 const LS_PALORECS = "cuchillo_palorecs_v1";
+const LS_PALOCOMPAS = "cuchillo_palocompas_v1";
 let PALO_DESC = {};
 let PALO_DESCMETA = {};   // { nombre: {autor, editado} }
 let PALO_RECS = {};
+let PALO_COMPAS = {};     // { nombre: {pulsos,bpm,patron,muestras,audios} }
 function normRecs(v){ return Array.isArray(v) ? v : []; }
 async function listarPalos(){
   if(MODO==="nube"){
     // intenta traer todo; si alguna columna no existe, degrada por conjuntos de columnas
     const intentos=[
+      "nombre,descripcion,desc_autor,desc_editado,recomendaciones,compas",
       "nombre,descripcion,desc_autor,desc_editado,recomendaciones",
       "nombre,descripcion,recomendaciones",
       "nombre,descripcion",
@@ -702,11 +766,12 @@ async function listarPalos(){
       try{
         const { data, error } = await sb.from("palos").select(cols);
         if(error) throw error;
-        PALO_DESC={}; PALO_DESCMETA={}; PALO_RECS={};
+        PALO_DESC={}; PALO_DESCMETA={}; PALO_RECS={}; PALO_COMPAS={};
         (data||[]).forEach(r=>{
           if(r.descripcion) PALO_DESC[r.nombre]=r.descripcion;
           if(r.desc_autor||r.desc_editado) PALO_DESCMETA[r.nombre]={autor:r.desc_autor||"", editado:r.desc_editado||""};
           if(r.recomendaciones) PALO_RECS[r.nombre]=normRecs(r.recomendaciones);
+          if(r.compas) PALO_COMPAS[r.nombre]=r.compas;
         });
         return (data||[]).map(r=>r.nombre);
       }catch(e){ /* prueba el siguiente conjunto de columnas */ }
@@ -717,6 +782,7 @@ async function listarPalos(){
   try{ PALO_DESC = JSON.parse(localStorage.getItem(LS_PALODESC)||"{}"); }catch{ PALO_DESC={}; }
   try{ PALO_DESCMETA = JSON.parse(localStorage.getItem(LS_PALODESCMETA)||"{}"); }catch{ PALO_DESCMETA={}; }
   try{ PALO_RECS = JSON.parse(localStorage.getItem(LS_PALORECS)||"{}"); }catch{ PALO_RECS={}; }
+  try{ PALO_COMPAS = JSON.parse(localStorage.getItem(LS_PALOCOMPAS)||"{}"); }catch{ PALO_COMPAS={}; }
   return leerPalosLocal();
 }
 async function guardarPaloDB(nombre){
@@ -747,6 +813,17 @@ async function guardarRecsPalo(nombre, arr){
   }
   let map={}; try{ map=JSON.parse(localStorage.getItem(LS_PALORECS)||"{}"); }catch{}
   map[nombre]=arr; try{ localStorage.setItem(LS_PALORECS, JSON.stringify(map)); }catch{}
+  return true;
+}
+async function guardarCompasPalo(nombre, obj){
+  PALO_COMPAS[nombre]=obj;
+  if(MODO==="nube"){
+    const { error } = await sb.from("palos").upsert({ nombre, compas:obj }, { onConflict:"nombre" });
+    if(error){ alert("No se pudo guardar el compás: "+error.message); return false; }
+    return true;
+  }
+  let map={}; try{ map=JSON.parse(localStorage.getItem(LS_PALOCOMPAS)||"{}"); }catch{}
+  map[nombre]=obj; try{ localStorage.setItem(LS_PALOCOMPAS, JSON.stringify(map)); }catch{}
   return true;
 }
 
@@ -1045,9 +1122,11 @@ function render(){
       ? `<div class="grid">${arr.map(it=>tarjeta(it,{mostrarPalo:false, mostrarCurso:true})).join("")}</div>`
       : `<p class="palo-sec-vacio">Todavía no hay ningún cante en este palo.</p>`}
   </div>`;
-  board.innerHTML = descHTML + recsHTML + cantesHTML;
+  const compasHTML = compasSeccionHTML(vista.valor, paloArg, paloCol);
+  board.innerHTML = descHTML + recsHTML + compasHTML + cantesHTML;
   cargarCaratulasSpotify();
   ajustarVerMas();
+  wirePlayer(board); wireSpeed(board);
 }
 function togglePaloDesc(){
   const box=$("#paloDescBox"), btn=$("#paloVerMas");
@@ -1141,6 +1220,127 @@ function wireSpeed(scope){
     });
   });
 }
+
+/* ---------- Compás: motor de audio ---------- */
+function normCompas(c){
+  if(!c || typeof c!=="object") return null;
+  const pulsos = Math.max(2, Math.min(16, parseInt(c.pulsos,10)||12));
+  let patron = Array.isArray(c.patron) ? c.patron.slice(0,pulsos) : [];
+  while(patron.length<pulsos) patron.push("off");
+  patron = patron.map(p=> (p==="pie"||p==="palma") ? p : "off");
+  const bpm = Math.max(30, Math.min(240, parseInt(c.bpm,10)||90));
+  const muestras = (c.muestras&&typeof c.muestras==="object") ? c.muestras : {};
+  const audios = Array.isArray(c.audios) ? c.audios : [];
+  return { pulsos, patron, bpm, muestras, audios };
+}
+const CompasAudio = {
+  ctx:null, pieBuf:null, palmaBuf:null, pieUrl:null, palmaUrl:null,
+  async ensure(){
+    if(!this.ctx){ const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false; this.ctx=new AC(); }
+    if(this.ctx.state==="suspended"){ try{ await this.ctx.resume(); }catch(e){} }
+    return true;
+  },
+  async loadBuf(url){ try{ const r=await fetch(url); const ab=await r.arrayBuffer(); return await this.ctx.decodeAudioData(ab); }catch(e){ return null; } },
+  async prepare(muestras){
+    if(!await this.ensure()) return;
+    const pu=(muestras&&muestras.pie&&muestras.pie.url)||null;
+    const au=(muestras&&muestras.palma&&muestras.palma.url)||null;
+    if(pu!==this.pieUrl){ this.pieUrl=pu; this.pieBuf = pu? await this.loadBuf(pu) : null; }
+    if(au!==this.palmaUrl){ this.palmaUrl=au; this.palmaBuf = au? await this.loadBuf(au) : null; }
+  },
+  synthPie(t){ const c=this.ctx, o=c.createOscillator(), g=c.createGain();
+    o.type="sine"; o.frequency.setValueAtTime(115,t); o.frequency.exponentialRampToValueAtTime(52,t+0.15);
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.95,t+0.006); g.gain.exponentialRampToValueAtTime(0.0001,t+0.22);
+    o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.25); },
+  synthPalma(t){ const c=this.ctx, dur=0.09, n=c.createBufferSource(), buf=c.createBuffer(1,Math.floor(c.sampleRate*dur),c.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+    n.buffer=buf; const bp=c.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=1900; bp.Q.value=0.8;
+    const g=c.createGain(); g.gain.setValueAtTime(0.85,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    n.connect(bp).connect(g).connect(c.destination); n.start(t); n.stop(t+dur); },
+  playBuf(buf,t){ const c=this.ctx, s=c.createBufferSource(); s.buffer=buf; s.connect(c.destination); s.start(t); },
+  hit(type,t){ if(type==="pie"){ this.pieBuf?this.playBuf(this.pieBuf,t):this.synthPie(t); } else if(type==="palma"){ this.palmaBuf?this.playBuf(this.palmaBuf,t):this.synthPalma(t); } }
+};
+let compasState={ playing:false, timer:null, rafId:null, beat:0, nextTime:0, pattern:[], bpm:90, curBeat:-1, cola:[], scope:"" };
+function compasHighlight(idx, scope){
+  document.querySelectorAll((scope||".cp-grid")+" .cp-cell").forEach(el=>el.classList.toggle("activo", +el.dataset.i===idx));
+}
+function compasDraw(){
+  if(!compasState.playing) return;
+  const now=CompasAudio.ctx.currentTime;
+  let cur=compasState.curBeat;
+  while(compasState.cola.length && compasState.cola[0].t < now){ cur=compasState.cola.shift().i; }
+  if(cur!==compasState.curBeat){ compasState.curBeat=cur; compasHighlight(cur, compasState.scope); }
+  compasState.rafId=requestAnimationFrame(compasDraw);
+}
+async function compasReproducir(compasObj, scope){
+  const c=normCompas(compasObj); if(!c) return;
+  compasParar();
+  if(!await CompasAudio.ensure()){ alert("Tu navegador no permite reproducir el compás."); return; }
+  await CompasAudio.prepare(c.muestras);
+  const st=compasState;
+  st.playing=true; st.pattern=c.patron; st.bpm=c.bpm; st.beat=0; st.curBeat=-1; st.cola=[]; st.scope=scope||".cp-grid";
+  st.nextTime=CompasAudio.ctx.currentTime+0.12;
+  const spb=()=>60/(st.bpm||90);
+  const tick=()=>{
+    if(!st.playing) return;
+    while(st.nextTime < CompasAudio.ctx.currentTime + 0.12){
+      const idx=st.beat % st.pattern.length, type=st.pattern[idx];
+      if(type!=="off") CompasAudio.hit(type, st.nextTime);
+      st.cola.push({i:idx, t:st.nextTime});
+      st.nextTime += spb(); st.beat++;
+    }
+    st.timer=setTimeout(tick,25);
+  };
+  tick(); compasDraw(); compasBtnEstado(true, st.scope);
+}
+function compasParar(){
+  const st=compasState; st.playing=false;
+  if(st.timer){ clearTimeout(st.timer); st.timer=null; }
+  if(st.rafId){ cancelAnimationFrame(st.rafId); st.rafId=null; }
+  st.cola=[]; st.curBeat=-1;
+  document.querySelectorAll(".cp-cell.activo").forEach(el=>el.classList.remove("activo"));
+  compasBtnEstado(false, st.scope);
+}
+function compasBtnEstado(reproduciendo, scope){
+  const prefix = (scope==="#cp-edit-grid") ? "#cp-edit-play" : "#cp-play";
+  const btn=document.querySelector(prefix);
+  if(btn){ btn.classList.toggle("on", reproduciendo); btn.innerHTML = (reproduciendo?PAUSE_SVG:PLAY_SVG)+`<span>${reproduciendo?"Parar":"Reproducir"}</span>`; }
+}
+function compasTogglePagina(){
+  if(compasState.playing && compasState.scope===".cp-grid") compasParar();
+  else compasReproducir(PALO_COMPAS[vista.valor], ".cp-grid");
+}
+window.compasTogglePagina=compasTogglePagina;
+function cpCell(tipo,i){ return `<div class="cp-cell ${tipo}" data-i="${i}"><span class="cp-num">${i+1}</span></div>`; }
+function audioPlayerHTML(url,nombre){
+  return `<div class="dmedia audio-item">
+    <span class="cap">${nombre?escapar(nombre):"Grabación"}</span>
+    <div class="player">
+      <button class="pbtn" type="button" aria-label="Reproducir">${PLAY_SVG}</button>
+      <div class="pbar"><div class="pfill"></div></div>
+      <span class="ptime"><span class="pcur">0:00</span> / <span class="pdur">0:00</span></span>
+    </div>
+    <audio class="paudio" preload="metadata" src="${escapar(url)}"></audio>
+    ${SPEED_BTNS}
+  </div>`;
+}
+function compasSeccionHTML(nombrePalo, paloArg, paloCol){
+  const compas = normCompas(PALO_COMPAS[nombrePalo]);
+  const cuerpo = compas
+    ? `<div class="cp-controls">
+         <button id="cp-play" class="cp-play" onclick="compasTogglePagina()">${PLAY_SVG}<span>Reproducir</span></button>
+         <span class="cp-bpm">${compas.bpm} ppm</span>
+       </div>
+       <div class="cp-grid">${compas.patron.map((p,i)=>cpCell(p,i)).join("")}</div>
+       <div class="cp-leyenda"><span class="cp-dot pie"></span> Pie (fuerte) &nbsp;·&nbsp; <span class="cp-dot palma"></span> Palma (flojo)</div>
+       ${compas.audios.length?`<div class="cp-audios">${compas.audios.map(a=>audioPlayerHTML(a.url,a.nombre)).join("")}</div>`:""}`
+    : `<p class="palo-sec-vacio">Todavía no hay compás para este palo.</p>`;
+  return `<div class="palo-sec palo-compas" style="--palo:${paloCol}">
+    <h2 class="palo-sec-tit">Compás</h2>
+    ${cuerpo}
+    <button class="btn btn-ghost btn-sm" onclick="editarCompasPalo('${paloArg}')">${compas?"Editar compás":"＋ Añadir compás"}</button>
+  </div>`;
+}
 function renderDetalle(id){
   const cont=$("#detail"); const it=byId(id);
   if(!it){ cont.innerHTML=`<div class="detalle"><button class="back" onclick="volver()">← Volver al tablón</button><p>Ese cante ya no está disponible.</p></div>`; return; }
@@ -1180,7 +1380,7 @@ function renderDetalle(id){
 }
 
 /* ---------- Rutas ---------- */
-function pararMedios(){ document.querySelectorAll("#detail audio, #detail video").forEach(m=>{ try{ m.pause(); }catch(e){} }); }
+function pararMedios(){ document.querySelectorAll("#detail audio, #detail video, #board audio").forEach(m=>{ try{ m.pause(); }catch(e){} }); try{ compasParar(); }catch(e){} }
 function renderRoute(){
   pararMedios();
   const h=location.hash; let m;
@@ -1315,6 +1515,126 @@ async function borrarRecPalo(nombre, idx){
   if(vista.tipo==="palo") render();
 }
 window.borrarRecPalo=borrarRecPalo;
+
+/* ---------- Editor de compás ---------- */
+let compasEdit=null;
+const compasOverlay=$("#compasOverlay");
+function editarCompasPalo(nombre){
+  const base=normCompas(PALO_COMPAS[nombre]) || {pulsos:12, bpm:90, patron:Array(12).fill("off"), muestras:{}, audios:[]};
+  compasEdit={
+    nombre,
+    pulsos:base.pulsos,
+    bpm:base.bpm,
+    patron:base.patron.slice(),
+    muestras:{ pie: base.muestras.pie||null, palma: base.muestras.palma||null },
+    pieFile:null, palmaFile:null,
+    audios: base.audios.map(a=>({url:a.url, path:a.path||null, nombre:a.nombre||""})),
+    borrar:[]
+  };
+  $("#cpTit").textContent="Compás · "+nombre;
+  $("#cp-pulsos").value=compasEdit.pulsos;
+  $("#cp-bpm").value=compasEdit.bpm; $("#cp-bpm-val").textContent=compasEdit.bpm+" ppm";
+  $("#cp-pie-file").value=""; $("#cp-palma-file").value=""; $("#cp-audio-file").value="";
+  cpRenderGrid(); cpRenderMuestras(); cpRenderAudios();
+  compasBtnEstado(false,"#cp-edit-grid");
+  compasOverlay.classList.add("open");
+}
+window.editarCompasPalo=editarCompasPalo;
+function cpRenderGrid(){
+  const g=$("#cp-edit-grid");
+  g.innerHTML=compasEdit.patron.map((p,i)=>`<div class="cp-cell ${p}" data-i="${i}" onclick="cpCicla(${i})"><span class="cp-num">${i+1}</span></div>`).join("");
+}
+function cpCicla(i){
+  const orden={off:"pie",pie:"palma",palma:"off"};
+  compasEdit.patron[i]=orden[compasEdit.patron[i]]||"off";
+  cpRenderGrid();
+}
+window.cpCicla=cpCicla;
+function cpRenderMuestras(){
+  const pie=compasEdit.pieFile?compasEdit.pieFile.name:(compasEdit.muestras.pie?"Muestra guardada":"");
+  const palma=compasEdit.palmaFile?compasEdit.palmaFile.name:(compasEdit.muestras.palma?"Muestra guardada":"");
+  $("#cp-pie-info").innerHTML = pie?`${escapar(pie)} <span class="quitar" onclick="cpQuitarMuestra('pie')">quitar</span>`:"";
+  $("#cp-palma-info").innerHTML = palma?`${escapar(palma)} <span class="quitar" onclick="cpQuitarMuestra('palma')">quitar</span>`:"";
+}
+function cpQuitarMuestra(tipo){
+  if(tipo==="pie"){ if(compasEdit.muestras.pie&&compasEdit.muestras.pie.path) compasEdit.borrar.push(compasEdit.muestras.pie.path); compasEdit.muestras.pie=null; compasEdit.pieFile=null; $("#cp-pie-file").value=""; }
+  else { if(compasEdit.muestras.palma&&compasEdit.muestras.palma.path) compasEdit.borrar.push(compasEdit.muestras.palma.path); compasEdit.muestras.palma=null; compasEdit.palmaFile=null; $("#cp-palma-file").value=""; }
+  cpRenderMuestras();
+}
+window.cpQuitarMuestra=cpQuitarMuestra;
+function cpRenderAudios(){
+  const cont=$("#cp-audios-list");
+  cont.innerHTML=compasEdit.audios.map((a,i)=>`<div class="cp-row" style="margin:6px 0">
+    <input class="cp-aud-nombre" data-i="${i}" type="text" placeholder="Nombre (opcional)" value="${escapar(a.nombre||"")}" style="flex:1 1 140px" />
+    <span class="cp-sample">${a.file?escapar(a.file.name):"guardado"} <span class="quitar" onclick="cpQuitarAudio(${i})">quitar</span></span>
+  </div>`).join("");
+  cont.querySelectorAll(".cp-aud-nombre").forEach(inp=>{ inp.oninput=()=>{ compasEdit.audios[+inp.dataset.i].nombre=inp.value; }; });
+}
+function cpQuitarAudio(i){
+  const a=compasEdit.audios[i]; if(a&&a.path) compasEdit.borrar.push(a.path);
+  compasEdit.audios.splice(i,1); cpRenderAudios();
+}
+window.cpQuitarAudio=cpQuitarAudio;
+$("#cp-pulsos").oninput=()=>{
+  let n=Math.max(2,Math.min(16, parseInt($("#cp-pulsos").value,10)||12));
+  const p=compasEdit.patron;
+  if(n>p.length){ while(p.length<n) p.push("off"); } else { p.length=n; }
+  compasEdit.pulsos=n; cpRenderGrid();
+};
+$("#cp-bpm").oninput=()=>{
+  compasEdit.bpm=parseInt($("#cp-bpm").value,10)||90;
+  $("#cp-bpm-val").textContent=compasEdit.bpm+" ppm";
+  if(compasState.playing && compasState.scope==="#cp-edit-grid") compasState.bpm=compasEdit.bpm;
+};
+$("#cp-pie-file").onchange=()=>{ const f=$("#cp-pie-file").files[0]; if(f&&f.size>5*1024*1024){ alert("El archivo supera 5 MB."); $("#cp-pie-file").value=""; return; } compasEdit.pieFile=f||null; cpRenderMuestras(); };
+$("#cp-palma-file").onchange=()=>{ const f=$("#cp-palma-file").files[0]; if(f&&f.size>5*1024*1024){ alert("El archivo supera 5 MB."); $("#cp-palma-file").value=""; return; } compasEdit.palmaFile=f||null; cpRenderMuestras(); };
+$("#cp-audio-file").onchange=()=>{
+  for(const f of [...$("#cp-audio-file").files]){
+    if(f.size>5*1024*1024){ alert(`"${f.name}" supera 5 MB y no se añade.`); continue; }
+    compasEdit.audios.push({file:f, nombre:""});
+  }
+  $("#cp-audio-file").value=""; cpRenderAudios();
+};
+function editorCompasObj(preview){
+  const e=compasEdit; let muestras={};
+  if(preview){
+    const pu = e.pieFile ? URL.createObjectURL(e.pieFile) : (e.muestras.pie&&e.muestras.pie.url);
+    const au = e.palmaFile ? URL.createObjectURL(e.palmaFile) : (e.muestras.palma&&e.muestras.palma.url);
+    if(pu) muestras.pie={url:pu}; if(au) muestras.palma={url:au};
+  } else { muestras={ pie:e.muestras.pie||null, palma:e.muestras.palma||null }; }
+  return {pulsos:e.pulsos, bpm:e.bpm, patron:e.patron, muestras, audios:e.audios};
+}
+function compasPreview(){
+  if(compasState.playing && compasState.scope==="#cp-edit-grid") compasParar();
+  else compasReproducir(editorCompasObj(true), "#cp-edit-grid");
+}
+window.compasPreview=compasPreview;
+function cerrarCompas(){ compasParar(); compasOverlay.classList.remove("open"); }
+$("#cerrarCompas").onclick=cerrarCompas; $("#cancelarCompas").onclick=cerrarCompas;
+compasOverlay.addEventListener("click",e=>{ if(e.target===compasOverlay) cerrarCompas(); });
+$("#guardarCompas").onclick=async ()=>{
+  const e=compasEdit; if(!e) return;
+  const hayArchivos = e.pieFile||e.palmaFile||e.audios.some(a=>a.file);
+  if(hayArchivos && MODO!=="nube"){ alert("Para subir archivos necesitas conectar Supabase (ver README)."); return; }
+  compasParar();
+  const btn=$("#guardarCompas"); btn.disabled=true; btn.textContent="Guardando…";
+  try{
+    const muestras={ pie:e.muestras.pie||null, palma:e.muestras.palma||null };
+    if(e.pieFile){ const up=await subir(e.pieFile); muestras.pie={url:up.url, path:up.path}; }
+    if(e.palmaFile){ const up=await subir(e.palmaFile); muestras.palma={url:up.url, path:up.path}; }
+    const audios=[];
+    for(const a of e.audios){
+      if(a.file){ const up=await subir(a.file); audios.push({url:up.url, path:up.path, nombre:(a.nombre||"").trim()}); }
+      else if(a.url){ audios.push({url:a.url, path:a.path||null, nombre:(a.nombre||"").trim()}); }
+    }
+    const obj=normCompas({pulsos:e.pulsos, bpm:e.bpm, patron:e.patron, muestras, audios});
+    const ok=await guardarCompasPalo(e.nombre, obj);
+    if(ok){ for(const p of e.borrar) await borrarArchivo(p); }
+  }catch(err){ alert("No se pudo guardar el compás: "+(err&&err.message||err)); }
+  btn.disabled=false; btn.textContent="Guardar";
+  compasOverlay.classList.remove("open");
+  if(vista.tipo==="palo") render();
+};
 
 /* ---------- Chips ---------- */
 function pintarMenu(){
