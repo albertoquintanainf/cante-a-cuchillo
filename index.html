@@ -1650,7 +1650,7 @@ const compasOverlay=$("#compasOverlay");
 function editarCompasPalo(nombre, idx){
   const lista=normCompasList(PALO_COMPAS[nombre]);
   const esNuevo=(typeof idx!=="number");
-  const base = esNuevo ? {titulo:"", pulsos:12, bpm:90, patron:Array(12).fill("off"), audios:[], autor:""} : (lista[idx]||{titulo:"", pulsos:12, bpm:90, patron:Array(12).fill("off"), audios:[], autor:""});
+  const base = esNuevo ? {titulo:"", pulsos:12, bpm:90, patron:Array(12).fill("palma"), audios:[], autor:""} : (lista[idx]||{titulo:"", pulsos:12, bpm:90, patron:Array(12).fill("palma"), audios:[], autor:""});
   const tituloDefecto = esNuevo ? ("Variante "+(lista.length+1)) : (base.titulo||("Variante "+(idx+1)));
   compasEdit={
     nombre, idx: esNuevo ? -1 : idx,
@@ -1701,7 +1701,7 @@ $("#cp-autor").oninput=()=>{ compasEdit.autor=$("#cp-autor").value; };
 $("#cp-pulsos").oninput=()=>{
   let n=Math.max(2,Math.min(16, parseInt($("#cp-pulsos").value,10)||12));
   const p=compasEdit.patron;
-  if(n>p.length){ while(p.length<n) p.push("off"); } else { p.length=n; }
+  if(n>p.length){ while(p.length<n) p.push("palma"); } else { p.length=n; }
   compasEdit.pulsos=n; cpRenderGrid();
 };
 $("#cp-bpm").oninput=()=>{
