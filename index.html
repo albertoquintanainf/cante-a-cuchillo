@@ -551,7 +551,7 @@
       <label for="cp-pulsos">Nº de pulsos</label>
       <input id="cp-pulsos" type="number" min="2" max="16" value="12" style="width:72px" />
     </div>
-    <p class="cp-edit-hint">Pulsa cada casilla para cambiarla: vacío → <b>pie</b> (fuerte) → <b>palma</b> (flojo) → <b>silencio</b> (no suena).</p>
+    <p class="cp-edit-hint">Pulsa cada casilla para cambiarla: <b>palma</b> (flojo) → <b>pie</b> (fuerte) → <b>silencio</b> (no suena).</p>
     <div class="cp-edit-grid" id="cp-edit-grid"></div>
     <div class="cp-leyenda" style="margin:2px 0 12px"><span class="cp-dot pie"></span> Pie (fuerte) &nbsp;·&nbsp; <span class="cp-dot palma"></span> Palma (flojo) &nbsp;·&nbsp; <span class="cp-dot silencio"></span> Silencio</div>
     <div class="cp-row">
@@ -1292,7 +1292,7 @@ function normCompas(c){   // una variante
   const pulsos = Math.max(2, Math.min(16, parseInt(c.pulsos,10)||12));
   let patron = Array.isArray(c.patron) ? c.patron.slice(0,pulsos) : [];
   while(patron.length<pulsos) patron.push("off");
-  patron = patron.map(p=> (p==="pie"||p==="palma"||p==="silencio") ? p : "off");
+  patron = patron.map(p=> (p==="pie"||p==="palma"||p==="silencio") ? p : "palma");
   const bpm = Math.max(30, Math.min(240, parseInt(c.bpm,10)||90));
   const audios = Array.isArray(c.audios) ? c.audios.map(a=>({url:a.url, path:a.path||null, nombre:a.nombre||""})) : [];
   const out = { titulo:(c.titulo||"").toString(), pulsos, patron, bpm, audios, autor:(c.autor||"").toString() };
@@ -1678,8 +1678,8 @@ function cpRenderGrid(){
   g.innerHTML=compasEdit.patron.map((p,i)=>`<div class="cp-cell ${p}" data-i="${i}" onclick="cpCicla(${i})"><span class="cp-num">${i+1}</span></div>`).join("");
 }
 function cpCicla(i){
-  const orden={off:"pie",pie:"palma",palma:"silencio",silencio:"off"};
-  compasEdit.patron[i]=orden[compasEdit.patron[i]]||"off";
+  const orden={palma:"pie",pie:"silencio",silencio:"palma"};
+  compasEdit.patron[i]=orden[compasEdit.patron[i]]||"palma";
   cpRenderGrid();
 }
 window.cpCicla=cpCicla;
