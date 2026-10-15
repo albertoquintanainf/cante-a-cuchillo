@@ -1180,9 +1180,8 @@ function render(){
   }
   // Todas las recomendaciones (agrupadas por palo)
   if(vista.tipo==="recos"){
-    const ctaReco = `<div class="cta-todos"><button class="btn btn-vino" onclick="editarRecPalo('')">＋ Añadir recomendación</button></div>`;
     const palos=Object.keys(PALO_RECS).filter(p=>(PALO_RECS[p]||[]).length).sort((a,b)=>ordenPalo(a)-ordenPalo(b));
-    if(!palos.length){ board.innerHTML=`<div class="empty"><p>Todavía no hay recomendaciones.</p></div>`+ctaReco; return; }
+    if(!palos.length){ board.innerHTML=`<div class="empty"><p>Todavía no hay recomendaciones.</p></div>`; return; }
     board.innerHTML = palos.map(p=>{
       const paloArg=escapar(p).replace(/'/g,"\\'");
       const colRaw=colorPalo(p); const col=(colRaw||"").toUpperCase()==="#FFFFFF"?"var(--oro)":colRaw;
@@ -1191,7 +1190,7 @@ function render(){
         <div class="palo-head" style="--palo:${col}"><h2><a class="palo-head-link" href="#palo=${encodeURIComponent(p)}">${escapar(p)}</a></h2><span class="n">${recs.length} ${recs.length===1?"recomendación":"recomendaciones"}</span><span class="rule"></span></div>
         ${recListHTML(recs, paloArg)}
       </section>`;
-    }).join("") + ctaReco;
+    }).join("");
     cargarCaratulasSpotify();
     return;
   }
@@ -1563,7 +1562,11 @@ function renderRoute(){
   $("#hero").style.display = home?"":"none";
   $("#estado").style.display = home?"":"none";
   $("#ctaHome").style.display = home?"":"none";
-  $("#abrirAddSm").style.display = home?"none":"";
+  const esReco = (vista.tipo==="recos");
+  const addSm = $("#abrirAddSm");
+  addSm.style.display = home?"none":"";
+  addSm.textContent = esReco ? "＋ Añadir recomendación" : "＋ Añadir";
+  addSm.onclick = esReco ? ()=>editarRecPalo("") : ()=>abrir();
   render(); window.scrollTo(0,0);
 }
 window.addEventListener("hashchange", renderRoute);
