@@ -1229,7 +1229,7 @@ function render(){
     ${arr.length
       ? `<div class="grid">${arr.map(it=>tarjeta(it,{mostrarPalo:false, mostrarCurso:true})).join("")}</div>`
       : `<p class="palo-sec-vacio">Todavía no hay ningún cante en este palo.</p>`}
-    <button class="btn btn-ghost btn-sm" onclick="abrirCantePalo('${paloArg}')">＋ Añadir cante</button>
+    <button class="btn btn-ghost btn-sm" style="margin-top:18px" onclick="abrirCantePalo('${paloArg}')">＋ Añadir cante</button>
   </div>`;
   const compasHTML = compasSeccionHTML(vista.valor, paloArg, paloCol);
   board.innerHTML = descHTML + compasHTML + recsHTML + cantesHTML;
