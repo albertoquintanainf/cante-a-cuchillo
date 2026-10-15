@@ -516,6 +516,10 @@
       <input id="rec-estilo" type="text" placeholder="Ej. Soleá de Alcalá" />
     </div>
     <div class="field">
+      <label for="rec-tema">Título del tema (opcional)</label>
+      <input id="rec-tema" type="text" placeholder="Ej. A mi primo Enrique" />
+    </div>
+    <div class="field">
       <label for="rec-disco">Disco (opcional)</label>
       <input id="rec-disco" type="text" placeholder="Ej. La fragua de los Mairena" />
     </div>
@@ -527,6 +531,7 @@
       <label for="rec-spotify">Enlace de Spotify (opcional)</label>
       <input id="rec-spotify" type="url" placeholder="https://open.spotify.com/…" />
     </div>
+    <p class="hint" id="rec-auto-hint" style="margin:-6px 0 10px">Al pegar un enlace se intenta rellenar el cantaor/tema; revísalo por si acaso.</p>
     <div class="field">
       <label for="rec-autor">Quién la sube <span class="req">*</span></label>
       <input id="rec-autor" type="text" placeholder="Tu nombre" />
@@ -964,13 +969,15 @@ function recItemHTML(r,i,paloArg){
   const links=[];
   if(yt) links.push(`<a class="rec-plat yt" href="${escapar(yt)}" target="_blank" rel="noopener" title="Ver en YouTube" aria-label="Ver en YouTube">${YT_LOGO}</a>`);
   if(sp) links.push(`<a class="rec-plat sp" href="${escapar(sp)}" target="_blank" rel="noopener" title="Escuchar en Spotify" aria-label="Escuchar en Spotify">${SP_LOGO}</a>`);
-  const cantaor=escapar(r.cantaor||""), estilo=escapar(r.estilo||""), disco=escapar(r.disco||"");
+  const cantaor=escapar(r.cantaor||""), estilo=escapar(r.estilo||"");
+  const l3parts=[]; if(r.tema) l3parts.push(escapar(r.tema)); if(r.disco) l3parts.push(escapar(r.disco));
+  const l3=l3parts.join(" · ");
   return `<div class="rec-item">
     <div class="rec-cover">${coverImg}</div>
     <div class="rec-main">
       <div class="rec-l1" title="${cantaor}"><b>${cantaor}</b></div>
       <div class="rec-l2" title="${estilo}">${estilo||"&nbsp;"}</div>
-      <div class="rec-l3" title="${disco}">${disco||"&nbsp;"}</div>
+      <div class="rec-l3" title="${l3}">${l3||"&nbsp;"}</div>
     </div>
     <div class="rec-links">${links.join("")}</div>
     <div class="rec-acts">
@@ -1104,12 +1111,14 @@ function setTopHeader(){
   let titulo, col, n;
   if(vista.tipo==="recientes"){ titulo="Últimas actualizaciones"; col="var(--vino)"; n=Math.min(8,DATOS.length); }
   else if(vista.tipo==="todo"){ titulo="Todos los cantes"; col="var(--vino)"; n=DATOS.length; }
+  else if(vista.tipo==="recos"){ titulo="Todas las recomendaciones"; col="var(--vino)"; n=Object.values(PALO_RECS).reduce((s,a)=>s+(a?a.length:0),0); }
   else if(vista.tipo==="curso"){ titulo=vista.valor; col="var(--vino)"; n=DATOS.filter(it=>it.curso===vista.valor).length; }
   else { titulo=vista.valor; col=colorPalo(vista.valor); n=DATOS.filter(it=>(it.palo||"")===vista.valor).length; }
   tt.textContent=titulo; tt.style.display="";
   tb.style.setProperty("--palo", col);
   tb.classList.add("con-titulo");
-  const contHeader = vista.tipo==="palo" ? "" : `<span class="page-count">${n} ${n===1?"cante":"cantes"}</span>`;
+  const unidad = vista.tipo==="recos" ? (n===1?"recomendación":"recomendaciones") : (n===1?"cante":"cantes");
+  const contHeader = vista.tipo==="palo" ? "" : `<span class="page-count">${n} ${unidad}</span>`;
   ps.innerHTML=`<button class="back" onclick="irInicio()">← Inicio</button>${contHeader}`;
   ps.style.display="";
 }
@@ -1149,6 +1158,23 @@ function render(){
   if(vista.tipo==="todo"){
     if(!DATOS.length) return vacio();
     board.innerHTML=agrupadoPorPalo(DATOS, true);
+    return;
+  }
+  // Todas las recomendaciones (agrupadas por palo)
+  if(vista.tipo==="recos"){
+    const palos=Object.keys(PALO_RECS).filter(p=>(PALO_RECS[p]||[]).length).sort((a,b)=>ordenPalo(a)-ordenPalo(b));
+    if(!palos.length){ board.innerHTML=`<div class="empty"><p>Todavía no hay recomendaciones.</p></div>`; return; }
+    board.innerHTML = palos.map(p=>{
+      const paloArg=escapar(p).replace(/'/g,"\\'");
+      const colRaw=colorPalo(p); const col=(colRaw||"").toUpperCase()==="#FFFFFF"?"var(--oro)":colRaw;
+      const recs=PALO_RECS[p]||[];
+      const items=recs.map((r,i)=>recItemHTML(r,i,paloArg)).join("");
+      return `<section class="palo-sec" style="--palo:${col}">
+        <div class="palo-head" style="--palo:${col}"><h2><a class="palo-head-link" href="#palo=${encodeURIComponent(p)}">${escapar(p)}</a></h2><span class="n">${recs.length} ${recs.length===1?"recomendación":"recomendaciones"}</span><span class="rule"></span></div>
+        <div class="rec-list">${items}</div>
+      </section>`;
+    }).join("");
+    cargarCaratulasSpotify();
     return;
   }
   // Un curso: sus cantes, agrupados por palo, ordenados por fecha de clase
@@ -1513,6 +1539,7 @@ function renderRoute(){
   if((m=h.match(/^#palo=(.+)$/))) vista={tipo:"palo", valor:decodeURIComponent(m[1])};
   else if((m=h.match(/^#curso=(.+)$/))) vista={tipo:"curso", valor:decodeURIComponent(m[1])};
   else if(h==="#todos") vista={tipo:"todo", valor:null};
+  else if(h==="#recomendaciones") vista={tipo:"recos", valor:null};
   else if(h==="#recientes") vista={tipo:"recientes", valor:null};
   else vista={tipo:"inicio", valor:null};
   const home = (vista.tipo==="inicio");
@@ -1597,6 +1624,7 @@ function editarRecPalo(nombre, idx){
   }
   $("#rec-cantaor").value=r.cantaor||"";
   $("#rec-estilo").value=r.estilo||"";
+  $("#rec-tema").value=r.tema||"";
   $("#rec-disco").value=r.disco||"";
   $("#rec-youtube").value=recYoutube(r);
   $("#rec-spotify").value=recSpotify(r);
@@ -1604,11 +1632,44 @@ function editarRecPalo(nombre, idx){
   recOverlay.classList.add("open");
   setTimeout(()=>$("#rec-cantaor").focus(),50);
 }
+// Autorrelleno "a mejor esfuerzo" a partir del enlace (sin claves)
+async function recAutorellenar(tipo){
+  const hint=$("#rec-auto-hint");
+  const setVal=(id,v)=>{ const el=$("#"+id); if(el && !el.value.trim() && v) el.value=v; };
+  try{
+    if(tipo==="spotify"){
+      const u=$("#rec-spotify").value.trim(); if(!/spotify\.com/i.test(u)) return;
+      if(hint) hint.textContent="Buscando datos en Spotify…";
+      const r=await fetch("https://open.spotify.com/oembed?url="+encodeURIComponent(u));
+      if(r.ok){ const j=await r.json(); if(j&&j.title) setVal("rec-tema", j.title); }
+    } else if(tipo==="youtube"){
+      const u=$("#rec-youtube").value.trim(); if(!/youtube\.com|youtu\.be/i.test(u)) return;
+      if(hint) hint.textContent="Buscando datos en YouTube…";
+      const r=await fetch("https://www.youtube.com/oembed?format=json&url="+encodeURIComponent(u));
+      if(r.ok){
+        const j=await r.json();
+        let artista="", tema=j.title||"";
+        const m=(j.title||"").split(/\s[-–—]\s/);
+        if(m.length>=2){ artista=m[0].trim(); tema=m.slice(1).join(" - ").trim(); }
+        if(!artista && j.author_name){ artista=j.author_name.replace(/\s*-\s*Topic\s*$/i,"").trim(); }
+        setVal("rec-cantaor", artista);
+        setVal("rec-tema", tema);
+      }
+    }
+    if(hint) hint.textContent="Datos rellenados automáticamente (revísalos por si acaso).";
+  }catch(e){
+    if(hint) hint.textContent="No se pudieron leer los datos del enlace; rellénalo a mano.";
+  }
+  setTimeout(()=>{ if(hint) hint.textContent="Al pegar un enlace se intenta rellenar el cantaor/tema; revísalo por si acaso."; }, 4000);
+}
+$("#rec-spotify").addEventListener("change", ()=>recAutorellenar("spotify"));
+$("#rec-youtube").addEventListener("change", ()=>recAutorellenar("youtube"));
 function cerrarRec(){ recOverlay.classList.remove("open"); recEditIdx=-1; }
 $("#cerrarRec").onclick=cerrarRec; $("#cancelarRec").onclick=cerrarRec;
 recOverlay.addEventListener("click",e=>{ if(e.target===recOverlay) cerrarRec(); });
 $("#guardarRec").onclick=async ()=>{
   const cantaor=$("#rec-cantaor").value.trim(), estilo=$("#rec-estilo").value.trim();
+  const tema=$("#rec-tema").value.trim();
   const disco=$("#rec-disco").value.trim();
   const youtube=$("#rec-youtube").value.trim(), spotify=$("#rec-spotify").value.trim();
   const autor=$("#rec-autor").value.trim();
@@ -1624,7 +1685,7 @@ $("#guardarRec").onclick=async ()=>{
   const btn=$("#guardarRec"); btn.disabled=true; btn.textContent="Guardando…";
   const arr=(PALO_RECS[recPaloActual]||[]).slice();
   const ahora=new Date().toISOString();
-  const obj={cantaor, estilo, disco, youtube, spotify, autor, ts:ahora};
+  const obj={cantaor, estilo, tema, disco, youtube, spotify, autor, ts:ahora};
   if(recEditIdx>=0 && recEditIdx<arr.length){ obj.creado=(arr[recEditIdx]&&arr[recEditIdx].creado)||ahora; arr[recEditIdx]=obj; }
   else { obj.creado=ahora; arr.push(obj); }
   await guardarRecsPalo(recPaloActual, arr);
@@ -1761,6 +1822,8 @@ function pintarMenu(){
   let html =`<button class="menu-item ${act('inicio')}" data-t="inicio">Inicio</button>`;
   html+=`<button class="menu-item ${act('recientes')}" data-t="recientes">Últimas actualizaciones</button>`;
   html+=`<button class="menu-item ${act('todo')}" data-t="todo">Todos los cantes <span class="cnt">${DATOS.length}</span></button>`;
+  const totalRecs=Object.values(PALO_RECS).reduce((s,a)=>s+(a?a.length:0),0);
+  html+=`<button class="menu-item ${act('recos')}" data-t="recos">Todas las recomendaciones <span class="cnt">${totalRecs}</span></button>`;
   if(cursos.length){
     const cActual = cursoActual();
     html+=`<div class="menu-sep">Cursos</div>`;
@@ -1785,6 +1848,7 @@ function pintarMenu(){
       if(t==="inicio") location.hash="";
       else if(t==="recientes") location.hash="recientes";
       else if(t==="todo") location.hash="todos";
+      else if(t==="recos") location.hash="recomendaciones";
       else if(t==="curso") location.hash="curso="+encodeURIComponent(v);
       else location.hash="palo="+encodeURIComponent(v);
       renderRoute();
