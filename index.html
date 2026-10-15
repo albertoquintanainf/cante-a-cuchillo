@@ -81,6 +81,8 @@
   .palo-sec-tit .sec-count{font-size:.8rem;color:var(--tinta-2);font-weight:400;letter-spacing:.05em;margin-left:6px}
   .palo-sec-vacio{color:var(--tinta-2);font-style:italic;margin:0 0 10px}
   .rec-list{display:flex;flex-direction:column;gap:8px;margin:0 0 12px}
+  .rec-item.rec-extra{display:none}
+  .rec-list.abierto .rec-item.rec-extra{display:flex}
   .rec-item{display:flex;align-items:center;gap:12px;border-left:3px solid var(--palo,var(--oro));padding:8px 12px;background:var(--papel);border-radius:0 8px 8px 0;box-shadow:var(--sombra-sm)}
   .rec-cover{flex:0 0 auto;width:52px;height:52px;border-radius:6px;overflow:hidden;background:#e9e0d2 radial-gradient(circle at 50% 50%, #c9bca6 0 18%, #e9e0d2 19% 100%);display:flex;align-items:center;justify-content:center;position:relative}
   .rec-cover::after{content:"";position:absolute;width:12px;height:12px;border-radius:50%;background:#efe7d8;box-shadow:0 0 0 2px #c9bca6}
@@ -986,6 +988,22 @@ function recItemHTML(r,i,paloArg){
     </div>
   </div>`;
 }
+function recListHTML(recs, paloArg){
+  const LIMITE=5;
+  const itemsHTML = recs.map((r,i)=>{
+    const html=recItemHTML(r,i,paloArg);
+    return i>=LIMITE ? html.replace('class="rec-item"','class="rec-item rec-extra"') : html;
+  }).join("");
+  const btn = recs.length>LIMITE ? `<button class="ver-mas rec-vermas" onclick="recVerMas(this)">Ver más (${recs.length-LIMITE})</button>` : "";
+  return `<div class="rec-list">${itemsHTML}</div>${btn}`;
+}
+function recVerMas(btn){
+  const lista=btn.previousElementSibling; if(!lista) return;
+  const abierto=lista.classList.toggle("abierto");
+  const extra=lista.querySelectorAll(".rec-item.rec-extra").length;
+  btn.textContent = abierto ? "Ver menos" : `Ver más (${extra})`;
+}
+window.recVerMas=recVerMas;
 async function cargarCaratulasSpotify(){
   const imgs=[...document.querySelectorAll('.rec-cover-img[data-sp]')];
   for(const img of imgs){
@@ -1162,18 +1180,18 @@ function render(){
   }
   // Todas las recomendaciones (agrupadas por palo)
   if(vista.tipo==="recos"){
+    const ctaReco = `<div class="cta-todos"><button class="btn btn-vino" onclick="editarRecPalo('')">＋ Añadir recomendación</button></div>`;
     const palos=Object.keys(PALO_RECS).filter(p=>(PALO_RECS[p]||[]).length).sort((a,b)=>ordenPalo(a)-ordenPalo(b));
-    if(!palos.length){ board.innerHTML=`<div class="empty"><p>Todavía no hay recomendaciones.</p></div>`; return; }
+    if(!palos.length){ board.innerHTML=`<div class="empty"><p>Todavía no hay recomendaciones.</p></div>`+ctaReco; return; }
     board.innerHTML = palos.map(p=>{
       const paloArg=escapar(p).replace(/'/g,"\\'");
       const colRaw=colorPalo(p); const col=(colRaw||"").toUpperCase()==="#FFFFFF"?"var(--oro)":colRaw;
       const recs=PALO_RECS[p]||[];
-      const items=recs.map((r,i)=>recItemHTML(r,i,paloArg)).join("");
       return `<section class="palo-sec" style="--palo:${col}">
         <div class="palo-head" style="--palo:${col}"><h2><a class="palo-head-link" href="#palo=${encodeURIComponent(p)}">${escapar(p)}</a></h2><span class="n">${recs.length} ${recs.length===1?"recomendación":"recomendaciones"}</span><span class="rule"></span></div>
-        <div class="rec-list">${items}</div>
+        ${recListHTML(recs, paloArg)}
       </section>`;
-    }).join("");
+    }).join("") + ctaReco;
     cargarCaratulasSpotify();
     return;
   }
@@ -1199,10 +1217,9 @@ function render(){
     <button class="btn btn-ghost btn-sm" onclick="editarDescPalo('${paloArg}')">${desc?"Editar":"＋ Añadir descripción"}</button>
   </div>`;
   const recs = PALO_RECS[vista.valor]||[];
-  const recsItems = recs.map((r,i)=>recItemHTML(r,i,paloArg)).join("");
   const recsHTML = `<div class="palo-sec palo-recs" style="--palo:${paloCol}">
     <h2 class="palo-sec-tit">Recomendaciones</h2>
-    ${recs.length?`<div class="rec-list">${recsItems}</div>`:`<p class="palo-sec-vacio">Todavía no hay recomendaciones para este palo.</p>`}
+    ${recs.length?recListHTML(recs, paloArg):`<p class="palo-sec-vacio">Todavía no hay recomendaciones para este palo.</p>`}
     <button class="btn btn-ghost btn-sm" onclick="editarRecPalo('${paloArg}')">＋ Añadir recomendación</button>
   </div>`;
   const cantesHTML = `<div class="palo-sec palo-cantes">
