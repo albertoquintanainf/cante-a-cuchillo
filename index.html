@@ -64,6 +64,8 @@
   .btn-lg{font-size:1.12rem;padding:15px 40px;border-radius:999px;letter-spacing:.01em;box-shadow:0 12px 26px -12px rgba(142,30,44,.6)}
   .btn-lg:hover{transform:translateY(-1px)}
   .btn-sm{font-size:.86rem;padding:9px 15px;white-space:nowrap}
+  #abrirAddSm .add-short{display:none}
+  @media (max-width:600px){ #abrirAddSm .add-full{display:none} #abrirAddSm .add-short{display:inline} }
   .topbar{position:sticky;top:0;z-index:5;margin:6px 0;padding:10px 0;background:linear-gradient(180deg,var(--cal) 78%,rgba(246,241,230,0));display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .topbar .search{flex:1 1 180px;padding:8px 14px}
   .topbar .search input{font-size:.95rem}
@@ -107,7 +109,8 @@
   .curso-link{cursor:pointer;text-decoration:none;transition:background .15s}
   .curso-link:hover{background:rgba(181,133,47,.3)}
   .palo-desc-txt{color:#3f362c;line-height:1.65;font-size:1.02rem;white-space:pre-wrap;text-align:justify;margin:0 0 10px;border-left:3px solid var(--palo,var(--oro));padding-left:14px}
-  .palo-desc-txt.clamp{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+  .palo-desc-txt.clamp{display:-webkit-box;-webkit-line-clamp:10;-webkit-box-orient:vertical;overflow:hidden}
+  .desc-edit-btn{display:block;width:fit-content}
   .ver-mas{background:none;border:0;color:var(--vino);font-family:"Spectral",serif;font-size:.9rem;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px;margin:0 0 10px}
   .ver-mas:hover{color:var(--vino-claro)}
   .cp-sec-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px}
@@ -1213,7 +1216,7 @@ function render(){
       ? `<div class="palo-desc-txt clamp" id="paloDescBox">${escapar(desc)}</div>
     <button class="ver-mas" id="paloVerMas" style="display:none" onclick="togglePaloDesc()">Ver más</button>`
       : `<p class="palo-sec-vacio">Todavía no hay una descripción de este palo.</p>`}
-    <button class="btn btn-ghost btn-sm" onclick="editarDescPalo('${paloArg}')">${desc?"Editar":"＋ Añadir descripción"}</button>
+    <button class="btn btn-ghost btn-sm desc-edit-btn" onclick="editarDescPalo('${paloArg}')">${desc?"Editar":"＋ Añadir descripción"}</button>
   </div>`;
   const recs = PALO_RECS[vista.valor]||[];
   const recsHTML = `<div class="palo-sec palo-recs" style="--palo:${paloCol}">
@@ -1226,6 +1229,7 @@ function render(){
     ${arr.length
       ? `<div class="grid">${arr.map(it=>tarjeta(it,{mostrarPalo:false, mostrarCurso:true})).join("")}</div>`
       : `<p class="palo-sec-vacio">Todavía no hay ningún cante en este palo.</p>`}
+    <button class="btn btn-ghost btn-sm" onclick="abrirCantePalo('${paloArg}')">＋ Añadir cante</button>
   </div>`;
   const compasHTML = compasSeccionHTML(vista.valor, paloArg, paloCol);
   board.innerHTML = descHTML + compasHTML + recsHTML + cantesHTML;
@@ -1565,7 +1569,7 @@ function renderRoute(){
   const esReco = (vista.tipo==="recos");
   const addSm = $("#abrirAddSm");
   addSm.style.display = home?"none":"";
-  addSm.textContent = esReco ? "＋ Añadir recomendación" : "＋ Añadir";
+  addSm.innerHTML = esReco ? '＋ <span class="add-full">Añadir recomendación</span><span class="add-short">Añadir recom.</span>' : "＋ Añadir";
   addSm.onclick = esReco ? ()=>editarRecPalo("") : ()=>abrir();
   render(); window.scrollTo(0,0);
 }
@@ -2167,6 +2171,12 @@ function abrir(id){
   overlay.classList.add("open");
   $("#f-titulo").focus();
 }
+function abrirCantePalo(nombre){
+  abrir();
+  const sel=$("#f-palo");
+  if(nombre && sel && [...sel.options].some(o=>o.value===nombre)) sel.value=nombre;
+}
+window.abrirCantePalo=abrirCantePalo;
 function cerrar(){ overlay.classList.remove("open"); }
 $("#abrirAdd").onclick=()=>abrir();
 $("#abrirAddSm").onclick=()=>abrir();
