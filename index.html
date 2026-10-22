@@ -1352,9 +1352,21 @@ function normCompasList(v){   // admite formato antiguo (objeto único) o lista
 }
 const CompasAudio = {
   ctx:null,
+  _cebado:false,
+  _crear(){ if(!this.ctx){ const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false; this.ctx=new AC(); } return true; },
+  _silencio(){ // lanza un buffer mudo: imprescindible para desbloquear Web Audio en móvil/iOS
+    try{ const c=this.ctx, b=c.createBuffer(1,1,22050), s=c.createBufferSource(); s.buffer=b; s.connect(c.destination); s.start(0); this._cebado=true; }catch(e){}
+  },
+  // Debe ejecutarse SÍNCRONAMENTE dentro de un gesto del usuario (toque/clic)
+  desbloquear(){
+    if(!this._crear()) return;
+    try{ this.ctx.resume(); }catch(e){}
+    if(!this._cebado) this._silencio();
+  },
   async ensure(){
-    if(!this.ctx){ const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false; this.ctx=new AC(); }
+    if(!this._crear()) return false;
     if(this.ctx.state==="suspended"){ try{ await this.ctx.resume(); }catch(e){} }
+    if(!this._cebado) this._silencio();
     return true;
   },
   ruido(t, dur, forma){ const c=this.ctx, n=c.createBufferSource(), buf=c.createBuffer(1,Math.max(1,Math.floor(c.sampleRate*dur)),c.sampleRate), d=buf.getChannelData(0);
@@ -1378,6 +1390,11 @@ const CompasAudio = {
     this.palmada(t, 2.7); this.palmada(t+0.008, 1.3); },
   hit(type,t){ if(compasMute) return; if(type==="pie") this.synthPie(t); else if(type==="palma") this.synthPalma(t); }
 };
+// Desbloqueo del audio al primer gesto del usuario (necesario en móvil/iOS).
+// En captura, se ejecuta antes que el onclick del play, dejando el contexto listo.
+["pointerdown","touchend","mousedown","keydown"].forEach(ev=>{
+  window.addEventListener(ev, ()=>CompasAudio.desbloquear(), {capture:true, passive:true});
+});
 let compasMute=false; try{ compasMute=localStorage.getItem("cuchillo_compas_mute")==="1"; }catch{}
 let compasState={ playing:false, timer:null, rafId:null, beat:0, nextTime:0, pattern:[], bpm:90, curBeat:-1, cola:[], scope:"" };
 function compasToggleMute(){
