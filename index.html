@@ -131,7 +131,12 @@
   .cp-play.on{background:var(--tinta)}
   .cp-play svg{width:15px;height:15px;fill:currentColor}
   .cp-play span{display:none}
-  .cp-bpm{font-size:.8rem;color:var(--tinta-2);letter-spacing:.04em;flex:0 0 auto}
+  .cp-bpm{font-size:.8rem;color:var(--tinta-2);letter-spacing:.04em;flex:0 0 auto;min-width:52px;text-align:right}
+  .cp-vel{flex-wrap:nowrap;gap:9px}
+  .cp-stepper{display:inline-flex;align-items:center;gap:0;border:1px solid var(--linea);border-radius:999px;overflow:hidden;background:var(--papel)}
+  .cp-step{width:38px;height:38px;border:0;background:transparent;color:var(--vino);font-size:1.3rem;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+  .cp-step:active{background:rgba(122,30,45,.08)}
+  .cp-step-val{min-width:40px;text-align:center;font-size:1rem;font-weight:600;color:var(--tinta);font-variant-numeric:tabular-nums}
   .cp-grid{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;overflow-x:auto;overflow-y:visible;min-width:0;flex:1 1 auto;padding:9px 4px 9px 14px;margin:0;-webkit-overflow-scrolling:touch}
   .cp-beat{flex:0 0 auto;width:11px;height:11px;border-radius:50%;background:#E7DCC6;border:1px solid var(--linea-2);transition:transform .15s,box-shadow .15s}
   .cp-beat.palma{background:var(--oro);border-color:var(--oro)}
@@ -558,16 +563,20 @@
       <input id="cp-titulo" type="text" placeholder="Ej. Fandango de Alosno" />
     </div>
     <div class="cp-row">
-      <label for="cp-pulsos">Nº de pulsos</label>
-      <input id="cp-pulsos" type="number" min="2" max="16" value="12" style="width:72px" />
+      <label>Nº de pulsos</label>
+      <div class="cp-stepper">
+        <button type="button" class="cp-step" aria-label="Menos pulsos" onclick="cpPulsosDelta(-1)">−</button>
+        <span id="cp-pulsos-val" class="cp-step-val">12</span>
+        <button type="button" class="cp-step" aria-label="Más pulsos" onclick="cpPulsosDelta(1)">+</button>
+      </div>
     </div>
     <p class="cp-edit-hint">Pulsa cada casilla para cambiarla: <b>palma</b> (flojo) → <b>pie</b> (fuerte) → <b>silencio</b> (no suena).</p>
     <div class="cp-edit-grid" id="cp-edit-grid"></div>
     <div class="cp-leyenda" style="margin:2px 0 12px"><span class="cp-dot pie"></span> Pie (fuerte) &nbsp;·&nbsp; <span class="cp-dot palma"></span> Palma (flojo) &nbsp;·&nbsp; <span class="cp-dot silencio"></span> Silencio</div>
-    <div class="cp-row">
+    <div class="cp-row cp-vel">
       <label for="cp-bpm">Velocidad</label>
-      <input id="cp-bpm" type="range" min="40" max="200" value="90" style="flex:1 1 140px;min-width:120px" />
-      <span id="cp-bpm-val" class="cp-bpm">90 ppm</span>
+      <input id="cp-bpm" type="range" min="40" max="200" value="90" style="flex:1 1 60px;min-width:60px" />
+      <span id="cp-bpm-val" class="cp-bpm">90 bpm</span>
       <button type="button" id="cp-edit-play" class="cp-play" onclick="compasPreview()"><span>Reproducir</span></button>
     </div>
     <div class="media-box">
@@ -1498,7 +1507,7 @@ function compasVarianteHTML(c, idx, paloArg){
     <div class="cp-controls">
       <button id="cp-play-${idx}" class="cp-play" title="Reproducir" aria-label="Reproducir" onclick="compasTogglePagina(${idx})">${PLAY_SVG}<span>Reproducir</span></button>
       <div class="cp-grid" id="cp-grid-${idx}">${dots}</div>
-      <span class="cp-bpm">${c.bpm} ppm</span>
+      <span class="cp-bpm">${c.bpm} bpm</span>
     </div>
     <div class="cp-leyenda"><span class="cp-dot pie"></span> Pie (fuerte) &nbsp;·&nbsp; <span class="cp-dot palma"></span> Palma (flojo) &nbsp;·&nbsp; <span class="cp-dot silencio"></span> Silencio</div>
     ${c.audios.length?`<div class="cp-audios">${c.audios.map(a=>audioPlayerHTML(a.url,a.nombre)).join("")}</div>`:""}
@@ -1780,8 +1789,8 @@ function editarCompasPalo(nombre, idx){
   };
   $("#cpTit").textContent=(esNuevo?"Nuevo compás · ":"Editar compás · ")+nombre;
   $("#cp-titulo").value=compasEdit.titulo;
-  $("#cp-pulsos").value=compasEdit.pulsos;
-  $("#cp-bpm").value=compasEdit.bpm; $("#cp-bpm-val").textContent=compasEdit.bpm+" ppm";
+  $("#cp-pulsos-val").textContent=compasEdit.pulsos;
+  $("#cp-bpm").value=compasEdit.bpm; $("#cp-bpm-val").textContent=compasEdit.bpm+" bpm";
   $("#cp-autor").value=compasEdit.autor;
   $("#cp-audio-file").value="";
   cpRenderGrid(); cpRenderAudios();
@@ -1814,15 +1823,19 @@ function cpQuitarAudio(i){
 window.cpQuitarAudio=cpQuitarAudio;
 $("#cp-titulo").oninput=()=>{ compasEdit.titulo=$("#cp-titulo").value; };
 $("#cp-autor").oninput=()=>{ compasEdit.autor=$("#cp-autor").value; };
-$("#cp-pulsos").oninput=()=>{
-  let n=Math.max(2,Math.min(16, parseInt($("#cp-pulsos").value,10)||12));
+function cpPulsosDelta(d){
+  if(!compasEdit) return;
+  const n=Math.max(2,Math.min(16,(parseInt(compasEdit.pulsos,10)||12)+d));
   const p=compasEdit.patron;
   if(n>p.length){ while(p.length<n) p.push("palma"); } else { p.length=n; }
-  compasEdit.pulsos=n; cpRenderGrid();
-};
+  compasEdit.pulsos=n;
+  $("#cp-pulsos-val").textContent=n;
+  cpRenderGrid();
+}
+window.cpPulsosDelta=cpPulsosDelta;
 $("#cp-bpm").oninput=()=>{
   compasEdit.bpm=parseInt($("#cp-bpm").value,10)||90;
-  $("#cp-bpm-val").textContent=compasEdit.bpm+" ppm";
+  $("#cp-bpm-val").textContent=compasEdit.bpm+" bpm";
   if(compasState.playing && compasState.scope==="#cp-edit-grid") compasState.bpm=compasEdit.bpm;
 };
 $("#cp-audio-file").onchange=()=>{
