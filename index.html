@@ -293,6 +293,16 @@
   .dmeta-lbl{color:var(--tinta-2);font-weight:600}
   .dmeta b{color:var(--vino);font-weight:600}
   .dletra{font-family:"Spectral",serif;font-style:italic;font-size:clamp(1.1rem,3vw,1.28rem);line-height:1.75;white-space:pre-wrap;color:#3c332a;border-left:3px solid var(--palo,var(--oro));padding:6px 0 6px 18px;margin:0 0 28px}
+  .dletra-wrap{margin:0 0 28px}
+  .dletra-wrap .dletra{margin:0}
+  /* Dos columnas en pantallas anchas cuando la letra es larga */
+  .dletra.cols{column-count:2;column-gap:40px}
+  @media (max-width:640px){ .dletra.cols{column-count:auto;column-gap:normal} }
+  /* Plegado con "ver más" */
+  .dletra.clamp{max-height:var(--letra-max,520px);overflow:hidden;position:relative}
+  @media (max-width:640px){ .dletra.clamp{max-height:var(--letra-max-mov,300px)} }
+  .dletra.clamp::after{content:"";position:absolute;left:0;right:0;bottom:0;height:64px;pointer-events:none;background:linear-gradient(rgba(246,241,230,0),var(--cal))}
+  .letra-mas{margin:10px 0 0}
   .dmedia{margin:0 0 22px}
   .dmedia audio.paudio{display:none}
   .player{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--linea-2);border-radius:14px;padding:10px 14px;box-shadow:var(--sombra-sm)}
@@ -1559,7 +1569,7 @@ function renderDetalle(id){
     <h1 class="dtitulo">${escapar(it.titulo||it.estilo||"Sin título")}</h1>
     ${dmeta}
     ${fClase}
-    ${it.letra?`<div class="dletra">${escapar(it.letra)}</div>`:""}
+    ${it.letra?letraHTML(it.letra):""}
     ${mediaHTML(it)}
     <div class="dfoot">
       <div class="dwho">
@@ -1574,7 +1584,52 @@ function renderDetalle(id){
   </div>`;
   wireSpeed(cont);
   wirePlayer(cont);
+  reajustarLetra();
 }
+
+/* ---------- Letra: dos columnas + "ver más" ---------- */
+function letraHTML(letra){
+  const lineas = (letra.match(/\n/g)||[]).length + 1;
+  const largo = lineas > 14 || letra.length > 520;
+  // Dos columnas (en PC) cuando es larga; el plegado lo decide ajustarLetra tras medir.
+  const cls = "dletra" + (largo ? " cols" : "");
+  const btn = largo ? `<button class="ver-mas letra-mas" id="letraMas" style="display:none" onclick="toggleLetra()">Ver más</button>` : "";
+  return `<div class="dletra-wrap"><div class="${cls}" id="letraBox">${escapar(letra)}</div>${btn}</div>`;
+}
+function ajustarLetra(){
+  const box=document.getElementById("letraBox"), btn=document.getElementById("letraMas");
+  if(!box) return;
+  if(!box.classList.contains("cols")){ if(btn) btn.style.display="none"; return; }
+  // Medimos la altura NATURAL (sin recortar) y la comparamos con el tope del dispositivo.
+  box.classList.remove("clamp");
+  const esMovil = window.matchMedia("(max-width:640px)").matches;
+  const tope = esMovil ? 300 : 520;
+  if(box.scrollHeight > tope + 8){
+    box.classList.add("clamp");
+    if(btn){ btn.style.display=""; btn.textContent="Ver más"; }
+  } else {
+    if(btn) btn.style.display="none";
+  }
+}
+function toggleLetra(){
+  const box=document.getElementById("letraBox"), btn=document.getElementById("letraMas");
+  if(!box||!btn) return;
+  const plegado=box.classList.toggle("clamp");
+  btn.textContent = plegado ? "Ver más" : "Ver menos";
+}
+window.toggleLetra=toggleLetra;
+// Recalcula solo si el usuario no ha desplegado la letra manualmente.
+function ajustarLetraSiProcede(){
+  const btn=document.getElementById("letraMas");
+  if(btn && btn.textContent==="Ver menos") return;
+  ajustarLetra();
+}
+function reajustarLetra(){
+  // Medimos tras el layout (el detalle puede no estar visible aún) y con las fuentes listas.
+  requestAnimationFrame(()=>requestAnimationFrame(ajustarLetraSiProcede));
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarLetraSiProcede);
+}
+let _letraRz; window.addEventListener("resize", ()=>{ clearTimeout(_letraRz); _letraRz=setTimeout(reajustarLetra, 180); });
 
 /* ---------- Rutas ---------- */
 function pararMedios(){ document.querySelectorAll("#detail audio, #detail video, #board audio").forEach(m=>{ try{ m.pause(); }catch(e){} }); try{ compasParar(); }catch(e){} }
