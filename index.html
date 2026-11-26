@@ -316,6 +316,8 @@
   .loop-btn{display:inline-flex;align-items:center;gap:6px;background:var(--papel);border:1px solid var(--linea-2);color:var(--tinta-2);border-radius:999px;padding:5px 12px;font-family:"Spectral",serif;font-size:.82rem;cursor:pointer;line-height:1.2}
   .loop-btn:hover{border-color:var(--oro);color:var(--vino)}
   .loop-btn svg{display:block;width:16px;height:16px}
+  .skip-btn{padding:4px 11px}
+  .skip-btn svg{width:24px;height:24px}
   .loop-btn.on{background:var(--vino);border-color:var(--vino);color:#fff}
   .player{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--linea-2);border-radius:14px;padding:10px 14px;box-shadow:var(--sombra-sm)}
   .pbtn{flex:none;width:46px;height:46px;border-radius:50%;border:0;background:var(--vino);color:#fff;font-size:1.15rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0}
@@ -1304,8 +1306,9 @@ function audiosDe(it){
   return [];
 }
 const SPEED_BTNS = `<div class="speed"><span>Velocidad</span><button data-r="0.5">0.5×</button><button data-r="0.75">0.75×</button><button data-r="1" class="on">1×</button><button data-r="1.25">1.25×</button><button data-r="1.5">1.5×</button></div>`;
+const SKIP_SVG=(adelante)=>`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path ${adelante?'transform="translate(24 0) scale(-1 1)" ':''}d="M11.99 5V1l-5 5 5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6h-2c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="12" y="16.4" text-anchor="middle" font-size="7.4" font-weight="700" font-family="Spectral,Georgia,serif">10</text></svg>`;
 const LOOP_SVG='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>';
-function loopRowHTML(){ return `<div class="loop-row"><button type="button" class="loop-btn" aria-pressed="false" title="Repetir en bucle">${LOOP_SVG}<span>Bucle</span></button><button type="button" class="loop-btn skip-btn" data-s="-10" title="Atrasar 10 segundos" aria-label="Atrasar 10 segundos"><span>−10 s</span></button><button type="button" class="loop-btn skip-btn" data-s="10" title="Adelantar 10 segundos" aria-label="Adelantar 10 segundos"><span>+10 s</span></button></div>`; }
+function loopRowHTML(){ return `<div class="loop-row"><button type="button" class="loop-btn" aria-pressed="false" title="Repetir en bucle">${LOOP_SVG}<span>Bucle</span></button><button type="button" class="loop-btn skip-btn" data-s="-10" title="Atrasar 10 segundos" aria-label="Atrasar 10 segundos">${SKIP_SVG(false)}</button><button type="button" class="loop-btn skip-btn" data-s="10" title="Adelantar 10 segundos" aria-label="Adelantar 10 segundos">${SKIP_SVG(true)}</button></div>`; }
 const PLAY_SVG='<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
 const PAUSE_SVG='<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4.5" height="14" rx="1"/><rect x="13.5" y="5" width="4.5" height="14" rx="1"/></svg>';
 const SPK_ON='<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M4 9v6h4l5 4V5L8 9H4z"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M16.5 8.5a5 5 0 0 1 0 7M18.9 6.1a8 8 0 0 1 0 11.8"/></svg>';
