@@ -1305,7 +1305,7 @@ function audiosDe(it){
 }
 const SPEED_BTNS = `<div class="speed"><span>Velocidad</span><button data-r="0.5">0.5×</button><button data-r="0.75">0.75×</button><button data-r="1" class="on">1×</button><button data-r="1.25">1.25×</button><button data-r="1.5">1.5×</button></div>`;
 const LOOP_SVG='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>';
-function loopRowHTML(){ return `<div class="loop-row"><button type="button" class="loop-btn" aria-pressed="false" title="Repetir en bucle">${LOOP_SVG}<span>Bucle</span></button></div>`; }
+function loopRowHTML(){ return `<div class="loop-row"><button type="button" class="loop-btn" aria-pressed="false" title="Repetir en bucle">${LOOP_SVG}<span>Bucle</span></button><button type="button" class="loop-btn skip-btn" data-s="-10" title="Atrasar 10 segundos" aria-label="Atrasar 10 segundos"><span>−10 s</span></button><button type="button" class="loop-btn skip-btn" data-s="10" title="Adelantar 10 segundos" aria-label="Adelantar 10 segundos"><span>+10 s</span></button></div>`; }
 const PLAY_SVG='<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
 const PAUSE_SVG='<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4.5" height="14" rx="1"/><rect x="13.5" y="5" width="4.5" height="14" rx="1"/></svg>';
 const SPK_ON='<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M4 9v6h4l5 4V5L8 9H4z"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M16.5 8.5a5 5 0 0 1 0 7M18.9 6.1a8 8 0 0 1 0 11.8"/></svg>';
@@ -1358,6 +1358,14 @@ function wirePlayer(scope){
       const on=!audio.loop; audio.loop=on;
       lb.classList.toggle("on", on); lb.setAttribute("aria-pressed", on?"true":"false");
     };
+    item.querySelectorAll(".skip-btn").forEach(sb=>{
+      sb.onclick=()=>{
+        const d=audio.duration; if(!isFinite(d)||!d) return;
+        let t=audio.currentTime+parseFloat(sb.dataset.s);
+        if(t>=d) t = audio.loop ? t % d : d;      // en bucle, al pasarse del final se vuelve al principio
+        audio.currentTime=Math.max(0,t);
+      };
+    });
     audio.addEventListener("play", icon);
     audio.addEventListener("pause", icon);
     audio.addEventListener("ended", ()=>{ icon(); if(fill) fill.style.width="0%"; });
@@ -2170,7 +2178,7 @@ function renderAyuda(){
       <li><b>Cursos:</b> al entrar en un curso (por ejemplo, "Curso 2026-2027"), podrás ver los cantes de esa edición. Hay además un apartado <b>"Otras letras de clase"</b> para las letras sueltas que traiga la gente y no pertenezcan a un curso concreto.</li>
       <li><b>Palos:</b> al entrar en un palo (soleá, bulerías…), podrás ver todo lo de ese palo: su descripción, su compás, las recomendaciones y todos sus cantes, sin importar cuándo se aprendieron.</li>
     </ul>
-    <p>El buscador encuentra por título, palo, cantaor o letra. Al pulsar en una ficha de cante, se abre con su letra completa, sus audios (con control de velocidad para estudiar despacio y botón <b>Bucle</b> para repetirlos) y las referencias de <b>YouTube</b> y <b>Spotify</b> si las hubiera. Desde la página del cante, pulsando el nombre del palo (arriba) también se va directamente a su página.</p>
+    <p>El buscador encuentra por título, palo, cantaor o letra. Al pulsar en una ficha de cante, se abre con su letra completa, sus audios (con control de velocidad para estudiar despacio y botones para repetirlos en <b>Bucle</b> o <b>atrasar/adelantar 10 segundos</b>) y las referencias de <b>YouTube</b> y <b>Spotify</b> si las hubiera. Desde la página del cante, pulsando el nombre del palo (arriba) también se va directamente a su página.</p>
 
     <h2>El compás</h2>
     <p>En cada palo se pueden crear una o varias <b>variantes</b> de compás con <b>＋ Añadir compás</b>. Para construirlo, eliges el número de pulsos con los botones <b>−/+</b> y pulsas cada casilla para marcar qué suena en cada tiempo:</p>
