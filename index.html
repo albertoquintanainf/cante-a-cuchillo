@@ -218,13 +218,6 @@
   .explora-chip:hover{border-color:var(--palo,var(--oro));transform:translateY(-1px)}
   .explora-chip .dot{width:11px;height:11px;border-radius:50%;background:var(--palo,var(--oro));flex:none}
   .explora-chip .n{font-size:.8rem;color:var(--tinta-2);font-variant-numeric:tabular-nums}
-  .explora-chip.curso .dot{border-radius:3px}
-  .explora-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .explora-card{display:flex;flex-direction:column;gap:2px;padding:14px 16px;border-radius:14px;background:var(--papel);border:1px solid var(--linea);border-left:4px solid var(--vino);color:var(--tinta);text-decoration:none;box-shadow:var(--sombra-sm)}
-  .explora-card:hover{border-color:var(--vino)}
-  .explora-card b{font-family:"Bodoni Moda",serif;font-size:1.05rem}
-  .explora-card span{font-size:.85rem;color:var(--tinta-2)}
-  @media (max-width:420px){ .explora-card{padding:12px 12px} .explora-card b{font-size:.98rem} }
   .palo-head{display:flex;align-items:baseline;gap:14px;margin:0 0 16px}
   .palo-head h2{font-family:"Bodoni Moda",serif;font-weight:700;font-size:clamp(1.45rem,4.5vw,2.1rem);margin:0;color:var(--tinta)}
   .palo-head-link{color:inherit;text-decoration:none}
@@ -1159,19 +1152,15 @@ function seccion(titulo, col, arr, opts, linkPalo, sinConteo){
 function explorarHTML(){
   const cantes={}; DATOS.forEach(d=>{ if(d.palo) cantes[d.palo]=(cantes[d.palo]||0)+1; });
   const palos=[...new Set([...Object.keys(cantes), ...Object.keys(PALO_RECS).filter(p=>(PALO_RECS[p]||[]).length)])].sort((a,b)=>ordenPalo(a)-ordenPalo(b));
-  const nCurso={}; DATOS.forEach(d=>{ if(d.curso) nCurso[d.curso]=(nCurso[d.curso]||0)+1; });
-  const cursos=cursosConocidos().map(c=>c.nombre).filter(c=>nCurso[c]);
   const totalRecs=Object.values(PALO_RECS).reduce((t,a)=>t+(a?a.length:0),0);
   const colDe=p=>{ const c=colorPalo(p); return (c||"").toUpperCase()==="#FFFFFF" ? "var(--oro)" : c; };
   const chipsPalos = palos.map(p=>`<a class="explora-chip" href="#palo=${encodeURIComponent(p)}" style="--palo:${colDe(p)}"><span class="dot"></span>${escapar(p)}<span class="n">${cantes[p]||0}</span></a>`).join("");
-  const chipsCursos = cursos.map(c=>`<a class="explora-chip curso" href="#curso=${encodeURIComponent(c)}" style="--palo:var(--oro)"><span class="dot"></span>${escapar(c)}<span class="n">${nCurso[c]}</span></a>`).join("");
   return `<section class="explora">
     <div class="palo-head" style="--palo:var(--vino)"><h2>Explora el cuaderno</h2><span class="rule"></span></div>
     ${palos.length?`<p class="explora-sub">Por palos</p><div class="explora-chips">${chipsPalos}</div>`:""}
-    ${cursos.length?`<p class="explora-sub">Por cursos</p><div class="explora-chips">${chipsCursos}</div>`:""}
-    <div class="explora-cards">
-      <a class="explora-card" href="#todos"><b>Todos los cantes</b><span>${DATOS.length} ${DATOS.length===1?"cante":"cantes"}</span></a>
-      <a class="explora-card" href="#recomendaciones"><b>Recomendaciones</b><span>${totalRecs} ${totalRecs===1?"recomendación":"recomendaciones"}</span></a>
+    <div class="explora-chips">
+      <a class="explora-chip" href="#todos" style="--palo:var(--tinta)"><span class="dot"></span>Todos los cantes<span class="n">${DATOS.length}</span></a>
+      <a class="explora-chip" href="#recomendaciones" style="--palo:#B14A86"><span class="dot"></span>Todas las recomendaciones<span class="n">${totalRecs}</span></a>
     </div>
   </section>`;
 }
@@ -2173,7 +2162,7 @@ function renderAyuda(){
     <p class="intro">Esto es el cuaderno vivo del taller de cante flamenco impartido por 'El Cuchillero' en Espacio Loseta. Entre todxs, guardamos las letras, las grabaciones y las referencias de cada cante aprendidos en el taller, ordenados por palo, estilos y cronología de las clases.</p>
 
     <h2>¿Cómo moverte por la web?</h2>
-    <p>La página de <b>Inicio</b> tiene dos partes: arriba, <b>Explora el cuaderno</b>, con todos los <b>palos</b> y <b>cursos</b> (con el número de cantes de cada uno) y accesos a <i>Todos los cantes</i> y <i>Recomendaciones</i>; y debajo, las <b>últimas actualizaciones</b>, que son solo los cantes de las últimas clases y no todo lo que hay en el cuaderno. Pulsa cualquier palo o curso para entrar. Además, el botón <b>☰</b> (arriba a la derecha) despliega el menú con todas las formas de mirar el cuaderno:</p>
+    <p>La página de <b>Inicio</b> tiene dos partes: arriba, <b>Explora el cuaderno</b>, con todos los <b>palos</b> (con el número de cantes de cada uno) y accesos a <i>Todos los cantes</i> y <i>Todas las recomendaciones</i>; y debajo, las <b>últimas actualizaciones</b>, que son solo los cantes de las últimas clases y no todo lo que hay en el cuaderno. Pulsa cualquier palo para entrar. Los cursos están en el menú. Además, el botón <b>☰</b> (arriba a la derecha) despliega el menú con todas las formas de mirar el cuaderno:</p>
     <ul>
       <li><b>Inicio:</b> la portada con las últimas actualizaciones.</li>
       <li><b>Todos los cantes:</b> el listado completo, agrupado por palo.</li>
