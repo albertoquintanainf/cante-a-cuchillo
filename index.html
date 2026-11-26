@@ -211,6 +211,20 @@
   .estado b{color:var(--tinta);font-weight:500}
 
   .palo-sec{margin:28px 0 6px}
+  .explora{margin:0 0 34px}
+  .explora-sub{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--tinta-2);margin:0 0 8px}
+  .explora-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+  .explora-chip{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:6px 14px;border-radius:999px;background:var(--papel);border:1px solid var(--linea);color:var(--tinta);text-decoration:none;font-size:.95rem;box-shadow:var(--sombra-sm);transition:border-color .15s,transform .15s}
+  .explora-chip:hover{border-color:var(--palo,var(--oro));transform:translateY(-1px)}
+  .explora-chip .dot{width:11px;height:11px;border-radius:50%;background:var(--palo,var(--oro));flex:none}
+  .explora-chip .n{font-size:.8rem;color:var(--tinta-2);font-variant-numeric:tabular-nums}
+  .explora-chip.curso .dot{border-radius:3px}
+  .explora-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .explora-card{display:flex;flex-direction:column;gap:2px;padding:14px 16px;border-radius:14px;background:var(--papel);border:1px solid var(--linea);border-left:4px solid var(--vino);color:var(--tinta);text-decoration:none;box-shadow:var(--sombra-sm)}
+  .explora-card:hover{border-color:var(--vino)}
+  .explora-card b{font-family:"Bodoni Moda",serif;font-size:1.05rem}
+  .explora-card span{font-size:.85rem;color:var(--tinta-2)}
+  @media (max-width:420px){ .explora-card{padding:12px 12px} .explora-card b{font-size:.98rem} }
   .palo-head{display:flex;align-items:baseline;gap:14px;margin:0 0 16px}
   .palo-head h2{font-family:"Bodoni Moda",serif;font-weight:700;font-size:clamp(1.45rem,4.5vw,2.1rem);margin:0;color:var(--tinta)}
   .palo-head-link{color:inherit;text-decoration:none}
@@ -305,6 +319,11 @@
   .letra-mas{margin:10px 0 0}
   .dmedia{margin:0 0 22px}
   .dmedia audio.paudio{display:none}
+  .loop-row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .loop-btn{display:inline-flex;align-items:center;gap:6px;background:var(--papel);border:1px solid var(--linea-2);color:var(--tinta-2);border-radius:999px;padding:5px 12px;font-family:"Spectral",serif;font-size:.82rem;cursor:pointer;line-height:1.2}
+  .loop-btn:hover{border-color:var(--oro);color:var(--vino)}
+  .loop-btn svg{display:block;width:16px;height:16px}
+  .loop-btn.on{background:var(--vino);border-color:var(--vino);color:#fff}
   .player{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--linea-2);border-radius:14px;padding:10px 14px;box-shadow:var(--sombra-sm)}
   .pbtn{flex:none;width:46px;height:46px;border-radius:50%;border:0;background:var(--vino);color:#fff;font-size:1.15rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0}
   .pbtn:hover{background:var(--vino-claro)}
@@ -1137,6 +1156,25 @@ function seccion(titulo, col, arr, opts, linkPalo, sinConteo){
     <div class="grid">${arr.map(it=>tarjeta(it, opts)).join("")}</div>
   </section>`;
 }
+function explorarHTML(){
+  const cantes={}; DATOS.forEach(d=>{ if(d.palo) cantes[d.palo]=(cantes[d.palo]||0)+1; });
+  const palos=[...new Set([...Object.keys(cantes), ...Object.keys(PALO_RECS).filter(p=>(PALO_RECS[p]||[]).length)])].sort((a,b)=>ordenPalo(a)-ordenPalo(b));
+  const nCurso={}; DATOS.forEach(d=>{ if(d.curso) nCurso[d.curso]=(nCurso[d.curso]||0)+1; });
+  const cursos=cursosConocidos().map(c=>c.nombre).filter(c=>nCurso[c]);
+  const totalRecs=Object.values(PALO_RECS).reduce((t,a)=>t+(a?a.length:0),0);
+  const colDe=p=>{ const c=colorPalo(p); return (c||"").toUpperCase()==="#FFFFFF" ? "var(--oro)" : c; };
+  const chipsPalos = palos.map(p=>`<a class="explora-chip" href="#palo=${encodeURIComponent(p)}" style="--palo:${colDe(p)}"><span class="dot"></span>${escapar(p)}<span class="n">${cantes[p]||0}</span></a>`).join("");
+  const chipsCursos = cursos.map(c=>`<a class="explora-chip curso" href="#curso=${encodeURIComponent(c)}" style="--palo:var(--oro)"><span class="dot"></span>${escapar(c)}<span class="n">${nCurso[c]}</span></a>`).join("");
+  return `<section class="explora">
+    <div class="palo-head" style="--palo:var(--vino)"><h2>Explora el cuaderno</h2><span class="rule"></span></div>
+    ${palos.length?`<p class="explora-sub">Por palos</p><div class="explora-chips">${chipsPalos}</div>`:""}
+    ${cursos.length?`<p class="explora-sub">Por cursos</p><div class="explora-chips">${chipsCursos}</div>`:""}
+    <div class="explora-cards">
+      <a class="explora-card" href="#todos"><b>Todos los cantes</b><span>${DATOS.length} ${DATOS.length===1?"cante":"cantes"}</span></a>
+      <a class="explora-card" href="#recomendaciones"><b>Recomendaciones</b><span>${totalRecs} ${totalRecs===1?"recomendación":"recomendaciones"}</span></a>
+    </div>
+  </section>`;
+}
 function vacio(){
   board.innerHTML=`<div class="empty"><p>Todavía no hay cantes que mostrar.</p></div>`;
 }
@@ -1182,7 +1220,7 @@ function render(){
     const MAX_CANTES = 8;
     const recientes = [...DATOS].sort((a,b)=>fechaClaseTs(b)-fechaClaseTs(a)).slice(0, MAX_CANTES);
     if(!recientes.length) return vacio();
-    board.innerHTML=seccion("Últimas actualizaciones", "var(--vino)", recientes, {mostrarPalo:true, mostrarCurso:true}, "", true);
+    board.innerHTML=explorarHTML()+seccion("Últimas actualizaciones", "var(--vino)", recientes, {mostrarPalo:true, mostrarCurso:true}, "", true);
     return;
   }
   // Últimas actualizaciones: los cantes más recientes (por fecha de la clase)
@@ -1277,6 +1315,8 @@ function audiosDe(it){
   return [];
 }
 const SPEED_BTNS = `<div class="speed"><span>Velocidad</span><button data-r="0.5">0.5×</button><button data-r="0.75">0.75×</button><button data-r="1" class="on">1×</button><button data-r="1.25">1.25×</button><button data-r="1.5">1.5×</button></div>`;
+const LOOP_SVG='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>';
+function loopRowHTML(){ return `<div class="loop-row"><button type="button" class="loop-btn" aria-pressed="false" title="Repetir en bucle">${LOOP_SVG}<span>Bucle</span></button></div>`; }
 const PLAY_SVG='<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
 const PAUSE_SVG='<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4.5" height="14" rx="1"/><rect x="13.5" y="5" width="4.5" height="14" rx="1"/></svg>';
 const SPK_ON='<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M4 9v6h4l5 4V5L8 9H4z"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M16.5 8.5a5 5 0 0 1 0 7M18.9 6.1a8 8 0 0 1 0 11.8"/></svg>';
@@ -1299,6 +1339,7 @@ function mediaHTML(it){
         <div class="pbar"><div class="pfill"></div></div>
         <span class="ptime"><span class="pcur">0:00</span> / <span class="pdur">0:00</span></span>
       </div>
+      ${loopRowHTML()}
       <audio class="paudio" preload="metadata" src="${escapar(a.url)}"></audio>
       ${SPEED_BTNS}
     </div>`;
@@ -1323,6 +1364,11 @@ function wirePlayer(scope){
           cur=item.querySelector(".pcur"), dur=item.querySelector(".pdur");
     const icon=()=>{ if(btn) btn.innerHTML = audio.paused ? PLAY_SVG : PAUSE_SVG; };
     if(btn) btn.onclick=()=>{ if(audio.paused){ try{ audio.play(); }catch(e){} } else audio.pause(); };
+    const lb=item.querySelector(".loop-btn");
+    if(lb) lb.onclick=()=>{
+      const on=!audio.loop; audio.loop=on;
+      lb.classList.toggle("on", on); lb.setAttribute("aria-pressed", on?"true":"false");
+    };
     audio.addEventListener("play", icon);
     audio.addEventListener("pause", icon);
     audio.addEventListener("ended", ()=>{ icon(); if(fill) fill.style.width="0%"; });
@@ -1500,6 +1546,7 @@ function audioPlayerHTML(url,nombre){
       <div class="pbar"><div class="pfill"></div></div>
       <span class="ptime"><span class="pcur">0:00</span> / <span class="pdur">0:00</span></span>
     </div>
+    ${loopRowHTML()}
     <audio class="paudio" preload="metadata" src="${escapar(url)}"></audio>
   </div>`;
 }
@@ -2126,7 +2173,7 @@ function renderAyuda(){
     <p class="intro">Esto es el cuaderno vivo del taller de cante flamenco impartido por 'El Cuchillero' en Espacio Loseta. Entre todxs, guardamos las letras, las grabaciones y las referencias de cada cante aprendidos en el taller, ordenados por palo, estilos y cronología de las clases.</p>
 
     <h2>¿Cómo moverte por la web?</h2>
-    <p>Al entrar, en <b>Inicio</b> podrás ver las <b>últimas actualizaciones</b>: los cantes de las últimas clases ordenados cronológicamente. En el botón <b>☰</b> (arriba a la derecha) se despliega el menú con todas las formas de mirar el cuaderno:</p>
+    <p>La página de <b>Inicio</b> tiene dos partes: arriba, <b>Explora el cuaderno</b>, con todos los <b>palos</b> y <b>cursos</b> (con el número de cantes de cada uno) y accesos a <i>Todos los cantes</i> y <i>Recomendaciones</i>; y debajo, las <b>últimas actualizaciones</b>, que son solo los cantes de las últimas clases y no todo lo que hay en el cuaderno. Pulsa cualquier palo o curso para entrar. Además, el botón <b>☰</b> (arriba a la derecha) despliega el menú con todas las formas de mirar el cuaderno:</p>
     <ul>
       <li><b>Inicio:</b> la portada con las últimas actualizaciones.</li>
       <li><b>Todos los cantes:</b> el listado completo, agrupado por palo.</li>
@@ -2134,14 +2181,14 @@ function renderAyuda(){
       <li><b>Cursos:</b> al entrar en un curso (por ejemplo, "Curso 2026-2027"), podrás ver los cantes de esa edición. Hay además un apartado <b>"Otras letras de clase"</b> para las letras sueltas que traiga la gente y no pertenezcan a un curso concreto.</li>
       <li><b>Palos:</b> al entrar en un palo (soleá, bulerías…), podrás ver todo lo de ese palo: su descripción, su compás, las recomendaciones y todos sus cantes, sin importar cuándo se aprendieron.</li>
     </ul>
-    <p>El buscador encuentra por título, palo, cantaor o letra. Al pulsar en una ficha de cante, se abre con su letra completa, sus audios (con control de velocidad, para estudiar despacio) y las referencias de <b>YouTube</b> y <b>Spotify</b> si las hubiera. Desde la página del cante, pulsando el nombre del palo (arriba) también se va directamente a su página.</p>
+    <p>El buscador encuentra por título, palo, cantaor o letra. Al pulsar en una ficha de cante, se abre con su letra completa, sus audios (con control de velocidad para estudiar despacio y botón <b>Bucle</b> para repetirlos) y las referencias de <b>YouTube</b> y <b>Spotify</b> si las hubiera. Desde la página del cante, pulsando el nombre del palo (arriba) también se va directamente a su página.</p>
 
     <h2>El compás</h2>
     <p>En cada palo se pueden crear una o varias <b>variantes</b> de compás con <b>＋ Añadir compás</b>. Para construirlo, eliges el número de pulsos con los botones <b>−/+</b> y pulsas cada casilla para marcar qué suena en cada tiempo:</p>
     <ul>
       <li><b>Palma</b> (flojo) → <b>Pie</b> (fuerte, el golpe de zapato) → <b>Silencio</b> (no suena). Cada toque sobre la casilla va cambiando entre esas tres opciones.</li>
     </ul>
-    <p>Con la barra de <b>velocidad</b> ajustas los <b>bpm</b> (pulsos por minuto) y con el botón de <b>play</b> lo escuchas: el pie suena como un golpe al suelo y la palma como un aplauso. Puedes silenciarlo con el botón de <b>sonido/silencio</b>. Si quieres, también puedes subir <b>audios de ejemplo</b> (máximo 5 MB cada uno) para acompañar la variante.</p>
+    <p>Con la barra de <b>velocidad</b> ajustas los <b>bpm</b> (pulsos por minuto) y con el botón de <b>play</b> lo escuchas (se repite en bucle hasta que lo pares): el pie suena como un golpe al suelo y la palma como un aplauso. Puedes silenciarlo con el botón de <b>sonido/silencio</b>. Si quieres, también puedes subir <b>audios de ejemplo</b> (máximo 5 MB cada uno) para acompañar la variante.</p>
 
     <h2>Las recomendaciones</h2>
     <p>En la sección de recomendaciones de un palo (o desde <b>Todas las recomendaciones</b>) pulsa <b>＋ Añadir recomendación</b>. Solo son obligatorios el <b>cantaor/cantaora</b> y el <b>estilo</b>; el título del tema, el disco y los enlaces de <b>YouTube</b> o <b>Spotify</b> son opcionales. Si pegas un enlace de Spotify o YouTube, la web intenta rellenar sola el artista y el nombre del tema.</p>
